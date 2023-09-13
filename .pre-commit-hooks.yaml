@@ -2,14 +2,17 @@
   description: format dockerfiles
   entry: pre_commit_hooks/python/format_dockerfile.py
   language: python
-  language_version: 3.10
-  minimum_pre_commit_version: 2.20.0
+  language_version: '3.10'
+  minimum_pre_commit_version: '2.20.0'
   name: format dockerfiles
+  stages:
+      - commit
+      - manual
   types: ["dockerfile"]
 - id: print-detection
   entry: pre_commit_hooks/bassh/print_detection.sh
   language: script
-  minimum_pre_commit_version: 2.20.0
+  minimum_pre_commit_version: '2.20.0'
   name: detect print on python code
   stages:
       - commit

@@ -11,8 +11,8 @@ class PreCommitTools:
 
     def set_params(self, *, help_msg: str, argv: Sequence[str] | None = None) -> argparse.Namespace:
         parser = argparse.ArgumentParser()
-        parser.add_argument("filenames", nargs="*", help=help_msg)
-        parser.add_argument("--force", action="store_true")
+        parser.add_argument('filenames', nargs='*', help=help_msg)
+        parser.add_argument('--force', action='store_true')
         self.args = parser.parse_args(argv)
         return self.args
 
@@ -20,7 +20,7 @@ class PreCommitTools:
         retval: bool = True
         if not file.exists():
             if display:
-                print(f"{file}: not exist")
+                print(f'{file}: not exist')
             retval = False
         return retval
 
@@ -29,7 +29,7 @@ class PreCommitTools:
         if self.file_exist(file=file, display=display):
             if not file.stat().st_size:
                 if display:
-                    print(f"{file}: is empty")
+                    print(f'{file}: is empty')
                 retval = True
         else:
             retval = True

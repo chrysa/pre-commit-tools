@@ -9,6 +9,7 @@ def create_content(*, command: str, content: str) -> str:
     content_content += '```\n'
     return content_content
 
+
 def define_section(*, name: str, level: int = 1) -> str:
     return f"{'#' * level} {name.title()}"
 
@@ -21,7 +22,12 @@ def run_command(*, command: str) -> str:
 
 
 def update_readme(
-    *, start_tag: str, end_tag: str, command: str, command_content_processed: str = None, readme_file_path: Path = None
+    *,
+    start_tag: str,
+    end_tag: str,
+    command: str,
+    command_content_processed: str = None,
+    readme_file_path: Path = None,
 ) -> None:
     if readme_file_path is None:
         readme_file_path = Path(__file__).resolve().parent.parent / 'README.md'

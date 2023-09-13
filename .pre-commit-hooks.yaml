@@ -18,4 +18,3 @@
   stages:
       - commit
       - manual
-      

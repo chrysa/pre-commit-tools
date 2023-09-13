@@ -1,0 +1,15 @@
+[tool.black]
+exclude = '''
+(
+    | \.git
+    | \.benchmark
+    | \.mypy_cache
+    | \.pytest_cache
+    | \.tox
+    | \reports
+)
+'''
+include = '\.py?$'
+line-length = 120
+skip-string-normalization = true
+target-version = ['py310','py311','py312']

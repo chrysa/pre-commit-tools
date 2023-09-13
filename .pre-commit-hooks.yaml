@@ -1,4 +1,6 @@
 - id: format-dockerfiles
+  additional_dependencies:
+      - dockerfile-parse
   description: format dockerfiles
   entry: pre_commit_hooks/python/format_dockerfile.py
   language: python

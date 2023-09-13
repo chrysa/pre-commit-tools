@@ -1,0 +1,17 @@
+- id: format-dockerfiles
+  description: format dockerfiles
+  entry: pre_commit_hooks/format_dockerfile.py
+  language: python
+  name: format dockerfiles
+  types: [Dockerfile]
+  additional_dependencies:
+    - dockerfile-parse
+- id: print-detection
+  entry: scripts/pre_commit_hooks/print_detection.sh
+  files: .py
+  language: script
+  name: detect print on python code
+  stages:
+      - commit
+      - manual
+  types: [python]

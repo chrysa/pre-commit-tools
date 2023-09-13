@@ -3,7 +3,7 @@
   entry: pre_commit_hooks/python/format_dockerfile.py
   language: python
   name: format dockerfiles
-  types: [Dockerfile]
+  types: ["dockerfile"]
   additional_dependencies:
     - dockerfile-parse
 - id: print-detection

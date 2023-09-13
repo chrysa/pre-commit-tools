@@ -6,44 +6,48 @@ default_language_version:
 fail_fast: true
 minimum_pre_commit_version: 2.20.0
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
-    hooks:
-    -   id: trailing-whitespace
-    -   id: end-of-file-fixer
-    -   id: check-yaml
-    -   id: debug-statements
-    -   id: double-quote-string-fixer
-    -   id: name-tests-test
-    -   id: requirements-txt-fixer
--   repo: https://github.com/asottile/setup-cfg-fmt
-    rev: v2.4.0
-    hooks:
-    -   id: setup-cfg-fmt
--   repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.10.0
-    hooks:
-    -   id: reorder-python-imports
+    - repo: https://github.com/asottile/setup-cfg-fmt
+      rev: c3034c131fe0acfd735949fd868c3db47d5fd34c
+      hooks:
+        - id: setup-cfg-fmt
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: 8ef58bed018d657a4ab997236ae2ab4337a92aa9
+      hooks:
+        - id: trailing-whitespace
+        - id: end-of-file-fixer
+        - id: check-yaml
+        - id: debug-statements
+        - id: double-quote-string-fixer
+        - id: name-tests-test
+        - id: requirements-txt-fixer
+    - repo: https://github.com/asottile/setup-cfg-fmt
+      rev: c3034c131fe0acfd735949fd868c3db47d5fd34c
+      hooks:
+        - id: setup-cfg-fmt
+    - repo: https://github.com/asottile/reorder-python-imports
+      rev: f3cff244e317f33ebd6301f2e044766ac1528369
+      hooks:
+      - id: reorder-python-imports
         args: [--py310-plus]
--   repo: https://github.com/asottile/add-trailing-comma
-    rev: v3.1.0
-    hooks:
-    -   id: add-trailing-comma
--   repo: https://github.com/asottile/pyupgrade
-    rev: v3.10.1
-    hooks:
-    -   id: pyupgrade
-        args: [--py38-plus]
--   repo: https://github.com/hhatto/autopep8
-    rev: v2.0.4
-    hooks:
-    -   id: autopep8
--   repo: https://github.com/PyCQA/flake8
-    rev: 6.1.0
-    hooks:
-    -   id: flake8
--   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.5.1
-    hooks:
-    -   id: mypy
-        additional_dependencies: [types-all]
+    - repo: https://github.com/asottile/add-trailing-comma
+      rev: fdcb18fff1ca65900961f02c269b8b9bbdcd097b
+      hooks:
+        - id: add-trailing-comma
+    - repo: https://github.com/asottile/pyupgrade
+      rev: 973eed1621b3431548ccccd25b00436fb253d4e9
+      hooks:
+        - id: pyupgrade
+          args: [--py38-plus]
+    - repo: https://github.com/hhatto/autopep8
+      rev: 4e869ad63a11575267450bfefdf022bb6128ab93
+      hooks:
+        - id: autopep8
+    - repo: https://github.com/PyCQA/flake8
+      rev: 2f90d073891b0b8777915383c35ecf8838680264
+      hooks:
+        - id: flake8
+    - repo: https://github.com/pre-commit/mirrors-mypy
+      rev: v1.5.1
+      hooks:
+        - id: mypy
+          additional_dependencies: [types-all]

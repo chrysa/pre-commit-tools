@@ -8,7 +8,6 @@
   stages:
       - commit
       - manual
-  types: ["dockerfile"]
 - id: print-detection
   entry: pre_commit_hooks/bassh/print_detection.sh
   language: script
@@ -17,4 +16,4 @@
   stages:
       - commit
       - manual
-  types: [python]
+      

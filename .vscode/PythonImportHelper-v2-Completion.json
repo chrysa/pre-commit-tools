@@ -231,6 +231,14 @@
         "documentation": {}
     },
     {
+        "label": "annotations",
+        "importPath": "__future__",
+        "description": "__future__",
+        "isExtraImport": true,
+        "detail": "__future__",
+        "documentation": {}
+    },
+    {
         "label": "google.protobuf.descriptor_pb2",
         "kind": 6,
         "isExtraImport": true,
@@ -322,28 +330,12 @@
         "documentation": {}
     },
     {
-        "label": "subprocess",
+        "label": "argparse",
         "kind": 6,
         "isExtraImport": true,
-        "importPath": "subprocess",
-        "description": "subprocess",
-        "detail": "subprocess",
-        "documentation": {}
-    },
-    {
-        "label": "Path",
-        "importPath": "pathlib",
-        "description": "pathlib",
-        "isExtraImport": true,
-        "detail": "pathlib",
-        "documentation": {}
-    },
-    {
-        "label": "Path",
-        "importPath": "pathlib",
-        "description": "pathlib",
-        "isExtraImport": true,
-        "detail": "pathlib",
+        "importPath": "argparse",
+        "description": "argparse",
+        "detail": "argparse",
         "documentation": {}
     },
     {
@@ -352,6 +344,47 @@
         "description": "collections.abc",
         "isExtraImport": true,
         "detail": "collections.abc",
+        "documentation": {}
+    },
+    {
+        "label": "Sequence",
+        "importPath": "collections.abc",
+        "description": "collections.abc",
+        "isExtraImport": true,
+        "detail": "collections.abc",
+        "documentation": {}
+    },
+    {
+        "label": "Path",
+        "importPath": "pathlib",
+        "description": "pathlib",
+        "isExtraImport": true,
+        "detail": "pathlib",
+        "documentation": {}
+    },
+    {
+        "label": "Path",
+        "importPath": "pathlib",
+        "description": "pathlib",
+        "isExtraImport": true,
+        "detail": "pathlib",
+        "documentation": {}
+    },
+    {
+        "label": "Path",
+        "importPath": "pathlib",
+        "description": "pathlib",
+        "isExtraImport": true,
+        "detail": "pathlib",
+        "documentation": {}
+    },
+    {
+        "label": "subprocess",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "subprocess",
+        "description": "subprocess",
+        "detail": "subprocess",
         "documentation": {}
     },
     {
@@ -1289,11 +1322,29 @@
         "documentation": {}
     },
     {
+        "label": "PreCommitTools",
+        "kind": 6,
+        "importPath": "pre_commit_hooks.python.tools.pre-commit_tools_class",
+        "description": "pre_commit_hooks.python.tools.pre-commit_tools_class",
+        "peekOfCode": "class PreCommitTools:\n    args: argparse.Namespace\n    def set_params(self, *, help_msg: str, argv: Sequence[str] | None = None) -> argparse.Namespace:\n        parser = argparse.ArgumentParser()\n        parser.add_argument(\"filenames\", nargs=\"*\", help=help_msg)\n        parser.add_argument(\"--force\", action=\"store_true\")\n        self.args = parser.parse_args(argv)\n        return self.args\n    def file_exist(self, *, file: Path, display: bool = True) -> bool:\n        retval: bool = True",
+        "detail": "pre_commit_hooks.python.tools.pre-commit_tools_class",
+        "documentation": {}
+    },
+    {
         "label": "create_content",
         "kind": 2,
         "importPath": "pre_commit_hooks.python.tools.update_readme",
         "description": "pre_commit_hooks.python.tools.update_readme",
-        "peekOfCode": "def create_content(*, command: str, content: str) -> str:\n    content_content = '\\n```bash\\n'\n    content_content += f'$ {command}\\n\\n'\n    content_content += f'{content}'\n    content_content += '```\\n'\n    return content_content\ndef run_command(*, command: str) -> str:\n    with subprocess.Popen(command, stdout=subprocess.PIPE, shell=True) as cmd_process_stream:  # nosec\n        output, _ = cmd_process_stream.communicate()\n        cmd_process_stream.wait()",
+        "peekOfCode": "def create_content(*, command: str, content: str) -> str:\n    content_content = '\\n```bash\\n'\n    content_content += f'$ {command}\\n\\n'\n    content_content += f'{content}'\n    content_content += '```\\n'\n    return content_content\ndef define_section(*, name: str, level: int = 1) -> str:\n    return f\"{'#' * level} {name.title()}\"\ndef run_command(*, command: str) -> str:\n    with subprocess.Popen(command, stdout=subprocess.PIPE, shell=True) as cmd_process_stream:  # nosec",
+        "detail": "pre_commit_hooks.python.tools.update_readme",
+        "documentation": {}
+    },
+    {
+        "label": "define_section",
+        "kind": 2,
+        "importPath": "pre_commit_hooks.python.tools.update_readme",
+        "description": "pre_commit_hooks.python.tools.update_readme",
+        "peekOfCode": "def define_section(*, name: str, level: int = 1) -> str:\n    return f\"{'#' * level} {name.title()}\"\ndef run_command(*, command: str) -> str:\n    with subprocess.Popen(command, stdout=subprocess.PIPE, shell=True) as cmd_process_stream:  # nosec\n        output, _ = cmd_process_stream.communicate()\n        cmd_process_stream.wait()\n        return bytes.decode(output, 'utf-8')\ndef update_readme(\n    *, start_tag: str, end_tag: str, command: str, command_content_processed: str = None, readme_file_path: Path = None\n) -> None:",
         "detail": "pre_commit_hooks.python.tools.update_readme",
         "documentation": {}
     },

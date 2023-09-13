@@ -3,7 +3,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 default_language_version:
     python: python3.10
-fail_fast: true
+fail_fast: false
 minimum_pre_commit_version: 2.20.0
 repos:
     - repo: https://github.com/asottile/setup-cfg-fmt
@@ -33,21 +33,97 @@ repos:
       rev: fdcb18fff1ca65900961f02c269b8b9bbdcd097b
       hooks:
         - id: add-trailing-comma
-    - repo: https://github.com/asottile/pyupgrade
-      rev: 973eed1621b3431548ccccd25b00436fb253d4e9
+    - repo: https://github.com/igorshubovych/markdownlint-cli
+      rev: f6aa6920cd50ecc48aead4858b2a04da63a9c5cc
       hooks:
-        - id: pyupgrade
-          args: [--py38-plus]
-    - repo: https://github.com/hhatto/autopep8
-      rev: 4e869ad63a11575267450bfefdf022bb6128ab93
+          - id: markdownlint
+            args: [-c, config-tools/.markdownlint.yaml, --fix]
+            stages:
+                - manual
+    - repo: https://github.com/executablebooks/mdformat
+      rev: 782cb22f294bc4ce48368ee173de4837fc208ecf
       hooks:
-        - id: autopep8
-    - repo: https://github.com/PyCQA/flake8
-      rev: 2f90d073891b0b8777915383c35ecf8838680264
+          - id: mdformat
+        # Optionally add plugins
+            additional_dependencies:
+                - mdformat-gfm
+                - mdformat-black
+            stages:
+                - manual
+    - repo: https://github.com/lovesegfault/beautysh.git
+      rev: 9845efc3ea3e86cc0d41465d720a47f521b2799c
       hooks:
-        - id: flake8
+          - id: beautysh
+            args: [--indent-size, '4']
+    - repo: https://github.com/openstack/bashate.git
+      rev: f5426a8c83b429b7bae80d9004bdebc73ebe8137
+      hooks:
+          - id: bashate
+            args: ['--ignore=E006,E020']
+    - repo: https://github.com/asottile/dead
+      rev: d4481fee66fb46394ac51b191556c0edf5e0a798
+      hooks:
+          - id: dead
+            stages:
+                - manual
+    - repo: https://github.com/psf/black
+      rev: e9356c1ff0083aea4416bf1d3e29748634bb4f7f
+      hooks:
+          - id: black
+        # We have to repeat exclusion conf for black in pre-commit.
+        # Cf: https://stackoverflow.com/questions/61032281/exclude-some-files-on-running-black-using-pre-commit
+            args: [--config=config-tools/black.toml]
+    - repo: https://github.com/asottile/blacken-docs
+      rev: 9ca98399fddd329c3f65380d129bccc8a1d5a030
+      hooks:
+          - id: blacken-docs
+            additional_dependencies:
+                - black
+    - repo: https://github.com/pre-commit/mirrors-pylint
+      rev: a1b176a5ee919967cf01e87c0222bd64b94fe0de
+      hooks:
+          - id: pylint
+            args: [--rcfile=setup.cfg, --reports=no, --persistent=no, --score=no, --disable=E0401]
+            stages:
+                - manual
     - repo: https://github.com/pre-commit/mirrors-mypy
       rev: v1.5.1
       hooks:
-        - id: mypy
-          additional_dependencies: [types-all]
+          - id: mypy
+            args: [--config-file=setup.cfg]
+            stages:
+                - manual
+    - repo: https://github.com/pycqa/flake8
+      rev: 2f90d073891b0b8777915383c35ecf8838680264
+      hooks:
+          - id: flake8
+            args: [--config=setup.cfg]
+            stages:
+                - manual
+            additional_dependencies:
+                - flake8-black
+    - repo: https://github.com/pre-commit/pygrep-hooks
+      rev: 9fa701e423370e2da5273d0848e2e46fd69adf37
+      hooks:
+          - id: python-no-eval
+          - id: python-no-log-warn
+          - id: python-use-type-annotations
+          - id: rst-backticks
+    - repo: https://github.com/MarcoGorelli/auto-walrus
+      rev: fd42c042a0910a93ddde9463167fedcc0b3a7bbd
+      hooks:
+          - id: auto-walrus
+    - repo: https://github.com/dannysepler/rm_unneeded_f_str
+      rev: df396a8bfdeced1a011c7d9d6787aa7f49ac8634
+      hooks:
+          - id: rm-unneeded-f-str
+    - repo: https://github.com/PyCQA/bandit
+      rev: 6d1d11c01e7824c04cc5005b4fe6b932c6999b18
+      hooks:
+          - id: bandit
+            args: [-c, config-tools/bandit.yaml]
+    - repo: https://github.com/asottile/pyupgrade
+      rev: 973eed1621b3431548ccccd25b00436fb253d4e9
+      hooks:
+          - id: pyupgrade
+            args: [--py3-only, --py310-plus]

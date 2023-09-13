@@ -7,7 +7,7 @@
   additional_dependencies:
     - dockerfile-parse
 - id: print-detection
-  entry: scripts/pre_commit_hooks/bassh/print_detection.sh
+  entry: pre_commit_hooks/bassh/print_detection.sh
   files: .py
   language: script
   name: detect print on python code

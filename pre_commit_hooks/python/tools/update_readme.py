@@ -9,6 +9,9 @@ def create_content(*, command: str, content: str) -> str:
     content_content += '```\n'
     return content_content
 
+def define_section(*, name: str, level: int = 1) -> str:
+    return f"{'#' * level} {name.title()}"
+
 
 def run_command(*, command: str) -> str:
     with subprocess.Popen(command, stdout=subprocess.PIPE, shell=True) as cmd_process_stream:  # nosec

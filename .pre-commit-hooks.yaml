@@ -2,7 +2,7 @@
   additional_dependencies:
       - dockerfile-parse
   description: format dockerfiles
-  entry: pre_commit_hooks/python/format_dockerfile.py
+  entry: format-dockerfile
   language: python
   language_version: '3.10'
   minimum_pre_commit_version: '2.20.0'

@@ -1,5 +1,6 @@
-.trunk/
+*.egg
+*.trunk/
+*__pycache__*
 .vscode/
 build/
 dist/
-*.egg*

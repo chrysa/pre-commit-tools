@@ -51,7 +51,7 @@ class FormatDockerfile:
         # print(f"check if line {line} is {instruction_type} ..........")
         return self._get_instruction(line=line) == instruction_type
 
-    def _load_dockerfile(self, *, dockerfile_path: Path) -> None:
+    def load_dockerfile(self, *, dockerfile_path: Path) -> None:
         print(f'read {file} ..........')
         with open(dockerfile_path) as stream:
             self.parser.content = self._remove_split_lines(content=stream.read())
@@ -59,7 +59,6 @@ class FormatDockerfile:
     def format_file(self, *, file):
         # format
         for index, line in enumerate(self.parser.structure):
-            print(line)
             if self._is_type(line=line, instruction_type='COMMENT'):
                 self.content += self._get_line_content(line=line)
             elif self._is_type(line=line, instruction_type='FROM'):
@@ -90,6 +89,7 @@ class FormatDockerfile:
                 self.content += '\n'
                 self.content += self._get_line_content(line=line)
 
+    def save(self, *, file: Path) -> None:
         if self.content != self.parser.content:
             # print(f"update {self.dockerfile} ..........")
             with open(file, 'w+') as stream:
@@ -107,9 +107,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     tools_instance = PreCommitTools()
     args = tools_instance.set_params(help_msg='format dockerfile', argv=argv)
     for file in args.filenames:
-        format_dockerfile_class.load_dockerfile(dockerfile_path=Path(file))
+        file = Path(file)
+        format_dockerfile_class.load_dockerfile(dockerfile_path=file)
         format_dockerfile_class.format_file(file=Path().absolute() / file)
-        format_dockerfile_class.save()
+        format_dockerfile_class.save(file=file)
 
 
 if __name__ == '__main__':

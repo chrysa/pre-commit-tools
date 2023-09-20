@@ -7,7 +7,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from dockerfile_parse import DockerfileParser
-from tools.pre_commit_tools import PreCommitTools
+
+from pre_commit_hooks.python.tools.pre_commit_tools import PreCommitTools
 
 KEYWORDS_GROUP = ['ADD', 'ARG', 'COPY']
 KEYWORDS_SEPARATE = [

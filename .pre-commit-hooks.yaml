@@ -1,6 +1,6 @@
 - id: format-dockerfiles
   additional_dependencies:
-      - dockerfile-parse
+      - dockerfile-parse==2.0.1
   description: format dockerfiles
   files: '.dockerfile$'
   entry: format-dockerfile

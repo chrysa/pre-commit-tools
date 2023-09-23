@@ -24,7 +24,7 @@ head=$(git rev-parse --verify HEAD)
 
 display "define regex"
 # BSD regex for finding Python print statements
-find_print='print[[:space:](]*'
+find_print='^[[:blank:]]*[^[:blank:]#]print[[:space:]](*'
 
 display "search print"
 # Save output to $out var

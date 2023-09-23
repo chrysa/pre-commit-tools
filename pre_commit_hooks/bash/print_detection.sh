@@ -8,6 +8,9 @@
 # statements.
 #
 
+# TODO: add an escape comment
+# TODO: ignore commented print
+
 # Set this to 0 to turn off testing.
 TESTING=0
 ALL_FILES=false

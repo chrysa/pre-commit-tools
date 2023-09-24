@@ -25,7 +25,7 @@ def is_disabked(*, line):
 
 def main(argve) -> int:
     tools_instance = PreCommitTools()
-    args = tools_instance.set_params(help_msg='format dockerfile', argv=argv)
+    args = tools_instance.set_params(help_msg='search print on python code', argv=argv)
     ret_val = 0
     for file in args.filenames:
         file = Path(file)

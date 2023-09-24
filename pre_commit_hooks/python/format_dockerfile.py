@@ -18,6 +18,7 @@ class FormatDockerfile:
     dockerfile: Path = None
     content: str = ''
     parser: DockerfileParser = DockerfileParser()
+    return_value: int = 0
 
     @staticmethod
     def _get_instruction(*, line: dict[str, str | int]):
@@ -97,6 +98,7 @@ class FormatDockerfile:
                 stream.write(self.content)
                 stream.truncate()
             status = 'formatted'
+            self.return_value = !
         else:
             status = 'unchanged'
         print(f'save {file} .......... {status}')
@@ -111,6 +113,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         format_dockerfile_class.load_dockerfile(dockerfile_path=file)
         format_dockerfile_class.format_file(file=Path().absolute() / file)
         format_dockerfile_class.save(file=file)
+    return format_dockerfile_class.return_value
 
 
 if __name__ == '__main__':

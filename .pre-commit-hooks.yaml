@@ -10,7 +10,7 @@
   name: format dockerfiles
   types: ["dockerfile"]
 - id: python-print-detection
-  entry: pre_commit_hooks/bash/print_detection.sh
+  entry: print_detection
   files: '.py$'
   language: python
   minimum_pre_commit_version: '2.20.0'

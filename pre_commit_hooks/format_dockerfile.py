@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from dockerfile_parse import DockerfileParser
-from tools.pre_commit_tools import PreCommitTools
+from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 
 KEYWORDS_GROUP = ['ADD', 'ARG', 'COPY']
 
@@ -53,7 +53,7 @@ class FormatDockerfile:
         return self._get_instruction(line=line) == instruction_type
 
     def load_dockerfile(self, *, dockerfile_path: Path) -> None:
-        print(f'read {file} ..........')
+        # print(f'read {dockerfile_path} ..........')
         with open(dockerfile_path) as stream:
             self.parser.content = self._remove_split_lines(content=stream.read())
 

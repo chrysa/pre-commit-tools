@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from tools.pre_commit_tools import PreCommitTools
+from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 
 PRINT_RE = re.compile(r'\bprint\(')
 COMMENTED_RE = re.compile(r'\s#\sprint\(')

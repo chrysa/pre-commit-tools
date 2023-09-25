@@ -98,7 +98,7 @@ class FormatDockerfile:
                 stream.write(self.content)
                 stream.truncate()
             status = 'formatted'
-            self.return_value = !
+            self.return_value = 1
         else:
             status = 'unchanged'
         print(f'save {file} .......... {status}')

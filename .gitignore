@@ -6,4 +6,4 @@ __pycache__/
 .vscode/
 build/
 dist/
-pre_commit_hooks_tools.egg-info/
+**/pre_commit_hooks_tools.egg-info/

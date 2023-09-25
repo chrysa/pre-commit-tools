@@ -1,6 +1,9 @@
 *.egg
 *.trunk/
-*__pycache__*
+__pycache__/
+**/__pycache__/
+**/*.py[ci]
 .vscode/
 build/
 dist/
+pre_commit_hooks_tools.egg-info/

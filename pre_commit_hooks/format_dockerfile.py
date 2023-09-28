@@ -15,7 +15,7 @@ from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 KEYWORDS_GROUP = ['ADD', 'ARG', 'COPY']
 
 logger = logging.getLogger()
-logger.setLevel(logging.ERROR)
+logger.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -42,6 +42,49 @@ class FormatDockerfile:
     def _remove_split_lines(*, content):
         logger.info('remove split lines ..........')
         return re.sub(r' \\\n +', ' ', content)
+
+    def _format_comment_line(self, *, index, line_content):
+        logger.info('format COMMENT ..........')
+        if index > 0:
+            self.content += '\n'
+        self.content += line_content
+
+    def _format_env_line(self, *, line_content):
+        logger.info('format ENV ..........')
+        multiline = ' \\\n  '.join(line_content.split(' ')[1:])
+        self.content += '\n' + f'ENV {multiline}'
+
+    def _format_grouped_keyword_line(self, *, index, line_content):
+        logger.info('format grouped line ..........')
+        if self._is_same_as_previous(index=index):
+            logger.debug('same line ..........')
+            self.content += line_content
+        else:
+            logger.debug('not same line ..........')
+            self.content += '\n' + line_content
+
+    def _format_healthcheck_line(self, *, index, line_content):
+        logger.info('format HEALTHCHECK ..........')
+        multiline = ' \\\n   CMD '.join(list(map(str.strip, line_content.split('CMD'))))
+        self.content += '\n' + multiline
+
+    def _format_run_line(self, *, index, line_content):
+        logger.info('format RUN ..........')
+        print(f"{line_content=}")
+        if '&&' in line_content:
+            multiline = ' \\\n  && '.join(list(map(str.strip, line_content.split('&&'))))
+        else:
+            multiline = line_content
+        print(f"{multiline=}")
+        print(f"{self._is_same_as_previous(index=index)=}")
+        if self._is_same_as_previous(index=index):
+            multiline = ' \\\n  && ' + line_content.replace('RUN ', '')
+        print(f"{multiline=}")
+        self.content += '\n' + multiline
+
+    def _format_simple(self, *, line):
+        logger.info(f'format {self._get_instruction(line=line)} ..........')
+        self.content += '\n\n' + self._get_line_content(line=line)
 
     def _get_line_content(self, *, line):
         logger.debug(f'get line content {line} ..........')
@@ -73,46 +116,17 @@ class FormatDockerfile:
         for index, line in enumerate(self.parser.structure):
             line_content = self._get_line_content(line=line)
             if self._is_type(line=line, instruction_type='COMMENT'):
-                logger.info('format CONTENT ..........')
-                if index > 0:
-                    self.content += '\n'
-                self.content += line_content
-            elif (
-                self._is_type(line=line, instruction_type='EXPOSE')
-                or self._is_type(line=line, instruction_type='FROM')
-                or self._is_type(line=line, instruction_type='USER')
-                or self._is_type(line=line, instruction_type='WORKDIR')
-            ):
-                logger.info(f'format {self._get_instruction(line=line)} ..........')
-                self.content += '\n\n' + line_content
+                self._format_comment_line(index=index, line_content=line_content)
             elif self._is_type(line=line, instruction_type='ENV'):
-                logger.info('format ENV ..........')
-                multiline = ' \\\n  '.join(line_content.split(' ')[1:])
-                self.content += '\n' + f'ENV {multiline}'
+                self._format_env_line(line_content=line_content)
             elif self._is_type(line=line, instruction_type='RUN'):
-                logger.info('format RUN ..........')
-                if "&&" in line_content:
-                    multiline = ' \\\n  && '.join(list(map(str.strip, line_content.split('&&'))))
-                else:
-                    multiline = line_content
-                if self._is_same_as_previous(index=index):
-                    line_content = ' \\\n  && ' + line_content.replace("RUN ","")
-                self.content += '\n' + multiline
+                self._format_run_line(index=index, line_content=line_content)
             elif self._is_type(line=line, instruction_type='HEALTHCHECK'):
-                logger.info('format HEALTHCHECK ..........')
-                multiline = ' \\\n   CMD '.join(list(map(str.strip, line_content.split('CMD'))))
-                self.content += '\n' + multiline
+                self._format_healthcheck_line(index=index, line_content=line_content)
             elif self._is_grouped_keyword(line=line):
-                logger.info('format grouped line ..........')
-                if self._is_same_as_previous(index=index):
-                    logger.debug('same line ..........')
-                    self.content += line_content
-                else:
-                    logger.debug('not same line ..........')
-                    self.content += '\n' + line_content
+                self._format_grouped_keyword_line(index=index, line_content=line_content)
             else:
-                logger.info('format simple line ..........')
-                self.content += '\n' + line_content
+                self._format_simple(line=line)
 
     def load_dockerfile(self, *, dockerfile_path: Path) -> None:
         logger.info(f'read {dockerfile_path} ..........')

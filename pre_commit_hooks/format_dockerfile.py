@@ -15,7 +15,7 @@ from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 KEYWORDS_GROUP = ['ADD', 'ARG', 'COPY']
 
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.ERROR)
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -40,22 +40,30 @@ class FormatDockerfile:
 
     @staticmethod
     def _remove_split_lines(*, content):
-        logger.info('remove split lines ..........')
+        logger.debug('remove split lines ..........')
         return re.sub(r' \\\n +', ' ', content)
 
+    def _define_header(self):
+        if self._get_line_content(line=self.parser.structure[0]) != '# syntax=docker/dockerfile:1.4':
+            self._format_comment_line(index=-1, line_content='# syntax=docker/dockerfile:1.4')
+
     def _format_comment_line(self, *, index, line_content):
-        logger.info('format COMMENT ..........')
+        logger.debug('format COMMENT ..........')
         if index > 0:
             self.content += '\n'
         self.content += line_content
 
     def _format_env_line(self, *, line_content):
-        logger.info('format ENV ..........')
-        multiline = ' \\\n  '.join(line_content.split(' ')[1:])
+        logger.debug('format ENV ..........')
+        multiline = ' \\\n\\\\t'.join(line_content.split(' ')[1:])
         self.content += '\n' + f'ENV {multiline}'
 
+    def _format_from_line(self, *, line_content):
+        logger.debug('format FROM ..........')
+        self.content += '\n' + '\n' + '\n' + line_content
+
     def _format_grouped_keyword_line(self, *, index, line_content):
-        logger.info('format grouped line ..........')
+        logger.debug('format grouped line ..........')
         if self._is_same_as_previous(index=index):
             logger.debug('same line ..........')
             self.content += line_content
@@ -63,30 +71,28 @@ class FormatDockerfile:
             logger.debug('not same line ..........')
             self.content += '\n' + line_content
 
-    def _format_healthcheck_line(self, *, index, line_content):
-        logger.info('format HEALTHCHECK ..........')
-        multiline = ' \\\n   CMD '.join(list(map(str.strip, line_content.split('CMD'))))
+    def _format_healthcheck_line(self, *, line_content):
+        logger.debug('format HEALTHCHECK ..........')
+        multiline = ' \\\n\\\\t CMD '.join(list(map(str.strip, line_content.split('CMD'))))
         self.content += '\n' + multiline
 
     def _format_run_line(self, *, index, line_content):
-        logger.info('format RUN ..........')
-        print(f"{line_content=}")
+        logger.debug('format RUN ..........')
+        line_content = line_content.replace('RUN ', '')
         if '&&' in line_content:
-            multiline = ' \\\n  && '.join(list(map(str.strip, line_content.split('&&'))))
+            data = ' \\\n\\\\t&& '.join(list(map(str.strip, line_content.split('&&'))))
         else:
-            multiline = line_content
-        print(f"{multiline=}")
-        print(f"{self._is_same_as_previous(index=index)=}")
+            data = ' \\\n\\\\t&& ' + line_content
         if self._is_same_as_previous(index=index):
-            multiline = ' \\\n  && ' + line_content.replace('RUN ', '')
-        print(f"{multiline=}")
-        self.content += '\n' + multiline
+            self.content = self.content.strip() + data
+        else:
+            self.content += '\n' + 'RUN ' + data.replace(' \\\n\\\\t&& ', '', 1).strip()
 
     def _format_simple(self, *, line):
-        logger.info(f'format {self._get_instruction(line=line)} ..........')
+        logger.debug(f'format {self._get_instruction(line=line)} ..........')
         self.content += '\n\n' + self._get_line_content(line=line)
 
-    def _get_line_content(self, *, line):
+    def _get_line_content(self, *, line: Line):
         logger.debug(f'get line content {line} ..........')
         return line['content']
 
@@ -111,25 +117,28 @@ class FormatDockerfile:
         return self._get_instruction(line=line) == instruction_type
 
     def format_file(self, *, file):
-        logger.info(f'format file {file}')
+        logger.debug(f'format file {file}')
         self.parser.content = self._remove_split_lines(content=self.parser.content)
+        self._define_header()
         for index, line in enumerate(self.parser.structure):
             line_content = self._get_line_content(line=line)
             if self._is_type(line=line, instruction_type='COMMENT'):
                 self._format_comment_line(index=index, line_content=line_content)
             elif self._is_type(line=line, instruction_type='ENV'):
                 self._format_env_line(line_content=line_content)
+            elif self._is_type(line=line, instruction_type='FROM'):
+                self._format_from_line(line_content=line_content)
             elif self._is_type(line=line, instruction_type='RUN'):
                 self._format_run_line(index=index, line_content=line_content)
             elif self._is_type(line=line, instruction_type='HEALTHCHECK'):
-                self._format_healthcheck_line(index=index, line_content=line_content)
+                self._format_healthcheck_line(line_content=line_content)
             elif self._is_grouped_keyword(line=line):
                 self._format_grouped_keyword_line(index=index, line_content=line_content)
             else:
                 self._format_simple(line=line)
 
     def load_dockerfile(self, *, dockerfile_path: Path) -> None:
-        logger.info(f'read {dockerfile_path} ..........')
+        logger.debug(f'read {dockerfile_path} ..........')
         self.parser.dockerfile_path = dockerfile_path
         with open(dockerfile_path) as stream:
             self.parser.content = stream.read()

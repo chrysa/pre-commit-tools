@@ -15,3 +15,10 @@
   minimum_pre_commit_version: '2.20.0'
   name: detect print on python code
   types: ["python"]
+- id: python-pprint-detection
+  entry: pprint-detection
+  language: python
+  language_version: '3.10'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect pprint on python code
+  types: ["python"]

@@ -49,6 +49,15 @@ class FormatDockerfile:
         if '# syntax=docker/dockerfile:1.4' not in self._get_line_content(line=self.parser.structure[0]):
             self._format_comment_line(index=-1, line_content='# syntax=docker/dockerfile:1.4\n')
 
+    def _file_as_changed(self):
+        print(self.content)
+        print("-------------")
+        print(self.content.replace('\\\n', '\n'))
+        print("-------------")
+        print(self.parser.content)
+        print("-------------")
+        print(self.content.replace('\\\n', '\n') == self.parser.content)
+        return  self.content.replace('\\\n', '\n') == self.parser.content
     def _format_comment_line(self, *, index, line_content):
         logger.debug('format COMMENT ..........')
         if index > 0:
@@ -152,7 +161,7 @@ class FormatDockerfile:
             self.parser.content = stream.read()
 
     def save(self, *, file: Path) -> None:
-        if (tmp := self.content.replace('\\\n', '\n')) == self.parser.content:
+        if not self._file_as_changed():
             status = 'unchanged'
         else:
             logger.debug(f'update {self.dockerfile} ..........')

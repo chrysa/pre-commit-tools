@@ -33,7 +33,7 @@ class FormatDockerfile:
     dockerfile: Path = None
     content: str = ''
     parser: DockerfileParser = DockerfileParser()
-    return_value: int = 1
+    return_value: int = 0
 
     @staticmethod
     def _get_instruction(*, line: Line):
@@ -48,6 +48,12 @@ class FormatDockerfile:
     def _define_header(self):
         if '# syntax=docker/dockerfile:1.4' not in self._get_line_content(line=self.parser.structure[0]):
             self._format_comment_line(index=-1, line_content='# syntax=docker/dockerfile:1.4\n')
+
+    def _file_as_changed(self):
+        print(self.content != self.parser.content)
+        if as_changed := (self.content != self.parser.content.strip()):
+            self.return_value = 1
+        return as_changed
 
     def _format_comment_line(self, *, index, line_content):
         logger.debug('format COMMENT ..........')
@@ -88,12 +94,10 @@ class FormatDockerfile:
         else:
             data = ' \\\n    && ' + line_content
         if self._is_same_as_previous(index=index):
-            self.content = self.content.strip() + data
+            self.content = self.content + data
         else:
             if data.startswith(' \\\n    && '):
-                data = data.replace(' \\\n    && ', '', 1).strip()
-            else:
-                data = data.strip()
+                data = data.replace(' \\\n    && ', '', 1)
             self.content += '\n' + 'RUN ' + data
 
     def _format_simple(self, *, line):
@@ -152,17 +156,14 @@ class FormatDockerfile:
             self.parser.content = stream.read()
 
     def save(self, *, file: Path) -> None:
-        if (tmp := self.content.replace('\\\n', '\n')) == self.parser.content:
-            status = 'unchanged'
-        else:
+        if self._file_as_changed():
             logger.debug(f'update {self.dockerfile} ..........')
             with open(file, 'w+') as stream:
                 stream.seek(0)
                 stream.write(self.content)
                 stream.truncate()
-            status = 'formatted'
-            self.return_value = 1
-        print(f'{file} .......... {status}')
+                status = 'formatted'
+            print(f'{file} .......... {status}')
 
 
 def main(argv: Sequence[str] | None = None) -> int:

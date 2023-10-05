@@ -33,7 +33,7 @@ class FormatDockerfile:
     dockerfile: Path = None
     content: str = ''
     parser: DockerfileParser = DockerfileParser()
-    return_value: int = 1
+    return_value: int = 0
 
     @staticmethod
     def _get_instruction(*, line: Line):
@@ -48,6 +48,11 @@ class FormatDockerfile:
     def _define_header(self):
         if '# syntax=docker/dockerfile:1.4' not in self._get_line_content(line=self.parser.structure[0]):
             self._format_comment_line(index=-1, line_content='# syntax=docker/dockerfile:1.4\n')
+
+    def _file_as_changed(self):
+        if as_changed := (self.content.replace('\\\n', '\n') == self.parser.content):
+            self.return_value = 1
+        return as_changed
 
     def _format_comment_line(self, *, index, line_content):
         logger.debug('format COMMENT ..........')
@@ -152,7 +157,7 @@ class FormatDockerfile:
             self.parser.content = stream.read()
 
     def save(self, *, file: Path) -> None:
-        if (tmp := self.content.replace('\\\n', '\n')) == self.parser.content:
+        if not self._file_as_changed():
             status = 'unchanged'
         else:
             logger.debug(f'update {self.dockerfile} ..........')
@@ -161,7 +166,6 @@ class FormatDockerfile:
                 stream.write(self.content)
                 stream.truncate()
             status = 'formatted'
-            self.return_value = 1
         print(f'{file} .......... {status}')
 
 

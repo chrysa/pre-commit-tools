@@ -24,16 +24,19 @@ logger.addHandler(ch)
 
 Line = NewType('Line', dict[str, int | str])
 
+SHEBANG = '# syntax=docker/dockerfile:1.4'
+
 
 # TODO: separate block for litteral ARGS and ARGS composed with variable
 # TODO: order alphabeticly ARGS
 # TODO: order alphabeticly ENV
+# TODO: add config file support
 @dataclass
 class FormatDockerfile:
     dockerfile: Path = None
     content: str = ''
     parser: DockerfileParser = DockerfileParser()
-    return_value: int = 1
+    return_value: int = 0
 
     @staticmethod
     def _get_instruction(*, line: Line):
@@ -45,9 +48,15 @@ class FormatDockerfile:
         logger.debug('remove split lines ..........')
         return re.sub(r' \\\n +', ' ', content)
 
+    def _as_header(self):
+        line = self.parser.structure[0]
+        return self._is_type(line=line, instruction_type='COMMENT') and SHEBANG in self._get_line_content(line=line)
+
     def _define_header(self):
-        if '# syntax=docker/dockerfile:1.4' not in self._get_line_content(line=self.parser.structure[0]):
-            self._format_comment_line(index=-1, line_content='# syntax=docker/dockerfile:1.4\n')
+        self._format_comment_line(index=-1, line_content=SHEBANG)
+
+    def _file_as_changed(self):
+        return repr(self.content) != repr(self.parser.content)
 
     def _format_comment_line(self, *, index, line_content):
         logger.debug('format COMMENT ..........')
@@ -60,9 +69,11 @@ class FormatDockerfile:
         multiline = ' \\\n    '.join(line_content.split(' ')[1:])
         self.content += '\n' + f'ENV {multiline}'
 
-    def _format_from_line(self, *, line_content):
+    def _format_from_line(self, *, index, line_content):
         logger.debug('format FROM ..........')
-        self.content += '\n' + '\n' + '\n' + line_content
+        if not self._is_same_as_previous(index=index):
+            self.content += '\n' + '\n'
+        self.content += line_content
 
     def _format_grouped_keyword_line(self, *, index, line_content):
         logger.debug('format grouped line ..........')
@@ -88,21 +99,19 @@ class FormatDockerfile:
         else:
             data = ' \\\n    && ' + line_content
         if self._is_same_as_previous(index=index):
-            self.content = self.content.strip() + data
+            self.content = self.content + data
         else:
             if data.startswith(' \\\n    && '):
-                data = data.replace(' \\\n    && ', '', 1).strip()
-            else:
-                data = data.strip()
+                data = data.replace(' \\\n    && ', '', 1)
             self.content += '\n' + 'RUN ' + data
 
-    def _format_simple(self, *, line):
+    def _format_simple(self, *, line: Line):
         logger.debug(f'format {self._get_instruction(line=line)} ..........')
         self.content += '\n\n' + self._get_line_content(line=line)
 
     def _get_line_content(self, *, line: Line):
         logger.debug(f'get line content {line} ..........')
-        return line['content']
+        return line['content'].strip()
 
     def _is_grouped_keyword(self, *, line: Line) -> bool:
         logger.debug(f"test {line['instruction']} is a grouped keyword ..........")
@@ -110,6 +119,9 @@ class FormatDockerfile:
 
     def _is_same_as_previous(self, *, index: int) -> bool:
         logger.debug(
+            f"test if line {index} type {self.parser.structure[index-1]['instruction']} is same as previous {self.parser.structure[index]['instruction']} ..........",
+        )
+        print(
             f"test if line {index} type {self.parser.structure[index-1]['instruction']} is same as previous {self.parser.structure[index]['instruction']} ..........",
         )
         if index == 0:
@@ -127,23 +139,35 @@ class FormatDockerfile:
     def format_file(self):
         logger.debug('format file')
         self.parser.content = self._remove_split_lines(content=self.parser.content)
-        self._define_header()
-        for index, line in enumerate(self.parser.structure):
+        if self._as_header():
+            self._format_comment_line(
+                index=0,
+                line_content=self._get_line_content(line=self.parser.structure[0]),
+            )
+            start = 1
+        else:
+            self._define_header()
+            start = 0
+        for index, line in enumerate(self.parser.structure[start:]):
             line_content = self._get_line_content(line=line)
-            if self._is_type(line=line, instruction_type='COMMENT'):
-                self._format_comment_line(index=index, line_content=line_content)
-            elif self._is_type(line=line, instruction_type='ENV'):
-                self._format_env_line(line_content=line_content)
-            elif self._is_type(line=line, instruction_type='FROM'):
-                self._format_from_line(line_content=line_content)
-            elif self._is_type(line=line, instruction_type='RUN'):
-                self._format_run_line(index=index, line_content=line_content)
-            elif self._is_type(line=line, instruction_type='HEALTHCHECK'):
-                self._format_healthcheck_line(line_content=line_content)
-            elif self._is_grouped_keyword(line=line):
-                self._format_grouped_keyword_line(index=index, line_content=line_content)
-            else:
-                self._format_simple(line=line)
+            line_instruction = self._get_instruction(line=self.parser.structure[index])
+            if index > 0:
+                previous_line_instruction = self._get_previous_instruction(line=self.parser.structure[index])
+
+            # if self._is_type(line=line, instruction_type='COMMENT'):
+            #    self._format_comment_line(index=index, line_content=line_content)
+            # elif self._is_type(line=line, instruction_type='ENV'):
+            #     self._format_env_line(line_content=line_content)
+            # elif self._is_type(line=line, instruction_type='FROM'):
+            #    self._format_from_line(index=index, line_content=line_content)
+            # elif self._is_type(line=line, instruction_type='RUN'):
+            #     self._format_run_line(index=index, line_content=line_content)
+            # elif self._is_type(line=line, instruction_type='HEALTHCHECK'):
+            #     self._format_healthcheck_line(line_content=line_content)
+            # elif self._is_grouped_keyword(line=line):
+            #     self._format_grouped_keyword_line(index=index, line_content=line_content)
+            # else:
+            #     self._format_simple(line=line)
 
     def load_dockerfile(self, *, dockerfile_path: Path) -> None:
         logger.debug(f'read {dockerfile_path} ..........')
@@ -152,17 +176,14 @@ class FormatDockerfile:
             self.parser.content = stream.read()
 
     def save(self, *, file: Path) -> None:
-        if (tmp := self.content.replace('\\\n', '\n')) == self.parser.content:
-            status = 'unchanged'
-        else:
+        if self._file_as_changed():
             logger.debug(f'update {self.dockerfile} ..........')
             with open(file, 'w+') as stream:
                 stream.seek(0)
                 stream.write(self.content)
                 stream.truncate()
-            status = 'formatted'
+            print(f'{file} .......... formatted')
             self.return_value = 1
-        print(f'{file} .......... {status}')
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -175,7 +196,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         format_dockerfile_class.load_dockerfile(dockerfile_path=file)
         format_dockerfile_class.format_file()
         format_dockerfile_class.save(file=file)
-    return format_dockerfile_class.return_value
+        return format_dockerfile_class.return_value
 
 
 if __name__ == '__main__':

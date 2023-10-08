@@ -41,7 +41,7 @@ repos:
       rev: febea6211c11cfb4c763a6f8abbd456148b7a029
       hooks:
           - id: markdownlint
-            args: [-c, config-tools/.markdownlint.yaml, --fix]
+            args: [--fix]
             stages:
                 - manual
     - repo: https://github.com/executablebooks/mdformat

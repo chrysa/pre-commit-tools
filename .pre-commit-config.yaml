@@ -64,18 +64,17 @@ repos:
       hooks:
           - id: bashate
             args: ['--ignore=E006,E020']
-    - repo: https://github.com/asottile/dead
-      rev: 6e83e75968e947269bb95f431f420ff85b348dbf
+    - repo: https://github.com/jendrikseipp/vulture
+      rev: 'v2.3'
       hooks:
-          - id: dead
-            stages:
-                - manual
+        - id: vulture
+          args: ["pre_commit_hooks/"]
+          stages:
+              - manual
     - repo: https://github.com/psf/black
       rev: 738c2789cc07dbbd6bcf5908fd06627ee8d5cd6c
       hooks:
           - id: black
-        # We have to repeat exclusion conf for black in pre-commit.
-        # Cf: https://stackoverflow.com/questions/61032281/exclude-some-files-on-running-black-using-pre-commit
             args: [--config=config-tools/black.toml]
     - repo: https://github.com/asottile/blacken-docs
       rev: 96bc175074492573e3df847d9153a0689ed18ac2

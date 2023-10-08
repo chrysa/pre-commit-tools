@@ -148,8 +148,7 @@ class FormatDockerfile:
     def save(self, *, file: Path) -> None:
         if self._file_as_changed():
             logger.debug(f'update {self.dockerfile} ..........')
-            # with open(file, 'w+') as stream:
-            with open(f"{self.dockerfile}-formatted", 'w+') as stream:
+            with open(file, 'w+') as stream:
                 stream.seek(0)
                 stream.write(self.content)
                 stream.truncate()
@@ -167,8 +166,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         format_dockerfile_class.load_dockerfile(dockerfile_path=file)
         format_dockerfile_class.format_file()
         format_dockerfile_class.save(file=file)
-        return 1
-        # return format_dockerfile_class.return_value
+        return format_dockerfile_class.return_value
 
 
 if __name__ == '__main__':

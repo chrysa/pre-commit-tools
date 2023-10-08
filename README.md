@@ -1,13 +1,5 @@
 <!--TOC-->
 
-- [Using pre-commit-tools with pre-commit](#using-pre-commit-tools-with-pre-commit)
-- [Hooks available](#hooks-available)
-  - [`format-dockerfiles`](#format-dockerfiles)
-    - [Description](#description)
-    - [Todo](#todo)
-  - [`python-print-detection`](#python-print-detection)
-  - [`python-pprint-detection`](#python-pprint-detection)
-
 <!--TOC-->
 
 # pre-commit-tools

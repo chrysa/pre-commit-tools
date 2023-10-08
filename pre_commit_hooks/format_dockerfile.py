@@ -4,6 +4,7 @@ from __future__ import annotations
 import logging
 import re
 from dataclasses import dataclass
+from dataclasses import field
 from pathlib import Path
 from typing import NewType
 from typing import TYPE_CHECKING
@@ -36,6 +37,7 @@ SHEBANG = '# syntax=docker/dockerfile:1.4'
 class FormatDockerfile:
     dockerfile: Path = None
     content: str = ''
+    origin_content: list[dict] = field(default_factory=list)
     parser: DockerfileParser = DockerfileParser()
     return_value: int = 0
 
@@ -55,8 +57,9 @@ class FormatDockerfile:
         return re.sub(r' \\\n +', ' ', content)
 
     def _as_header(self) -> bool:
+        logger.debug('verify if header is present ..........')
         line = self.parser.structure[0]
-        return self._is_type(line=line, instruction_type='COMMENT') and SHEBANG in self._get_line_content(line=line)
+        return self._is_type(line=line, instruction_type='COMMENT') and self._get_line_content(line=line) == SHEBANG
 
     def _define_header(self) -> None:
         logger.debug('add shebang ..........')
@@ -75,16 +78,20 @@ class FormatDockerfile:
         multiline = ' \\\n    '.join(line_content.split(' ')[1:])
         self.content += '\n' + f'ENV {multiline}'
 
-    def _format_run_line(self, *, line_content: str) -> None:
+    def _format_run_line(self, *, index: int, line_content: str) -> None:
         logger.debug('format RUN ..........')
         line_content = line_content.replace('RUN ', '')
         if '&&' in line_content:
             data = ' \\\n    && '.join(list(map(str.strip, line_content.split('&&'))))
         else:
             data = ' \\\n    && ' + line_content
-        if data.startswith(' \\\n    && '):
-            data = data.replace(' \\\n    && ', '', 1)
-        self.content += '\n' + 'RUN ' + data
+        if self._is_same_as_previous(index=index):
+            self.content += data
+        else:
+            self.content += "\n"
+            if data.startswith(' \\\n    && '):
+                data = data.replace(' \\\n    && ', '', 1)
+            self.content += '\n' + 'RUN ' + data
 
     def _format_simple_line(self, *, line_content: str, line_instruction: str) -> None:
         logger.debug(f'format {line_instruction} ..........')
@@ -94,50 +101,54 @@ class FormatDockerfile:
         logger.debug(f'check if line {line} is {instruction_type} ..........')
         return self._get_line_instruction(line=line) == instruction_type
 
-    def _same_as_previous(self, *, index: int, instruction: str) -> bool:
-        if is_different := instruction == self._get_line_instruction(line=self.parser.structure[index - 1]):
-            self.content += "\n"
-        else:
-            self.content += "\n\n"
-        return not is_different
-
-    def _validate_header(self) -> None:
+    def _validate_header(self):
+        logger.debug('validate shebang ..........')
         if self._as_header():
+            logger.debug('shebang is present ..........')
             self._format_simple_line(
                 line_content=self._get_line_content(line=self.parser.structure[0]),
                 line_instruction="COMMENT",
             )
-            self.parser.structure.remove(self.parser.structure[0])
+            return self.parser.structure[1:]
         else:
             self._define_header()
+            return self.parser.structure
 
-    def _format_line(self, *, line: Line, line_instruction: str) -> None:
+    def _get_previous_instruction(self, *, index: int) -> str:
+        return self._get_line_instruction(line=self.origin_content[index - 1])
+
+    def _is_same_as_previous(self, *, index: int) -> bool:
+        return self._get_line_instruction(line=self.origin_content[index]) == self._get_previous_instruction(
+            index=index,
+        )
+
+    def _format_line(self, *, index: int, line: Line) -> None:
         line_content = self._get_line_content(line=line)
-        if (
-            self._is_type(line=line, instruction_type='ADD')
-            or self._is_type(line=line, instruction_type='ARG')
-            or self._is_type(line=line, instruction_type='COMMENT')
-            or self._is_type(line=line, instruction_type='COPY')
-            or self._is_type(line=line, instruction_type='FROM')
-        ):
+        line_instruction = self._get_line_instruction(line=self.origin_content[index])
+        if line_instruction in ['ADD', 'ARG', 'COMMENT', 'COPY', 'FROM', 'SHELL', 'USER']:
+            if self._is_same_as_previous(index=index):
+                self.content += "\n"
+            else:
+                self.content += "\n\n"
             self._format_simple_line(line_content=line_content, line_instruction=line_instruction)
         elif self._is_type(line=line, instruction_type='ENV'):
+            if self._get_line_instruction(line=self.origin_content[index - 1]) != 'ENV':
+                self.content += "\n\n"
             self._format_env_line(line_content=line_content)
         elif self._is_type(line=line, instruction_type='HEALTHCHECK'):
+            self.content += "\n\n"
             self._format_healthcheck_line(line_content=line_content)
         elif self._is_type(line=line, instruction_type='RUN'):
-            self._format_run_line(line_content=line_content)
+            self._format_run_line(index=index, line_content=line_content)
         else:
             self.content += '\n' + line_content
 
     def format_file(self) -> None:
         logger.debug('format file')
         self.parser.content = self._remove_split_lines(content=self.parser.content)
-        self._validate_header()
-        for index, line in enumerate(self.parser.structure):
-            line_instruction = self._get_line_instruction(line=self.parser.structure[index])
-            self._same_as_previous(index=index, instruction=line_instruction)
-            self._format_line(line=line, line_instruction=line_instruction)
+        self.origin_content = self._validate_header()
+        for index, line in enumerate(self.origin_content):
+            self._format_line(index=index, line=line)
 
     def load_dockerfile(self, *, dockerfile_path: Path) -> None:
         logger.debug(f'read {dockerfile_path} ..........')
@@ -147,9 +158,7 @@ class FormatDockerfile:
 
     def save(self, *, file: Path) -> None:
         if self._file_as_changed():
-            logger.debug(f'update {self.dockerfile} ..........')
-            print(f"{file=}")
-            print(f"{self.dockerfile=}")
+            logger.debug(f'update {file} ..........')
             with open(file, 'w+') as stream:
                 stream.seek(0)
                 stream.write(self.content)

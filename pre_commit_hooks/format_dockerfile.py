@@ -3,14 +3,17 @@ from __future__ import annotations
 
 import logging
 import re
-from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import NewType
+from typing import TYPE_CHECKING
 
 from dockerfile_parse import DockerfileParser
 
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 KEYWORDS_GROUP = ['ADD', 'ARG', 'COPY']
 
@@ -38,36 +41,8 @@ class FormatDockerfile:
     parser: DockerfileParser = DockerfileParser()
     return_value: int = 0
 
-    @staticmethod
-    def _get_line_instruction(*, line: Line):
-        logger.debug(f'get instuction type for {line}')
-        return line['instruction']
-
-    @staticmethod
-    def _get_line_content(*, line: Line):
-        logger.debug(f'get line content {line} ..........')
-        return line['content'].strip()
-
-    @staticmethod
-    def _remove_split_lines(*, content):
-        logger.debug('remove split lines ..........')
-        return re.sub(r' \\\n +', ' ', content)
-
-    def _as_header(self):
-        line = self.parser.structure[0]
-        return self._is_type(line=line, instruction_type='COMMENT') and SHEBANG in self._get_line_content(line=line)
-
-    def _define_header(self):
-        self._format_comment_line(index=-1, line_content=SHEBANG)
-
     # def _file_as_changed(self):
     #     return repr(self.content) != repr(self.parser.content)
-
-    # def _format_comment_line(self, *, index, line_content):
-    #     logger.debug('format COMMENT ..........')
-    #     if index > 0:
-    #         self.content += '\n'
-    #     self.content += line_content
 
     # def _format_env_line(self, *, line_content):
     #     logger.debug('format ENV ..........')
@@ -133,17 +108,43 @@ class FormatDockerfile:
     #         )
     #     return state
 
-    # def _is_type(self, *, line: Line, instruction_type: str) -> bool:
-    #    logger.debug(f'check if line {line} is {instruction_type} ..........')
-    #    return self._get_line_instruction(line=line) == instruction_type
+    @staticmethod
+    def _get_line_instruction(*, line: Line):
+        logger.debug(f'get instuction type for {line}')
+        return line['instruction']
+
+    @staticmethod
+    def _get_line_content(*, line: Line):
+        logger.debug(f'get line content {line} ..........')
+        return line['content'].strip()
+
+    @staticmethod
+    def _remove_split_lines(*, content):
+        logger.debug('remove split lines ..........')
+        return re.sub(r' \\\n +', ' ', content)
+
+    def _as_header(self):
+        line = self.parser.structure[0]
+        return self._is_type(line=line, instruction_type='COMMENT') and SHEBANG in self._get_line_content(line=line)
+
+    def _define_header(self):
+        self._format_comment_line(index=-1, line_content=SHEBANG)
+
+    def _format_comment_line(self, *, index, line_content):
+        logger.debug('format COMMENT ..........')
+        if index > 0:
+            self.content += '\n'
+        self.content += line_content
+
+    def _is_type(self, *, line: Line, instruction_type: str) -> bool:
+        logger.debug(f'check if line {line} is {instruction_type} ..........')
+        return self._get_line_instruction(line=line) == instruction_type
 
     def _same_as_previous(self, *, index, instruction):
         if instruction != self._get_line_instruction(line=self.parser.structure[index - 1]):
             self.content += "\n"
 
-    def format_file(self):
-        logger.debug('format file')
-        self.parser.content = self._remove_split_lines(content=self.parser.content)
+    def _validate_header(self):
         if self._as_header():
             self._format_comment_line(
                 index=0,
@@ -152,6 +153,11 @@ class FormatDockerfile:
             self.parser.structure.remove(self.parser.structure[0])
         else:
             self._define_header()
+
+    def format_file(self):
+        logger.debug('format file')
+        self.parser.content = self._remove_split_lines(content=self.parser.content)
+        self._validate_header()
         for index, line in enumerate(self.parser.structure):
             # line_content = self._get_line_content(line=line)
             line_instruction = self._get_line_instruction(line=self.parser.structure[index])

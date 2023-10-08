@@ -1,3 +1,5 @@
+# pre-commit-tools
+
 <!--TOC-->
 
 - [pre-commit-tools](#pre-commit-tools)
@@ -10,8 +12,6 @@
     - [python-pprint-detection](#python-pprint-detection)
 
 <!--TOC-->
-
-# pre-commit-tools
 
 Some out-of-the-box hooks for pre-commit.
 

@@ -39,9 +39,14 @@ class FormatDockerfile:
     return_value: int = 0
 
     @staticmethod
-    def _get_instruction(*, line: Line):
+    def _get_line_instruction(*, line: Line):
         logger.debug(f'get instuction type for {line}')
         return line['instruction']
+
+    @staticmethod
+    def _get_line_content(*, line: Line):
+        logger.debug(f'get line content {line} ..........')
+        return line['content'].strip()
 
     @staticmethod
     def _remove_split_lines(*, content):
@@ -55,86 +60,86 @@ class FormatDockerfile:
     def _define_header(self):
         self._format_comment_line(index=-1, line_content=SHEBANG)
 
-    def _file_as_changed(self):
-        return repr(self.content) != repr(self.parser.content)
+    # def _file_as_changed(self):
+    #     return repr(self.content) != repr(self.parser.content)
 
-    def _format_comment_line(self, *, index, line_content):
-        logger.debug('format COMMENT ..........')
-        if index > 0:
-            self.content += '\n'
-        self.content += line_content
+    # def _format_comment_line(self, *, index, line_content):
+    #     logger.debug('format COMMENT ..........')
+    #     if index > 0:
+    #         self.content += '\n'
+    #     self.content += line_content
 
-    def _format_env_line(self, *, line_content):
-        logger.debug('format ENV ..........')
-        multiline = ' \\\n    '.join(line_content.split(' ')[1:])
-        self.content += '\n' + f'ENV {multiline}'
+    # def _format_env_line(self, *, line_content):
+    #     logger.debug('format ENV ..........')
+    #     multiline = ' \\\n    '.join(line_content.split(' ')[1:])
+    #     self.content += '\n' + f'ENV {multiline}'
 
-    def _format_from_line(self, *, index, line_content):
-        logger.debug('format FROM ..........')
-        if not self._is_same_as_previous(index=index):
-            self.content += '\n' + '\n'
-        self.content += line_content
+    # def _format_from_line(self, *, index, line_content):
+    #     logger.debug('format FROM ..........')
+    #     if not self._is_same_as_previous(index=index):
+    #         self.content += '\n' + '\n'
+    #     self.content += line_content
 
-    def _format_grouped_keyword_line(self, *, index, line_content):
-        logger.debug('format grouped line ..........')
-        if self._is_same_as_previous(index=index):
-            logger.debug('same line ..........')
-            self.content += line_content
-        else:
-            logger.debug('not same line ..........')
-            if self.content.endswith('\n'):
-                self.content = self.content.strip()
-            self.content += '\n' + '\n' + line_content
+    # def _format_grouped_keyword_line(self, *, index, line_content):
+    #     logger.debug('format grouped line ..........')
+    #     if self._is_same_as_previous(index=index):
+    #         logger.debug('same line ..........')
+    #         self.content += line_content
+    #     else:
+    #         logger.debug('not same line ..........')
+    #         if self.content.endswith('\n'):
+    #             self.content = self.content.strip()
+    #         self.content += '\n' + '\n' + line_content
 
-    def _format_healthcheck_line(self, *, line_content):
-        logger.debug('format HEALTHCHECK ..........')
-        multiline = ' \\\n    CMD '.join(list(map(str.strip, line_content.split('CMD'))))
-        self.content += '\n' + multiline
+    # def _format_healthcheck_line(self, *, line_content):
+    #     logger.debug('format HEALTHCHECK ..........')
+    #     multiline = ' \\\n    CMD '.join(list(map(str.strip, line_content.split('CMD'))))
+    #     self.content += '\n' + multiline
 
-    def _format_run_line(self, *, index, line_content):
-        logger.debug('format RUN ..........')
-        line_content = line_content.replace('RUN ', '')
-        if '&&' in line_content:
-            data = ' \\\n    && '.join(list(map(str.strip, line_content.split('&&'))))
-        else:
-            data = ' \\\n    && ' + line_content
-        if self._is_same_as_previous(index=index):
-            self.content = self.content + data
-        else:
-            if data.startswith(' \\\n    && '):
-                data = data.replace(' \\\n    && ', '', 1)
-            self.content += '\n' + 'RUN ' + data
+    # def _format_run_line(self, *, index, line_content):
+    #     logger.debug('format RUN ..........')
+    #     line_content = line_content.replace('RUN ', '')
+    #     if '&&' in line_content:
+    #         data = ' \\\n    && '.join(list(map(str.strip, line_content.split('&&'))))
+    #     else:
+    #         data = ' \\\n    && ' + line_content
+    #     if self._is_same_as_previous(index=index):
+    #         self.content = self.content + data
+    #     else:
+    #         if data.startswith(' \\\n    && '):
+    #             data = data.replace(' \\\n    && ', '', 1)
+    #         self.content += '\n' + 'RUN ' + data
 
-    def _format_simple(self, *, line: Line):
-        logger.debug(f'format {self._get_instruction(line=line)} ..........')
-        self.content += '\n\n' + self._get_line_content(line=line)
+    # def _format_simple(self, *, line: Line):
+    #     logger.debug(f'format {self._get_line_instruction(line=line)} ..........')
+    #     self.content += '\n\n' + self._get_line_content(line=line)
 
-    def _get_line_content(self, *, line: Line):
-        logger.debug(f'get line content {line} ..........')
-        return line['content'].strip()
+    # def _is_grouped_keyword(self, *, line: Line) -> bool:
+    #     logger.debug(f"test {line['instruction']} is a grouped keyword ..........")
+    #     return self._get_line_instruction(line=line) in KEYWORDS_GROUP
 
-    def _is_grouped_keyword(self, *, line: Line) -> bool:
-        logger.debug(f"test {line['instruction']} is a grouped keyword ..........")
-        return self._get_instruction(line=line) in KEYWORDS_GROUP
+    # def _is_same_as_previous(self, *, index: int) -> bool:
+    #     logger.debug(
+    #         f"test if line {index} type {self.parser.structure[index-1]['instruction']} is same as previous {self.parser.structure[index]['instruction']} ..........",
+    #     )
+    #     print(
+    #         f"test if line {index} type {self.parser.structure[index-1]['instruction']} is same as previous {self.parser.structure[index]['instruction']} ..........",
+    #     )
+    #     if index == 0:
+    #         state = False
+    #     else:
+    #         state = self._get_line_instruction(line=self.parser.structure[index - 1]) == self._get_line_instruction(
+    #             line=self.parser.structure[index],
+    #         )
+    #     return state
 
-    def _is_same_as_previous(self, *, index: int) -> bool:
-        logger.debug(
-            f"test if line {index} type {self.parser.structure[index-1]['instruction']} is same as previous {self.parser.structure[index]['instruction']} ..........",
-        )
-        print(
-            f"test if line {index} type {self.parser.structure[index-1]['instruction']} is same as previous {self.parser.structure[index]['instruction']} ..........",
-        )
-        if index == 0:
-            state = False
-        else:
-            state = self._get_instruction(line=self.parser.structure[index - 1]) == self._get_instruction(
-                line=self.parser.structure[index],
-            )
-        return state
+    # def _is_type(self, *, line: Line, instruction_type: str) -> bool:
+    #    logger.debug(f'check if line {line} is {instruction_type} ..........')
+    #    return self._get_line_instruction(line=line) == instruction_type
 
-    def _is_type(self, *, line: Line, instruction_type: str) -> bool:
-        logger.debug(f'check if line {line} is {instruction_type} ..........')
-        return self._get_instruction(line=line) == instruction_type
+    def _same_as_previous(self, *, index, instruction):
+        if instruction != self._get_line_instruction(line=self.parser.structure[index - 1]):
+            self.content += "\n"
 
     def format_file(self):
         logger.debug('format file')
@@ -144,15 +149,16 @@ class FormatDockerfile:
                 index=0,
                 line_content=self._get_line_content(line=self.parser.structure[0]),
             )
-            start = 1
+            self.parser.structure.remove(self.parser.structure[0])
         else:
             self._define_header()
-            start = 0
-        for index, line in enumerate(self.parser.structure[start:]):
-            line_content = self._get_line_content(line=line)
-            line_instruction = self._get_instruction(line=self.parser.structure[index])
-            if index > 0:
-                previous_line_instruction = self._get_previous_instruction(line=self.parser.structure[index])
+        for index, line in enumerate(self.parser.structure):
+            # line_content = self._get_line_content(line=line)
+            line_instruction = self._get_line_instruction(line=self.parser.structure[index])
+            print(
+                f"{self._get_line_instruction(line=line)=} => {self._same_as_previous(index=index,instruction=line_instruction)=}",
+            )
+            self._same_as_previous(index=index, instruction=line_instruction)
 
             # if self._is_type(line=line, instruction_type='COMMENT'):
             #    self._format_comment_line(index=index, line_content=line_content)

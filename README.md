@@ -29,7 +29,7 @@ Add this to your `.pre-commit-config.yaml`
 
 ### Hooks available
 
-#### `format-dockerfiles`
+#### format-dockerfiles
 
 ##### Description
 
@@ -44,10 +44,10 @@ Add this to your `.pre-commit-config.yaml`
 - order alphabeticly ENV
 - add config file support
 
-#### `python-print-detection`
+#### python-print-detection
 
 detect print on python code if is not commented or excape with `# print-detection: disable`
 
-#### `python-pprint-detection`
+#### python-pprint-detection
 
 detect pprint on python code if is not commented or excape with `# pprint-detection: disable`

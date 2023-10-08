@@ -25,7 +25,7 @@ class PreCommitTools:
         return retval
 
     def file_empty(self, *, file: Path, display: bool = True) -> bool:
-        retval: int = False
+        retval: bool = False
         if self.file_exist(file=file, display=display):
             if not file.stat().st_size:
                 if display:

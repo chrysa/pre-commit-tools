@@ -18,15 +18,15 @@ class PatternDetection:
     disable_comment: re.Match[bytes]
     pattern: re.Match[bytes]
 
-    def as_pattern(self, *, line):
+    def as_pattern(self, *, line: str) -> bool:
         logger.debug(f'{line} | presence -> {bool(self.pattern.search(line))}')
         return bool(self.pattern.search(line))
 
-    def is_commented(self, *, line):
+    def is_commented(self, *, line: str) -> bool:
         logger.debug(f'{line} | commented -> {bool(self.commented.search(line))}')
         return bool(self.commented.search(line))
 
-    def is_disabled(self, *, line):
+    def is_disabled(self, *, line: str) -> bool:
         logger.debug(f'{line} | disabled -> {bool(self.disable_comment.search(line))}')
         return bool(self.disable_comment.search(line))
 

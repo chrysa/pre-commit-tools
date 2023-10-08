@@ -148,6 +148,8 @@ class FormatDockerfile:
     def save(self, *, file: Path) -> None:
         if self._file_as_changed():
             logger.debug(f'update {self.dockerfile} ..........')
+            print(f"{file=}")
+            print(f"{self.dockerfile=}")
             with open(file, 'w+') as stream:
                 stream.seek(0)
                 stream.write(self.content)

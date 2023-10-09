@@ -165,6 +165,8 @@ class FormatDockerfile:
                 stream.truncate()
             print(f'{file} .......... formatted')
             self.return_value = 1
+        else:
+            print(f'{file} .......... unchabged')
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -177,7 +179,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         format_dockerfile_class.load_dockerfile(dockerfile_path=file)
         format_dockerfile_class.format_file()
         format_dockerfile_class.save(file=file)
-        return format_dockerfile_class.return_value
+    return format_dockerfile_class.return_value
 
 
 if __name__ == '__main__':

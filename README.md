@@ -24,6 +24,8 @@ Add this to your `.pre-commit-config.yaml`
     rev: ''  # Use the ref you want to point at
     hooks:
     -   id: format-dockerfiles
+        stages:
+            - manual
     -   id: print-detection
     -   id: pprint-detection
 ```

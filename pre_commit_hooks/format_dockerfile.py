@@ -125,7 +125,19 @@ class FormatDockerfile:
     def _format_line(self, *, index: int, line: Line) -> None:
         line_content = self._get_line_content(line=line)
         line_instruction = self._get_line_instruction(line=self.origin_content[index])
-        if line_instruction in ['ADD', 'ARG', 'COMMENT', 'COPY', 'FROM', 'SHELL', 'USER', 'WORKDIR']:
+        if line_instruction in [
+            'ADD',
+            'ARG',
+            'CMD',
+            'COMMENT',
+            'COPY',
+            'ENTRYPOINT',
+            'EXPOSE',
+            'HEALTHCHECK',
+            'SHELL',
+            'USER',
+            'WORKDIR',
+        ]:
             if self._is_same_as_previous(index=index):
                 self.content += "\n"
             else:
@@ -134,7 +146,7 @@ class FormatDockerfile:
         elif self._is_type(line=line, instruction_type='ENV'):
             self.content += "\n"
             self._format_env_line(line_content=line_content)
-        elif self._is_type(line=line, instruction_type='HEALTHCHECK'):
+        elif self._is_type(line=line, instruction_type='FROM'):
             self.content += "\n\n"
             self._format_healthcheck_line(line_content=line_content)
         elif self._is_type(line=line, instruction_type='RUN'):

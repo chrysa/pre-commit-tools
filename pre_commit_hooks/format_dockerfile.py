@@ -133,7 +133,6 @@ class FormatDockerfile:
             'COPY',
             'ENTRYPOINT',
             'EXPOSE',
-            'HEALTHCHECK',
             'SHELL',
             'USER',
             'WORKDIR',
@@ -148,6 +147,9 @@ class FormatDockerfile:
             self._format_env_line(line_content=line_content)
         elif self._is_type(line=line, instruction_type='FROM'):
             self.content += "\n\n"
+            self._format_simple_line(line_content=line_content, line_instruction=line_instruction)
+        elif self._is_type(line=line, instruction_type='HEALTHCHECK'):
+            self.content += "\n"
             self._format_healthcheck_line(line_content=line_content)
         elif self._is_type(line=line, instruction_type='RUN'):
             self._format_run_line(index=index, line_content=line_content)

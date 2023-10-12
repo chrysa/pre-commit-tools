@@ -54,3 +54,7 @@ detect print on python code if is not commented or excape with `# print-detectio
 ### python-pprint-detection
 
 detect pprint on python code if is not commented or excape with `# pprint-detection: disable`
+
+### pylint-html-report
+
+generate pylint html reports

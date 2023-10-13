@@ -58,3 +58,5 @@ detect pprint on python code if is not commented or excape with `# pprint-detect
 ### pylint-html-report
 
 generate pylint html reports
+
+use `--output-json=` to define json output and `--output-html=` to specify html output

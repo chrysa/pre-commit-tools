@@ -32,9 +32,10 @@ class PatternDetection:
 
     def detect(self, *, argv: Sequence[str] | None = None) -> int:
         tools_instance = PreCommitTools()
-        args = tools_instance.set_params(help_msg='search print on python code', argv=argv)
+        tools_instance.set_params(help_msg='search print on python code')
+        namespace_args, _ = tools_instance.get_args(argv=argv)
         ret_val = 0
-        for file in args.filenames:
+        for file in namespace_args.filenames:
             file = Path(file)
             with open(file) as stream:
                 logger.debug(f'process file {file}')

@@ -55,8 +55,7 @@ detect print on python code if is not commented or excape with `# print-detectio
 
 detect pprint on python code if is not commented or excape with `# pprint-detection: disable`
 
-### pylint-html-report
+### [WIP] pylint-html-report
 
 generate pylint html reports
-
-use `--output-json=` to define json output and `--output-html=` to specify html output
+use `--=output-json` to define json output and `--output-html=` to specify html output

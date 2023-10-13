@@ -179,13 +179,14 @@ class FormatDockerfile:
             print(f'{file} .......... formatted')
             self.return_value = 1
         else:
-            print(f'{file} .......... unchabged')
+            print(f'{file} .......... unchanged')
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     format_dockerfile_class = FormatDockerfile()
     tools_instance = PreCommitTools()
-    args = tools_instance.set_params(help_msg='format dockerfile', argv=argv)
+    tools_instance.set_params(help_msg='format dockerfile')
+    args, _ = tools_instance.get_args(argv=argv)
     for file in args.filenames:
         file = Path(file)
         format_dockerfile_class.content = ''

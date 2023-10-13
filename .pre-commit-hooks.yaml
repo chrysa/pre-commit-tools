@@ -22,8 +22,12 @@
   minimum_pre_commit_version: '2.20.0'
   name: detect pprint on python code
   types: ["python"]
-- id: pylint-html-report
+- id: pylint-with-html-report
   name: pylint html report
-  description: genereate htmll report
+  additional_dependencies:
+    - pylint
+    - pylint-report
+  description: genereate html report from pylint
   entry: precommit_tools/pylint-report-html.sh
-  language: script
+  language: system
+  minimum_pre_commit_version: '2.20.0'

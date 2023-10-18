@@ -29,14 +29,14 @@ class PylintHtmlReport(PreCommitTools):
     namesapace_args: argparse.Namespace
     pylint_args: list[str]
 
-    def clean_json_report(self):
-        if self.namesapace_args.output_json is None:
-            logger.debug("clean json report")
-            self.output_json.unlink()
+    # def clean_json_report(self):
+    #     if self.namesapace_args.output_json is None:
+    #         logger.debug("clean json report")
+    #         self.output_json.unlink()
 
-    def convert_json_to_html(self):
-        logger.debug("convert json to html")
-        report_main([self.output_json.as_posix(), "-o", self.output_html.as_posix()])
+    # def convert_json_to_html(self):
+    #     logger.debug("convert json to html")
+    #     report_main([self.output_json.as_posix(), "-o", self.output_html.as_posix()])
 
     def get_args(self, argv):
         logger.debug("parse arguments")
@@ -51,8 +51,7 @@ class PylintHtmlReport(PreCommitTools):
                 + ["--load-plugins=pylint_report", "--output-format=pylint_report.CustomJsonReporter"]
                 + self.namesapace_args.filenames,
             )
-        except SystemExit as e:
-            print(e)
+        except SystemExit:
             pass
 
     def define_output_path(self, *, output_variable_name):
@@ -92,12 +91,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     instance.output_html.parent.mkdir(parents=True, exist_ok=True)
     instance.output_json.parent.mkdir(parents=True, exist_ok=True)
     instance.generate_json_report()
-    instance.convert_json_to_html()
-    instance.clean_json_report()
-    if instance.file_exist(file=instance.output_html) and not instance.file_empty(file=instance.output_html):
-        return 0
-    else:
-        return 1
+    # instance.convert_json_to_html()
+    # instance.clean_json_report()
+    # if instance.file_exist(file=instance.output_html) and not instance.file_empty(file=instance.output_html):
+    #     return 0
+    # else:
+    #     return 1
 
 
 if __name__ == '__main__':

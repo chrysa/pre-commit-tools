@@ -66,7 +66,7 @@ class PylintHtmlReport(PreCommitTools):
 
     def run_pylint(self):
         logger.debug("run pylint")
-        Run(self.pylint_args, do_exit=False)
+        Run(self.pylint_args)
 
     def set_params(self):
         logger.debug("define parser")
@@ -86,12 +86,11 @@ class PylintHtmlReport(PreCommitTools):
 
     def update_pylint_args(self):
         logger.debug("update pylint args")
-        # self.pylint_args.extend(["--exit-zero", "--persistent=n", "--reports=n", "--score=n"])
-        # self.pylint_args.extend(
-        #     [f"--output={self.output_json.as_posix()}", "--output-format=pylint_report.CustomJsonReporter"],
-        # )
+        self.pylint_args.extend(["--exit-zero", "--persistent=n", "--reports=n", "--score=n"])
+        self.pylint_args.extend(
+            [f"--output={self.output_json.as_posix()}", "--output-format=pylint_report.CustomJsonReporter"],
+        )
         self.pylint_args.extend(self.namesapace_args.filenames)
-        print(self.pylint_args)
 
 
 def main(argv: Sequence[str] | None = None) -> int:

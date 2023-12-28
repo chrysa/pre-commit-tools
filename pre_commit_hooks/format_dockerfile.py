@@ -71,7 +71,7 @@ class FormatDockerfile:
         self.content += '\n' + multiline
 
     def _file_as_changed(self) -> bool:
-        return repr(self.content) != repr(self.parser.content)
+        return self.content != self.parser.content
 
     def _format_env_line(self, *, line_content: str) -> None:
         logger.debug('format ENV ..........')
@@ -81,7 +81,12 @@ class FormatDockerfile:
     def _format_run_line(self, *, index: int, line_content: str) -> None:
         logger.debug('format RUN ..........')
         line_content = line_content.replace('RUN ', '')
-        if '&&' in line_content:
+        data: str
+        if line_content.startswith("--"):
+            split_list = list(map(str.strip, line_content.split('&&')))
+            content = ' \\\n    && '.join(split_list)
+            data = '\n' + f"RUN {content}"
+        elif '&&' in line_content:
             data = ' \\\n    && '.join(list(map(str.strip, line_content.split('&&'))))
         else:
             data = ' \\\n    && ' + line_content

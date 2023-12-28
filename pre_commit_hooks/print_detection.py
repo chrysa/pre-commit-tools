@@ -8,9 +8,9 @@ from pre_commit_hooks.tools.pattern_detection import PatternDetection
 
 def main(argv: Sequence[str] | None = None) -> int:
     pattern_detection = PatternDetection(
-        commented=re.compile(r'\s#*print\('),
+        commented=re.compile(r'^\s{0,}#\s{0,}print\('),
         disable_comment=re.compile(r'\bprint-detection\s*:\s*disable'),
-        pattern=re.compile(r'\bprint\('),
+        pattern=re.compile(r'^\s{0,}print\('),
     )
     return pattern_detection.detect()
 

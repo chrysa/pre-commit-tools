@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 from __future__ import annotations
 
+import logging
 import typing
 from dataclasses import dataclass
 from pathlib import Path
@@ -10,6 +11,14 @@ from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 
 if typing.TYPE_CHECKING:
     import re
+
+logger = logging.getLogger()
+logger.setLevel(logging.ERROR)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 
 @dataclass

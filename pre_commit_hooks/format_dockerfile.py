@@ -37,6 +37,7 @@ SHEBANG = '# syntax=docker/dockerfile:1.4'
 class FormatDockerfile:
     dockerfile: Path = None
     content: str = ''
+    content_reference: str = ''
     origin_content: list[dict] = field(default_factory=list)
     parser: DockerfileParser = DockerfileParser()
     return_value: int = 0
@@ -71,7 +72,7 @@ class FormatDockerfile:
         self.content += '\n' + multiline
 
     def _file_as_changed(self) -> bool:
-        return self.content != self.parser.content
+        return self.content_reference != self.parser.content
 
     def _format_env_line(self, *, line_content: str) -> None:
         logger.debug('format ENV ..........')
@@ -173,6 +174,7 @@ class FormatDockerfile:
         self.parser.dockerfile_path = dockerfile_path
         with open(dockerfile_path) as stream:
             self.parser.content = stream.read()
+            self.content_reference = stream.read()
 
     def save(self, *, file: Path) -> None:
         if self._file_as_changed():

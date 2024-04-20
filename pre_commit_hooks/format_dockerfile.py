@@ -185,8 +185,6 @@ class FormatDockerfile:
                 stream.truncate()
             print(f'{file} .......... formatted')
             self.return_value = 1
-        else:
-            print(f'{file} .......... unchanged')
 
 
 def main(argv: Sequence[str] | None = None) -> int:

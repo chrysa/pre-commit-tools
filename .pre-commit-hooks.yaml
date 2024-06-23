@@ -3,26 +3,26 @@
     - dockerfile-parse
   description: format dockerfiles
   entry: format-dockerfile
-  files: Dockerfile, .dockerfile$, .Dockerfile$
+  files: Dockerfile, .[dD]ockerfile$
   language: python
-  language_version: '3.10'
-  minimum_pre_commit_version: '2.20.0'
+  language_version: '3.11'
+  minimum_pre_commit_version: '3.7.1'
   name: format dockerfiles
   types: ["dockerfile"]
 - id: python-print-detection
   entry: print-detection
   files: .py$
   language: python
-  language_version: '3.10'
-  minimum_pre_commit_version: '2.20.0'
+  language_version: '3.11'
+  minimum_pre_commit_version: '3.7.1'
   name: detect print on python code
   types: ["python"]
 - id: python-pprint-detection
   entry: pprint-detection
   files: .py$
   language: python
-  language_version: '3.10'
-  minimum_pre_commit_version: '2.20.0'
+  language_version: '3.11'
+  minimum_pre_commit_version: '3.7.1'
   name: detect pprint on python code
   types: ["python"]
 - id: pylint-with-html-report
@@ -32,7 +32,17 @@
   description: genereate html report from pylint
   entry: pylint-report-html
   language: python
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '3.7.1'
   name: pylint html report
-  language_version: '3.10'
+  language_version: '3.11'
   types: ["python"]
+- id: yaml-sorter
+  entry: yaml-sorter
+  files: .yml$, .yaml$
+  language: python
+  language_version: '3.11'
+  minimum_pre_commit_version: '3.7.1'
+  name: sort yaml file alphabeticly for root and sub elements
+  types: ["yaml"]
+  additional_dependencies:
+    - pyyaml

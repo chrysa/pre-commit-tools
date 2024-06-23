@@ -49,25 +49,25 @@ class FormatDockerfile:
 
     @staticmethod
     def _get_line_content(*, line: Line) -> str:
-        logger.debug(f'get line content {line} ..........')
+        logger.debug(f'get line content {line}..........')
         return line['content'].strip()
 
     @staticmethod
     def _remove_split_lines(*, content) -> str:
-        logger.debug('remove split lines ..........')
+        logger.debug('remove split lines..........')
         return re.sub(r' \\\n +', ' ', content)
 
     def _as_header(self) -> bool:
-        logger.debug('verify if header is present ..........')
+        logger.debug('verify if header is present..........')
         line = self.parser.structure[0]
         return self._is_type(line=line, instruction_type='COMMENT') and self._get_line_content(line=line) == SHEBANG
 
     def _define_header(self) -> None:
-        logger.debug('add shebang ..........')
+        logger.debug('add shebang..........')
         self.content += SHEBANG
 
     def _format_healthcheck_line(self, *, line_content: str) -> None:
-        logger.debug('format HEALTHCHECK ..........')
+        logger.debug('format HEALTHCHECK..........')
         multiline = ' \\\n    CMD '.join(list(map(str.strip, line_content.split('CMD'))))
         self.content += '\n' + multiline
 
@@ -75,12 +75,12 @@ class FormatDockerfile:
         return self.content_reference != self.parser.content
 
     def _format_env_line(self, *, line_content: str) -> None:
-        logger.debug('format ENV ..........')
+        logger.debug('format ENV..........')
         multiline = ' \\\n    '.join(line_content.split(' ')[1:])
         self.content += '\n' + f'ENV {multiline}'
 
     def _format_run_line(self, *, index: int, line_content: str) -> None:
-        logger.debug('format RUN ..........')
+        logger.debug('format RUN..........')
         line_content = line_content.replace('RUN ', '')
         data: str
         if line_content.startswith("--"):
@@ -100,17 +100,17 @@ class FormatDockerfile:
             self.content += '\n' + 'RUN ' + data
 
     def _format_simple_line(self, *, line_content: str, line_instruction: str) -> None:
-        logger.debug(f'format {line_instruction} ..........')
+        logger.debug(f'format {line_instruction}..........')
         self.content += line_content
 
     def _is_type(self, *, line: Line, instruction_type: str) -> bool:
-        logger.debug(f'check if line {line} is {instruction_type} ..........')
+        logger.debug(f'check if line {line} is {instruction_type}..........')
         return self._get_line_instruction(line=line) == instruction_type
 
     def _validate_header(self):
-        logger.debug('validate shebang ..........')
+        logger.debug('validate shebang..........')
         if self._as_header():
-            logger.debug('shebang is present ..........')
+            logger.debug('shebang is present..........')
             self._format_simple_line(
                 line_content=self._get_line_content(line=self.parser.structure[0]),
                 line_instruction="COMMENT",
@@ -170,7 +170,7 @@ class FormatDockerfile:
             self._format_line(index=index, line=line)
 
     def load_dockerfile(self, *, dockerfile_path: Path) -> None:
-        logger.debug(f'read {dockerfile_path} ..........')
+        logger.debug(f'read {dockerfile_path}..........')
         self.parser.dockerfile_path = dockerfile_path
         with open(dockerfile_path) as stream:
             self.parser.content = stream.read()
@@ -178,12 +178,13 @@ class FormatDockerfile:
 
     def save(self, *, file: Path) -> None:
         if self._file_as_changed():
-            logger.debug(f'update {file} ..........')
+            logger.debug(f'update {file}..........')
             with open(file, 'w+') as stream:
                 stream.seek(0)
                 stream.write(self.content)
                 stream.truncate()
-            print(f'{file} .......... formatted')
+            print(f'{file}.......... formatted')
+            # Mettre à jour return_value ici pour indiquer que la Dockerfile a été modifiée
             self.return_value = 1
 
 

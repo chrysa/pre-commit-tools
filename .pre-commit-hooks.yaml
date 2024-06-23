@@ -38,6 +38,7 @@
   types: ["python"]
 - id: yaml-sorter
   entry: yaml-sorter
+  exclude: .pre-commit-config.yaml
   files: .yml$, .yaml$
   language: python
   language_version: '3.11'

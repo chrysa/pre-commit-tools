@@ -5,7 +5,7 @@
   entry: format-dockerfile
   files: Dockerfile, .[dD]ockerfile$
   language: python
-  language_version: '3.11'
+  language_version: '3.10'
   minimum_pre_commit_version: '3.7.1'
   name: format dockerfiles
   types: ["dockerfile"]
@@ -13,7 +13,7 @@
   entry: print-detection
   files: .py$
   language: python
-  language_version: '3.11'
+  language_version: '3.10'
   minimum_pre_commit_version: '3.7.1'
   name: detect print on python code
   types: ["python"]
@@ -21,7 +21,7 @@
   entry: pprint-detection
   files: .py$
   language: python
-  language_version: '3.11'
+  language_version: '3.10'
   minimum_pre_commit_version: '3.7.1'
   name: detect pprint on python code
   types: ["python"]
@@ -34,14 +34,14 @@
   language: python
   minimum_pre_commit_version: '3.7.1'
   name: pylint html report
-  language_version: '3.11'
+  language_version: '3.10'
   types: ["python"]
 - id: yaml-sorter
   entry: yaml-sorter
   exclude: .pre-commit-config.yaml
   files: .yml$, .yaml$
   language: python
-  language_version: '3.11'
+  language_version: '3.10'
   minimum_pre_commit_version: '3.7.1'
   name: sort yaml file alphabeticly for root and sub elements
   types: ["yaml"]

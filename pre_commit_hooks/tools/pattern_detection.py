@@ -54,6 +54,6 @@ class PatternDetection:
                         and not self.is_disabled(line=line_content)
                         and not self.is_commented(line=line_content)
                     ):
-                        print(f'[{file}][L.{line_number}] {line_content.strip()}')  # print-detection: disable
+                        print(f'[{file}:{line_number}] {line_content.strip()}')  # print-detection: disable
                         ret_val = 1
         return ret_val

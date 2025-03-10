@@ -2,9 +2,9 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 default_language_version:
-    python: python3.10
+    python: python3.13
 fail_fast: false
-minimum_pre_commit_version: 2.20.0
+minimum_pre_commit_version: 4.1.0
 repos:
     - repo: https://github.com/asottile/setup-cfg-fmt
       rev: 583e6b807299b819eef8ec12f3ac4341dc0f2f15

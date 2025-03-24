@@ -5,15 +5,39 @@
   entry: format-dockerfile
   files: Dockerfile, .[dD]ockerfile$
   language: python
-  language_version: '3.10'
+  language_version: '3.13'
   minimum_pre_commit_version: '3.7.1'
   name: format dockerfiles
   types: ["dockerfile"]
+- id: console-debug-detection
+  entry: console-debug-detection
+  files: .js$
+  language: python
+  language_version: '3.13'
+  minimum_pre_commit_version: '3.7.1'
+  name: detect console.debug on javascript code
+  types: ["javascript"]
+- id: console-log-detection
+  entry: console-log-detection
+  files: .js$
+  language: python
+  language_version: '3.13'
+  minimum_pre_commit_version: '3.7.1'
+  name: detect console.log on javascript code
+  types: ["javascript"]
+- id: console-table-detection
+  entry: console-table-detection
+  files: .js$
+  language: python
+  language_version: '3.13'
+  minimum_pre_commit_version: '3.7.1'
+  name: detect console.table on javascript code
+  types: ["javascript"]
 - id: python-print-detection
   entry: print-detection
   files: .py$
   language: python
-  language_version: '3.10'
+  language_version: '3.13'
   minimum_pre_commit_version: '3.7.1'
   name: detect print on python code
   types: ["python"]
@@ -21,7 +45,7 @@
   entry: pprint-detection
   files: .py$
   language: python
-  language_version: '3.10'
+  language_version: '3.13'
   minimum_pre_commit_version: '3.7.1'
   name: detect pprint on python code
   types: ["python"]
@@ -34,14 +58,14 @@
   language: python
   minimum_pre_commit_version: '3.7.1'
   name: pylint html report
-  language_version: '3.10'
+  language_version: '3.13'
   types: ["python"]
 - id: yaml-sorter
   entry: yaml-sorter
   exclude: .pre-commit-config.yaml
   files: .yml$, .yaml$
   language: python
-  language_version: '3.10'
+  language_version: '3.13'
   minimum_pre_commit_version: '3.7.1'
   name: sort yaml file alphabeticly for root and sub elements
   types: ["yaml"]

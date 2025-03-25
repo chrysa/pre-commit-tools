@@ -23,11 +23,15 @@ Add this to your `.pre-commit-config.yaml`
 -   repo: https://github.com/chrysa/pre-commit-tools
     rev: ''  # Use the ref you want to point at
     hooks:
-    -   id: format-dockerfiles
-        stages:
-            - manual
-    -   id: print-detection
-    -   id: pprint-detection
+          - id: console-debug-detection
+          - id: console-log-detection
+          - id: console-table-detection
+          - id: format-dockerfiles
+            stages:
+              - manual
+          - id: print-detection
+          - id: pprint-detection
+          - id: yaml-sorter
 ```
 
 ## Hooks available
@@ -58,4 +62,4 @@ detect pprint on python code if is not commented or excape with `# pprint-detect
 ### [WIP] pylint-html-report
 
 generate pylint html reports
-use `--=output-json` to define json output and `--output-html=` to specify html output
+use `--output-json=` to define json output and `--output-html=` to specify html output

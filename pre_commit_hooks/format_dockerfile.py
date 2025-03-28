@@ -174,7 +174,7 @@ class FormatDockerfile:
             logger.debug(f'update {file} ..........')
             with open(file, 'w+') as stream:
                 stream.seek(0)
-                stream.write(self.content)
+                stream.write(self.content.strip())
                 stream.truncate()
             print(f'{file} .......... formatted')
             self.return_value = 1

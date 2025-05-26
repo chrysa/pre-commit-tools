@@ -15,7 +15,7 @@
   language: python
   language_version: '3.13'
   minimum_pre_commit_version: '3.7.1'
-  name: detect console.debug on javascript code
+  name: detect console.log on javascript code
   types: ["javascript"]
 - id: console-log-detection
   entry: console-log-detection

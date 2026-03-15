@@ -58,16 +58,22 @@
   language: python
   minimum_pre_commit_version: '3.7.1'
   name: pylint html report
-  language_version: '3.13'
-  types: ["python"]
 - id: yaml-sorter
-  entry: yaml-sorter
-  exclude: .pre-commit-config.yaml
-  files: .yml$, .yaml$
-  language: python
-  language_version: '3.13'
-  minimum_pre_commit_version: '3.7.1'
-  name: sort yaml file alphabeticly for root and sub elements
-  types: ["yaml"]
   additional_dependencies:
-    - pyyaml
+    - PyYAML
+  description: sort yaml files keys alphabetically
+  entry: yaml-sorter
+  language: python
+  language_version: '3.10'
+  minimum_pre_commit_version: '2.20.0'
+  name: sort yaml files
+  types: ["yaml"]
+- id: requirements-sort
+  description: sort requirements files alphabetically
+  entry: requirements-sort
+  files: 'requirements.*\.txt$'
+  language: python
+  language_version: '3.10'
+  minimum_pre_commit_version: '2.20.0'
+  name: sort requirements files
+  types: ["text"]

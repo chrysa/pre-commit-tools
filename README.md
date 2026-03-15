@@ -10,6 +10,7 @@
       - [Todo](#todo)
     - [python-print-detection](#python-print-detection)
     - [python-pprint-detection](#python-pprint-detection)
+    - [debugger-detection](#debugger-detection)
 
 <!--TOC-->
 
@@ -32,6 +33,7 @@ Add this to your `.pre-commit-config.yaml`
           - id: print-detection
           - id: pprint-detection
           - id: yaml-sorter
+          - id: debugger-detection
 ```
 
 ## Hooks available
@@ -63,3 +65,8 @@ detect pprint on python code if is not commented or excape with `# pprint-detect
 
 generate pylint html reports
 use `--output-json=` to define json output and `--output-html=` to specify html output
+
+### debugger-detection
+
+Detect debugger statements (`breakpoint()`, `pdb.set_trace()`, `ipdb.set_trace()`, `pudb.set_trace()`) in Python files.
+Use `# debugger-detection: disable` to ignore a specific line.

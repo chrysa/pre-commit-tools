@@ -58,16 +58,21 @@
   language: python
   minimum_pre_commit_version: '3.7.1'
   name: pylint html report
-  language_version: '3.13'
-  types: ["python"]
 - id: yaml-sorter
-  entry: yaml-sorter
-  exclude: .pre-commit-config.yaml
-  files: .yml$, .yaml$
-  language: python
-  language_version: '3.13'
-  minimum_pre_commit_version: '3.7.1'
-  name: sort yaml file alphabeticly for root and sub elements
-  types: ["yaml"]
   additional_dependencies:
-    - pyyaml
+    - PyYAML
+  description: sort yaml files keys alphabetically
+  entry: yaml-sorter
+  language: python
+  language_version: '3.10'
+  minimum_pre_commit_version: '2.20.0'
+  name: sort yaml files
+  types: ["yaml"]
+- id: debugger-detection
+  description: detect debugger statements (breakpoint, pdb, ipdb, pudb)
+  entry: debugger-detection
+  language: python
+  language_version: '3.10'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect debugger statements
+  types: ["python"]

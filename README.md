@@ -10,6 +10,7 @@
       - [Todo](#todo)
     - [python-print-detection](#python-print-detection)
     - [python-pprint-detection](#python-pprint-detection)
+    - [json-sorter](#json-sorter)
 
 <!--TOC-->
 
@@ -63,3 +64,7 @@ detect pprint on python code if is not commented or excape with `# pprint-detect
 
 generate pylint html reports
 use `--output-json=` to define json output and `--output-html=` to specify html output
+
+### json-sorter
+
+Sort JSON file keys alphabetically (recursive). Modifies files in-place and returns 1 if any file was changed.

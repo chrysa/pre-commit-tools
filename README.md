@@ -10,6 +10,7 @@
       - [Todo](#todo)
     - [python-print-detection](#python-print-detection)
     - [python-pprint-detection](#python-pprint-detection)
+    - [requirements-sort](#requirements-sort)
 
 <!--TOC-->
 
@@ -63,3 +64,7 @@ detect pprint on python code if is not commented or excape with `# pprint-detect
 
 generate pylint html reports
 use `--output-json=` to define json output and `--output-html=` to specify html output
+
+### requirements-sort
+
+Sort `requirements*.txt` files alphabetically (comments and blank lines first, then packages sorted case-insensitively). Modifies files in-place and returns 1 if any file was changed.

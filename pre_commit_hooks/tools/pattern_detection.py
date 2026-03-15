@@ -1,7 +1,8 @@
 #!/usr/bin/python3
+"""Shared detection engine used by pattern-based pre-commit hooks."""
 from __future__ import annotations
 
-import logging
+import re
 import typing
 from dataclasses import dataclass
 from pathlib import Path
@@ -10,36 +11,34 @@ from pre_commit_hooks.tools.logger import logger
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 
 if typing.TYPE_CHECKING:
-    import re
-
-logger = logging.getLogger()
-logger.setLevel(logging.ERROR)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
+    from collections.abc import Sequence
 
 
 @dataclass
 class PatternDetection:
-    commented: re.Match[bytes]
-    disable_comment: re.Match[bytes]
-    pattern: re.Match[bytes]
+    """Dataclass that holds compiled regex patterns and runs detection over files."""
+
+    commented: re.Pattern[str]
+    disable_comment: re.Pattern[str]
+    pattern: re.Pattern[str]
 
     def as_pattern(self, *, line: str) -> bool:
+        """Return True if the line matches the detection pattern."""
         logger.debug(f'{line} | presence -> {bool(self.pattern.search(line))}')
         return bool(self.pattern.search(line))
 
     def is_commented(self, *, line: str) -> bool:
+        """Return True if the line is a commented-out occurrence of the pattern."""
         logger.debug(f'{line} | commented -> {bool(self.commented.search(line))}')
         return bool(self.commented.search(line))
 
     def is_disabled(self, *, line: str) -> bool:
+        """Return True if the line contains an inline disable comment."""
         logger.debug(f'{line} | disabled -> {bool(self.disable_comment.search(line))}')
         return bool(self.disable_comment.search(line))
 
     def detect(self, *, argv: Sequence[str] | None = None) -> int:
+        """Run detection across all files and return 1 if a violation is found."""
         tools_instance = PreCommitTools()
         tools_instance.set_params(help_msg='search print on python code')
         namespace_args, _ = tools_instance.get_args(argv=argv)

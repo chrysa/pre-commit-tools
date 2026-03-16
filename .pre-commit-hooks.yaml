@@ -68,7 +68,15 @@
   minimum_pre_commit_version: '2.20.0'
   name: sort yaml files
   types: ["yaml"]
-<<<<<<< feat/env-file-check
+- id: requirements-sort
+  description: sort requirements files alphabetically
+  entry: requirements-sort
+  files: 'requirements.*\.txt$'
+  language: python
+  language_version: '3.10'
+  minimum_pre_commit_version: '2.20.0'
+  name: sort requirements files
+  types: ["text"]
 - id: env-file-check
   description: detect potential secrets committed in .env files
   entry: env-file-check
@@ -78,7 +86,6 @@
   minimum_pre_commit_version: '2.20.0'
   name: check env files for secrets
   types: ["text"]
-=======
 - id: python-logger-detection
   description: detect direct use of root logging module instead of named logger
   entry: logger-detection
@@ -87,4 +94,3 @@
   minimum_pre_commit_version: '2.20.0'
   name: detect root logger usage
   types: ["python"]
->>>>>>> main

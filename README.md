@@ -12,6 +12,8 @@
     - [python-pprint-detection](#python-pprint-detection)
     - [\[WIP\] pylint-html-report](#wip-pylint-html-report)
     - [requirements-sort](#requirements-sort)
+    - [env-file-check](#env-file-check)
+    - [logger-detection](#logger-detection)
 
 <!--TOC-->
 
@@ -35,6 +37,8 @@ Add this to your `.pre-commit-config.yaml`
           - id: pprint-detection
           - id: yaml-sorter
           - id: requirements-sort
+          - id: env-file-check
+          - id: logger-detection
 ```
 
 ## Hooks available
@@ -70,3 +74,11 @@ use `--output-json` to define json output and `--output-html` to specify html ou
 ### requirements-sort
 
 Sort `requirements*.txt` files alphabetically (comments and blank lines first, then packages sorted case-insensitively). Modifies files in-place and returns 1 if any file was changed.
+### env-file-check
+
+Detect potential secrets committed in `.env` files (passwords, tokens, API keys, etc.).
+Placeholder values (`<value>`, `${VAR}`, `changeme`, etc.) are ignored.
+### logger-detection
+
+Detect direct use of the root `logging` module (e.g. `logging.info(...)`) instead of a named logger.
+Use `# logger-detection: disable` to ignore a specific line.

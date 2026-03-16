@@ -10,6 +10,7 @@
       - [Todo](#todo)
     - [python-print-detection](#python-print-detection)
     - [python-pprint-detection](#python-pprint-detection)
+    - [yaml-sorter](#yaml-sorter)
     - [\[WIP\] pylint-html-report](#wip-pylint-html-report)
     - [debugger-detection](#debugger-detection)
     - [json-sorter](#json-sorter)
@@ -73,6 +74,12 @@ detect pprint on python code if is not commented or escaped with `# pprint-detec
 ### [WIP] pylint-html-report
 
 generate pylint html reports
+use `--output-json=` to define json output and `--output-html=` to specify html output
+
+### yaml-sorter
+
+Sort YAML file keys alphabetically (recursive). Modifies files in-place and returns 1 if any file was changed.
+Use `# yaml-sorter: disable` is not supported — simply exclude the file in your `.pre-commit-config.yaml`.
 use `--output-json` to define json output and `--output-html` to specify html output
 
 ### debugger-detection

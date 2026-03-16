@@ -68,6 +68,13 @@
   minimum_pre_commit_version: '2.20.0'
   name: sort yaml files
   types: ["yaml"]
+- id: debugger-detection
+  description: detect debugger statements (breakpoint, pdb, ipdb, pudb)
+  entry: debugger-detection
+  language: python
+  language_version: '3.10'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect debugger statements
 - id: json-sorter
   description: sort json files keys alphabetically
   entry: json-sorter

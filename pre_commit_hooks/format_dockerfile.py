@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+"""Hook to format Dockerfiles: add shebang, merge consecutive identical instructions."""
 from __future__ import annotations
 
 import logging
@@ -35,6 +36,8 @@ SHEBANG = '# syntax=docker/dockerfile:1.4'
 # TODO: add config file support
 @dataclass
 class FormatDockerfile:
+    """Dataclass that parses and reformats a Dockerfile in-place."""
+
     dockerfile: Path = None
     content: str = ''
     origin_content: list[dict] = field(default_factory=list)
@@ -132,7 +135,16 @@ class FormatDockerfile:
         line_content = self._get_line_content(line=line)
         line_instruction = self._get_line_instruction(line=self.origin_content[index])
         if line_instruction in [
-            'ADD', 'ARG', 'CMD', 'COMMENT', 'COPY', 'ENTRYPOINT', 'EXPOSE', 'SHELL', 'USER', 'WORKDIR',
+            'ADD',
+            'ARG',
+            'CMD',
+            'COMMENT',
+            'COPY',
+            'ENTRYPOINT',
+            'EXPOSE',
+            'SHELL',
+            'USER',
+            'WORKDIR',
         ]:
             self._add_newline_if_needed(index=index)
             self._format_simple_line(line_content=line_content, line_instruction=line_instruction)
@@ -183,6 +195,7 @@ class FormatDockerfile:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    """Format each Dockerfile in args and return 1 if any file was modified."""
     format_dockerfile_class = FormatDockerfile()
     tools_instance = PreCommitTools()
     tools_instance.set_params(help_msg='format dockerfile')
@@ -201,4 +214,3 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 if __name__ == '__main__':
     raise SystemExit(main())
-

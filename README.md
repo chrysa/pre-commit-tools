@@ -74,6 +74,7 @@ detect pprint on python code if is not commented or escaped with `# pprint-detec
 ### [WIP] pylint-html-report
 
 generate pylint html reports
+use `--output-json` to define json output and `--output-html` to specify html output
 use `--output-json=` to define json output and `--output-html=` to specify html output
 
 ### yaml-sorter

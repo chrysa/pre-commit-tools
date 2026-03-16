@@ -11,6 +11,7 @@
     - [python-print-detection](#python-print-detection)
     - [python-pprint-detection](#python-pprint-detection)
     - [\[WIP\] pylint-html-report](#wip-pylint-html-report)
+    - [debugger-detection](#debugger-detection)
     - [json-sorter](#json-sorter)
     - [requirements-sort](#requirements-sort)
     - [env-file-check](#env-file-check)
@@ -37,6 +38,7 @@ Add this to your `.pre-commit-config.yaml`
           - id: print-detection
           - id: pprint-detection
           - id: yaml-sorter
+          - id: debugger-detection
           - id: json-sorter
           - id: requirements-sort
           - id: env-file-check
@@ -73,6 +75,10 @@ detect pprint on python code if is not commented or escaped with `# pprint-detec
 generate pylint html reports
 use `--output-json` to define json output and `--output-html` to specify html output
 
+### debugger-detection
+
+Detect debugger statements (`breakpoint()`, `pdb.set_trace()`, `ipdb.set_trace()`, `pudb.set_trace()`) in Python files.
+Use `# debugger-detection: disable` to ignore a specific line.
 ### json-sorter
 
 Sort JSON file keys alphabetically (recursive). Modifies files in-place and returns 1 if any file was changed.

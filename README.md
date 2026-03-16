@@ -10,6 +10,8 @@
       - [Todo](#todo)
     - [python-print-detection](#python-print-detection)
     - [python-pprint-detection](#python-pprint-detection)
+    - [\[WIP\] pylint-html-report](#wip-pylint-html-report)
+    - [logger-detection](#logger-detection)
 
 <!--TOC-->
 
@@ -32,6 +34,7 @@ Add this to your `.pre-commit-config.yaml`
           - id: print-detection
           - id: pprint-detection
           - id: yaml-sorter
+          - id: logger-detection
 ```
 
 ## Hooks available
@@ -41,25 +44,30 @@ Add this to your `.pre-commit-config.yaml`
 #### Description
 
 - add shebang `# syntax=docker/dockerfile:1.4` if missing
-- group donsecutif same command without space
-- group consecutive `RUN` or `ENV` on one commande line with new line
+- group consecutive same command without space
+- group consecutive `RUN` or `ENV` on one command line with new line
 
 #### Todo
 
-- separate block for litteral ARGS and ARGS composed with variable
-- order alphabeticly ARGS
-- order alphabeticly ENV
+- separate block for literal ARGS and ARGS composed with variable
+- order alphabetically ARGS
+- order alphabetically ENV
 - add config file support
 
 ### python-print-detection
 
-detect print on python code if is not commented or excape with `# print-detection: disable`
+detect print on python code if is not commented or escaped with `# print-detection: disable`
 
 ### python-pprint-detection
 
-detect pprint on python code if is not commented or excape with `# pprint-detection: disable`
+detect pprint on python code if is not commented or escaped with `# pprint-detection: disable`
 
 ### [WIP] pylint-html-report
 
 generate pylint html reports
-use `--output-json=` to define json output and `--output-html=` to specify html output
+use `--output-json` to define json output and `--output-html` to specify html output
+
+### logger-detection
+
+Detect direct use of the root `logging` module (e.g. `logging.info(...)`) instead of a named logger.
+Use `# logger-detection: disable` to ignore a specific line.

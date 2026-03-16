@@ -11,6 +11,7 @@
     - [python-print-detection](#python-print-detection)
     - [python-pprint-detection](#python-pprint-detection)
     - [\[WIP\] pylint-html-report](#wip-pylint-html-report)
+    - [env-file-check](#env-file-check)
     - [logger-detection](#logger-detection)
 
 <!--TOC-->
@@ -34,6 +35,7 @@ Add this to your `.pre-commit-config.yaml`
           - id: print-detection
           - id: pprint-detection
           - id: yaml-sorter
+          - id: env-file-check
           - id: logger-detection
 ```
 
@@ -67,6 +69,10 @@ detect pprint on python code if is not commented or escaped with `# pprint-detec
 generate pylint html reports
 use `--output-json` to define json output and `--output-html` to specify html output
 
+### env-file-check
+
+Detect potential secrets committed in `.env` files (passwords, tokens, API keys, etc.).
+Placeholder values (`<value>`, `${VAR}`, `changeme`, etc.) are ignored.
 ### logger-detection
 
 Detect direct use of the root `logging` module (e.g. `logging.info(...)`) instead of a named logger.

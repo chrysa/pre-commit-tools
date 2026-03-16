@@ -10,6 +10,13 @@
       - [Todo](#todo)
     - [python-print-detection](#python-print-detection)
     - [python-pprint-detection](#python-pprint-detection)
+    - [yaml-sorter](#yaml-sorter)
+    - [\[WIP\] pylint-html-report](#wip-pylint-html-report)
+    - [debugger-detection](#debugger-detection)
+    - [json-sorter](#json-sorter)
+    - [requirements-sort](#requirements-sort)
+    - [env-file-check](#env-file-check)
+    - [logger-detection](#logger-detection)
 
 <!--TOC-->
 
@@ -32,6 +39,11 @@ Add this to your `.pre-commit-config.yaml`
           - id: print-detection
           - id: pprint-detection
           - id: yaml-sorter
+          - id: debugger-detection
+          - id: json-sorter
+          - id: requirements-sort
+          - id: env-file-check
+          - id: logger-detection
 ```
 
 ## Hooks available
@@ -63,3 +75,29 @@ detect pprint on python code if is not commented or escaped with `# pprint-detec
 
 generate pylint html reports
 use `--output-json` to define json output and `--output-html` to specify html output
+use `--output-json=` to define json output and `--output-html=` to specify html output
+
+### yaml-sorter
+
+Sort YAML file keys alphabetically (recursive). Modifies files in-place and returns 1 if any file was changed.
+Use `# yaml-sorter: disable` is not supported — simply exclude the file in your `.pre-commit-config.yaml`.
+use `--output-json` to define json output and `--output-html` to specify html output
+
+### debugger-detection
+
+Detect debugger statements (`breakpoint()`, `pdb.set_trace()`, `ipdb.set_trace()`, `pudb.set_trace()`) in Python files.
+Use `# debugger-detection: disable` to ignore a specific line.
+### json-sorter
+
+Sort JSON file keys alphabetically (recursive). Modifies files in-place and returns 1 if any file was changed.
+### requirements-sort
+
+Sort `requirements*.txt` files alphabetically (comments and blank lines first, then packages sorted case-insensitively). Modifies files in-place and returns 1 if any file was changed.
+### env-file-check
+
+Detect potential secrets committed in `.env` files (passwords, tokens, API keys, etc.).
+Placeholder values (`<value>`, `${VAR}`, `changeme`, etc.) are ignored.
+### logger-detection
+
+Detect direct use of the root `logging` module (e.g. `logging.info(...)`) instead of a named logger.
+Use `# logger-detection: disable` to ignore a specific line.

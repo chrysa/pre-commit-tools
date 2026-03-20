@@ -74,7 +74,7 @@ class FormatDockerfile:
         self.content += '\n' + multiline
 
     def _file_as_changed(self) -> bool:
-        return self.content != self.parser.content
+        return self.content.strip() != self.parser.content.strip()
 
     def _format_env_line(self, *, line_content: str) -> None:
         logger.debug('format ENV ..........')

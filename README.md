@@ -10,8 +10,8 @@
       - [Todo](#todo)
     - [python-print-detection](#python-print-detection)
     - [python-pprint-detection](#python-pprint-detection)
-    - [yaml-sorter](#yaml-sorter)
     - [\[WIP\] pylint-html-report](#wip-pylint-html-report)
+    - [yaml-sorter](#yaml-sorter)
     - [debugger-detection](#debugger-detection)
     - [json-sorter](#json-sorter)
     - [requirements-sort](#requirements-sort)
@@ -34,8 +34,6 @@ Add this to your `.pre-commit-config.yaml`
           - id: console-log-detection
           - id: console-table-detection
           - id: format-dockerfiles
-            stages:
-              - manual
           - id: print-detection
           - id: pprint-detection
           - id: yaml-sorter

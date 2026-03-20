@@ -22,8 +22,11 @@ def sort_yaml_file(changed_file_state: bool, data: dict, sorted_data: dict) -> t
             sorted_data[key] = {}
             changed_file_state, sorted_data[key] = sort_yaml_file(changed_file_state, value, sorted_data[key])
         elif isinstance(value, list):
-            sorted_data[key] = sorted(value)
-            changed_file_state |= sorted_data[key] != value
+            if all(not isinstance(item, (dict, list)) for item in value):
+                sorted_data[key] = sorted(value)
+                changed_file_state |= sorted_data[key] != value
+            else:
+                sorted_data[key] = value
         else:
             sorted_data[key] = value
     return changed_file_state, sorted_data

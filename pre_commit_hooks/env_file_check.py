@@ -18,7 +18,8 @@ _SECRET_KEY_RE = re.compile(
     re.IGNORECASE,
 )
 _PLACEHOLDER_RE = re.compile(
-    r'^$|^<.+>$|^\$\{.+\}$|^%.+%$|^(?:your[-_]|change[-_]?me|todo|fixme|example|test|dummy|fake|none|null|false|true|0)$',
+    r'^$|^<.+>$|^\$\{.+\}$|^%.+%$'
+    r'|^(?:your[-_]|change[-_]?me|todo|fixme|example|test|dummy|fake|none|null|false|true|0)$',
     re.IGNORECASE,
 )
 

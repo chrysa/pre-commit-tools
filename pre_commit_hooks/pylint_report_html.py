@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from pylint.lint import Run
-from pylint_report.pylint_report import CustomJsonReporter
 from pylint_report.pylint_report import main as report_main
 
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools

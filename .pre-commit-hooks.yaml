@@ -11,28 +11,28 @@
   types: ["dockerfile"]
 - id: console-debug-detection
   entry: console-debug-detection
-  files: .js$
+  files: \.(js|gs)$
   language: python
   language_version: '3.13'
   minimum_pre_commit_version: '3.7.1'
-  name: detect console.log on javascript code
-  types: ["javascript"]
+  name: detect console.debug on javascript code
+  types_or: ["javascript", "file"]
 - id: console-log-detection
   entry: console-log-detection
-  files: .js$
+  files: \.(js|gs)$
   language: python
   language_version: '3.13'
   minimum_pre_commit_version: '3.7.1'
   name: detect console.log on javascript code
-  types: ["javascript"]
+  types_or: ["javascript", "file"]
 - id: console-table-detection
   entry: console-table-detection
-  files: .js$
+  files: \.(js|gs)$
   language: python
   language_version: '3.13'
   minimum_pre_commit_version: '3.7.1'
   name: detect console.table on javascript code
-  types: ["javascript"]
+  types_or: ["javascript", "file"]
 - id: python-print-detection
   entry: print-detection
   files: .py$

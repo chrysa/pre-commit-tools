@@ -113,7 +113,7 @@ repos:
           - id: python-use-type-annotations
           - id: rst-backticks
     - repo: https://github.com/MarcoGorelli/auto-walrus
-      rev: 3154eabcea87e810d7ae34046ba4132b697d79e3
+      rev: a5b68c175abc5d75c9279f42ac6c49a8d536d985
       hooks:
           - id: auto-walrus
     - repo: https://github.com/dannysepler/rm_unneeded_f_str

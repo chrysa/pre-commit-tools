@@ -126,7 +126,7 @@ repos:
           - id: bandit
             args: [-c, config-tools/bandit.yaml]
     - repo: https://github.com/asottile/pyupgrade
-      rev: v3.15.0
+      rev: v3.21.2
       hooks:
           - id: pyupgrade
             args: [--py3-only, --py310-plus]

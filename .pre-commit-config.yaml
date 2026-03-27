@@ -72,7 +72,7 @@ repos:
           stages:
               - manual
     - repo: https://github.com/psf/black
-      rev: 738c2789cc07dbbd6bcf5908fd06627ee8d5cd6c
+      rev: 9e969ddc31863a5c353b3f4e8f69d2aca05e36ae
       hooks:
           - id: black
             args: [--config=config-tools/black.toml]

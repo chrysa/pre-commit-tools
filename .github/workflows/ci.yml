@@ -26,6 +26,6 @@ jobs:
           pip install flake8 mypy
           pip install -e ".[format_dockerfile]"
       - name: flake8
-        run: flake8 pre_commit_hooks/
+        run: flake8
       - name: mypy
-        run: mypy pre_commit_hooks/
+        run: mypy .

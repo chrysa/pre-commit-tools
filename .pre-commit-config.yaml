@@ -45,7 +45,7 @@ repos:
             stages:
                 - manual
     - repo: https://github.com/executablebooks/mdformat
-      rev: 782cb22f294bc4ce48368ee173de4837fc208ecf
+      rev: 56b24ef0c6cfdab501844925971204f858185547
       hooks:
           - id: mdformat
         # Optionally add plugins

@@ -121,7 +121,7 @@ repos:
       hooks:
           - id: rm-unneeded-f-str
     - repo: https://github.com/PyCQA/bandit
-      rev: 6969489ff711a1762bd44d00eaaba75f0c7102f6
+      rev: 4dacfcbe3651ae13a4dce10d6025086bfceed8be
       hooks:
           - id: bandit
             args: [-c, config-tools/bandit.yaml]

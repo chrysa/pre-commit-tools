@@ -97,7 +97,7 @@ repos:
             stages:
                 - manual
     - repo: https://github.com/pycqa/flake8
-      rev: faef3587480ab621dd2fd2d87ec36fc479749a90
+      rev: 9d75094913570f2c676cf19e5cb1d58838246500
       hooks:
           - id: flake8
             args: [--config=setup.cfg]

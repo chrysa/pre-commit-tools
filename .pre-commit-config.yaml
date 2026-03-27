@@ -65,7 +65,7 @@ repos:
           - id: bashate
             args: ['--ignore=E006,E020']
     - repo: https://github.com/jendrikseipp/vulture
-      rev: 'v2.3'
+      rev: 'v2.16'
       hooks:
         - id: vulture
           args: ["pre_commit_hooks/"]

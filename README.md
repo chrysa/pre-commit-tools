@@ -217,9 +217,9 @@ pre-commit run python-dead-code --hook-stage manual --all-files
 
 ### ts-unreachable-code
 
-Detect **explicit** unreachable code — statements after `return`, `throw`, `break`, or `continue` — in TypeScript (`.ts`) and TSX (`.tsx`) files, using a real AST via [tree-sitter](https://github.com/tree-sitter/tree-sitter).
+Detect **explicit** unreachable code — statements after `return`, `throw`, `break`, or `continue` — in TypeScript (`.ts`), TSX (`.tsx`), JavaScript (`.js`) and JSX (`.jsx`) files, using a real AST via [tree-sitter](https://github.com/tree-sitter/tree-sitter).
 
-**Language**: TypeScript / TSX only. No support for plain JavaScript (use `python-unreachable-code` side-by-side if needed).
+**Language**: TypeScript / TSX / JavaScript / JSX (React). The TSX parser is used for `.tsx`/`.jsx` to handle JSX syntax.
 
 **Dynamic code generation**: tree-sitter performs syntactic analysis only, so dynamically evaluated code is unaffected.
 
@@ -241,17 +241,21 @@ function f() {
 
 ### css-duplicate-property
 
-Detect **duplicate CSS property declarations** within the same rule block. When the same property is declared twice, the first declaration is effectively overridden and hidden.
+Detect **duplicate CSS property declarations** within the same rule block, and **duplicate `#id` selectors** across the stylesheet. Duplicate properties hide the first declaration; duplicate IDs violate CSS specificity best-practices and make maintenance harder.
 
 **Language**: CSS (`.css`). SCSS/Less are not currently supported.
 
-Use `/* css-duplicate-property: disable */` on the duplicate line to suppress a specific violation.
+Use `/* css-duplicate-property: disable */` on the duplicate property line to suppress a specific violation.
+Use `/* css-duplicate-id: disable */` on the duplicate ID selector line to suppress a specific violation.
 
 ```css
 .foo {
   color: red;    /* ← first declaration */
   color: blue;   /* ← detected: duplicate property "color" (first at line 2) */
 }
+
+#hero { color: red; }   /* ← first occurrence */
+#hero { color: blue; }  /* ← detected: duplicate ID selector "hero" (first at line 6) */
 ```
 
 Nested rule blocks are tracked independently (each `{…}` scope has its own seen-properties map).

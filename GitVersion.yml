@@ -1,0 +1,15 @@
+# GitVersion configuration
+# Documentation: https://gitversion.net/docs/reference/configuration/
+workflow: GitHubFlow/v1
+
+branches:
+  fix:
+    regex: '^fix[/-]'
+    label: 'fix'
+    increment: Patch
+    source-branches: [main]
+  release:
+    regex: '^release[/-]'
+    label: 'rc'
+    increment: Patch
+    source-branches: [main]

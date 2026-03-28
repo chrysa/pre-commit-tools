@@ -3,14 +3,11 @@
 from __future__ import annotations
 
 import re
-import typing
+from collections.abc import Sequence
 from pathlib import Path
 
 from pre_commit_hooks.tools.logger import logger
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
-
-if typing.TYPE_CHECKING:
-    from collections.abc import Sequence
 
 _SECRET_KEY_RE = re.compile(
     r'^(PASSWORD|PASSWD|SECRET|TOKEN|API_KEY|APIKEY|PRIVATE_KEY|AUTH_KEY|ACCESS_KEY|CREDENTIAL|CREDENTIALS'

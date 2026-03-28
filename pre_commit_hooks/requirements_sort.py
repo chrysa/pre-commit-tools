@@ -2,13 +2,10 @@
 """Hook to sort requirements files alphabetically."""
 from __future__ import annotations
 
-import typing
+from collections.abc import Sequence
 from pathlib import Path
 
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
-
-if typing.TYPE_CHECKING:
-    from collections.abc import Sequence
 
 
 def sort_requirements(lines: list[str]) -> list[str]:

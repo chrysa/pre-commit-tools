@@ -11,14 +11,14 @@ class PreCommitTools:
     """Shared base class for all pre-commit hooks."""
 
     args: argparse.Namespace
-    parser: argparse.ArgumentParser()
+    parser: argparse.ArgumentParser
 
     def file_exist(self, *, file: Path, display: bool = True) -> bool:
         """Return True if the file exists, printing a message if not and display is True."""
         retval: bool = True
         if not file.exists():
             if display:
-                print(f'{file}: not exist')
+                print(f'{file}: not exist')  # print-detection: disable
             retval = False
         return retval
 
@@ -28,17 +28,22 @@ class PreCommitTools:
         if self.file_exist(file=file, display=display):
             if not file.stat().st_size:
                 if display:
-                    print(f'{file}: is empty')
+                    print(f'{file}: is empty')  # print-detection: disable
                 retval = True
         else:
             retval = True
         return retval
 
-    def get_args(self, *, argv: Sequence[str] | None = None) -> tuple[argparse.Namespace, list]:
+    def get_args(self, *, argv: Sequence[str] | None = None) -> tuple[argparse.Namespace, list[str]]:
         """Parse and return known arguments from argv."""
         return self.parser.parse_known_args(argv)
 
-    def set_params(self, *, help_msg: str, arguments: list[tuple[str, dict]] = None) -> None:
+    def set_params(
+        self,
+        *,
+        help_msg: str,
+        arguments: list[tuple[str, dict[str, object]]] | None = None,
+    ) -> None:
         """Configure the argument parser with optional extra arguments."""
         self.parser = argparse.ArgumentParser()
         if arguments is not None:

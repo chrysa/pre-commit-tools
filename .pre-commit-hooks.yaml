@@ -5,7 +5,7 @@
   entry: format-dockerfile
   files: Dockerfile, .[dD]ockerfile$
   language: python
-  language_version: '3.13'
+  language_version: '3.12'
   minimum_pre_commit_version: '3.7.1'
   name: format dockerfiles
   types: ["dockerfile"]
@@ -13,31 +13,31 @@
   entry: console-debug-detection
   files: \.(js|gs)$
   language: python
-  language_version: '3.13'
+  language_version: '3.12'
   minimum_pre_commit_version: '3.7.1'
-  name: detect console.debug on javascript code
+  name: detect console.debug on javascript/appscript code
   types_or: ["javascript", "file"]
 - id: console-log-detection
   entry: console-log-detection
   files: \.(js|gs)$
   language: python
-  language_version: '3.13'
+  language_version: '3.12'
   minimum_pre_commit_version: '3.7.1'
-  name: detect console.log on javascript code
+  name: detect console.log on javascript/appscript code
   types_or: ["javascript", "file"]
 - id: console-table-detection
   entry: console-table-detection
   files: \.(js|gs)$
   language: python
-  language_version: '3.13'
+  language_version: '3.12'
   minimum_pre_commit_version: '3.7.1'
-  name: detect console.table on javascript code
+  name: detect console.table on javascript/appscript code
   types_or: ["javascript", "file"]
 - id: python-print-detection
   entry: print-detection
   files: .py$
   language: python
-  language_version: '3.13'
+  language_version: '3.12'
   minimum_pre_commit_version: '3.7.1'
   name: detect print on python code
   types: ["python"]
@@ -45,7 +45,7 @@
   entry: pprint-detection
   files: .py$
   language: python
-  language_version: '3.13'
+  language_version: '3.12'
   minimum_pre_commit_version: '3.7.1'
   name: detect pprint on python code
   types: ["python"]
@@ -64,7 +64,7 @@
   description: sort yaml files keys alphabetically
   entry: yaml-sorter
   language: python
-  language_version: '3.13'
+  language_version: '3.12'
   minimum_pre_commit_version: '2.20.0'
   name: sort yaml files
   types: ["yaml"]
@@ -72,14 +72,14 @@
   description: detect debugger statements (breakpoint, pdb, ipdb, pudb)
   entry: debugger-detection
   language: python
-  language_version: '3.13'
+  language_version: '3.12'
   minimum_pre_commit_version: '2.20.0'
   name: detect debugger statements
 - id: json-sorter
   description: sort json files keys alphabetically
   entry: json-sorter
   language: python
-  language_version: '3.13'
+  language_version: '3.12'
   minimum_pre_commit_version: '2.20.0'
   name: sort json files
   types: ["json"]
@@ -88,7 +88,7 @@
   entry: requirements-sort
   files: 'requirements.*\.txt$'
   language: python
-  language_version: '3.13'
+  language_version: '3.12'
   minimum_pre_commit_version: '2.20.0'
   name: sort requirements files
   types: ["text"]
@@ -97,7 +97,7 @@
   entry: env-file-check
   files: '\.env'
   language: python
-  language_version: '3.13'
+  language_version: '3.12'
   minimum_pre_commit_version: '2.20.0'
   name: check env files for secrets
   types: ["text"]
@@ -105,7 +105,28 @@
   description: detect direct use of root logging module instead of named logger
   entry: logger-detection
   language: python
-  language_version: '3.13'
+  language_version: '3.12'
   minimum_pre_commit_version: '2.20.0'
   name: detect root logger usage
+  types: ["python"]
+- id: python-unreachable-code
+  description: detect unreachable code after return/raise/break/continue statements
+  entry: unreachable-code-detection
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect unreachable code
+  types: ["python"]
+- id: python-dead-code
+  additional_dependencies:
+    - vulture>=2.0
+  args: ['--min-confidence=80']
+  description: detect unused/dead code (functions, variables, imports) using vulture
+  entry: dead-code-detection
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect dead/unused code
+  pass_filenames: true
+  stages: [manual]
   types: ["python"]

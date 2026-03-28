@@ -3,16 +3,14 @@
 from __future__ import annotations
 
 import json
-import typing
+from collections.abc import Sequence
 from pathlib import Path
+from typing import Any
 
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 
-if typing.TYPE_CHECKING:
-    from collections.abc import Sequence
 
-
-def sort_json(data: object) -> object:
+def sort_json(data: Any) -> Any:
     """Sort a JSON object recursively (dicts by key, lists preserved)."""
     if isinstance(data, dict):
         return {k: sort_json(v) for k, v in sorted(data.items())}

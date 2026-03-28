@@ -3,17 +3,25 @@ target-version = "py310"
 
 [lint]
 select = [
-    "E",   # pycodestyle errors
-    "F",   # pyflakes
-    "W",   # pycodestyle warnings
-    "C90", # mccabe complexity
-    "B",   # flake8-bugbear
-    "I",   # isort
-    "N",   # pep8-naming
-    "UP",  # pyupgrade
-    "TID", # flake8-tidy-imports
+    "E",    # pycodestyle errors
+    "F",    # pyflakes (includes F401 unused imports)
+    "W",    # pycodestyle warnings
+    "C90",  # mccabe complexity
+    "B",    # flake8-bugbear
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade  — replaces asottile/pyupgrade hook
+    "TID",  # flake8-tidy-imports
+    "S",    # flake8-bandit (security) — replaces PyCQA/bandit hook
+    "FURB", # refurb (modernise Python idioms)
+    "RUF",  # ruff-specific rules
 ]
-ignore = ["E203"]
+ignore = [
+    "E203",   # whitespace before ':' (conflicts with black-style formatting)
+    "S101",   # assert used (fine in tests)
+    "S603",   # subprocess call: check=False (too noisy for hook scripts)
+    "S607",   # starting a process with a partial executable path
+]
 
 [lint.mccabe]
 max-complexity = 15
@@ -25,7 +33,8 @@ ban-relative-imports = "all"
 split-on-trailing-comma = true
 
 [lint.per-file-ignores]
-"tests/**" = ["S101", "N802"]
+"tests/**" = ["S101", "N802", "S603", "S607"]
+"pre_commit_hooks/pylint_report_html.py" = ["S101"]
 
 [format]
 quote-style = "single"

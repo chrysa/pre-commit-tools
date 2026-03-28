@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Hook to sort JSON files keys alphabetically."""
+
 from __future__ import annotations
 
 import json

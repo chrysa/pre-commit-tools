@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Shared logger instance for all pre-commit hooks."""
+
 from __future__ import annotations
 
 import logging

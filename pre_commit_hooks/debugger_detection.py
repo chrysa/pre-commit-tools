@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Hook to detect debugger statements in Python files."""
+
 from __future__ import annotations
 
 import re

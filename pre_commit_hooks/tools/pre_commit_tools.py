@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Base class providing shared argument parsing and file utilities for hooks."""
+
 from __future__ import annotations
 
 import argparse

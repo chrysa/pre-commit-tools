@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Hook to detect console.log() calls in JavaScript/AppScript files."""
+
 from __future__ import annotations
 
 import re

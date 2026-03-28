@@ -3,15 +3,12 @@
 from __future__ import annotations
 
 import re
-import typing
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
 from pre_commit_hooks.tools.logger import logger
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
-
-if typing.TYPE_CHECKING:
-    from collections.abc import Sequence
 
 
 @dataclass
@@ -41,18 +38,19 @@ class PatternDetection:
         """Run detection across all files and return 1 if a violation is found."""
         tools_instance = PreCommitTools()
         tools_instance.set_params(help_msg='search print on python code')
-        namespace_args, _ = tools_instance.get_args(argv=argv)
-        ret_val = 0
+        namespace_args, _ = tools_instance.get_args(argv=argv if argv is not None else [])
+        ret_val: int = 0
         for file in namespace_args.filenames:
-            file = Path(file)
-            with open(file) as stream:
-                logger.debug(f'process file {file}')
+            file_path = Path(file)
+            with open(file_path) as stream:
+                logger.debug(f'process file {file_path}')
                 for line_number, line_content in enumerate(stream.readlines()):
                     if (
                         self.as_pattern(line=line_content)
                         and not self.is_disabled(line=line_content)
                         and not self.is_commented(line=line_content)
                     ):
-                        print(f'[{file}:{line_number}] {line_content.strip()}')  # print-detection: disable
+                        print(f'[{file_path}:{line_number}] {line_content.strip()}')  # print-detection: disable
                         ret_val = 1
         return ret_val
+

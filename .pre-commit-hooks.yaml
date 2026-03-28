@@ -84,9 +84,9 @@
   name: sort json files
   types: ["json"]
 - id: requirements-sort
-  description: sort requirements files alphabetically
+  description: sort requirements files and setup.cfg dependencies alphabetically
   entry: requirements-sort
-  files: 'requirements.*\.txt$'
+  files: '(requirements.*\.txt|setup\.cfg)$'
   language: python
   language_version: '3.12'
   minimum_pre_commit_version: '2.20.0'
@@ -130,3 +130,24 @@
   pass_filenames: true
   stages: [manual]
   types: ["python"]
+- id: ts-unreachable-code
+  additional_dependencies:
+    - tree-sitter>=0.23
+    - tree-sitter-typescript>=0.23
+  description: detect unreachable code after return/throw/break/continue in TypeScript/TSX/JSX files
+  entry: ts-unreachable-code-detection
+  files: \.(ts|tsx|js|jsx)$
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect unreachable code in TypeScript/JSX
+  types_or: ["ts", "tsx", "javascript", "file"]
+- id: css-duplicate-property
+  description: detect duplicate/overridden CSS property declarations and duplicate ID selectors
+  entry: css-duplicate-property-detection
+  files: \.css$
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect duplicate CSS properties and IDs
+  types: ["css"]

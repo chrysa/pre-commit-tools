@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Hook to detect potential secrets committed in .env files."""
+
 from __future__ import annotations
 
 import re

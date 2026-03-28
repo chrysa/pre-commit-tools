@@ -1,133 +1,214 @@
-
-# See https://pre-commit.com for more information
-# See https://pre-commit.com/hooks.html for more hooks
 default_language_version:
-    python: python3.13
+  python: python3.13
 fail_fast: false
 minimum_pre_commit_version: 4.1.0
 repos:
-    - repo: https://github.com/asottile/setup-cfg-fmt
-      rev: v3.2.0
-      hooks:
-        - id: setup-cfg-fmt
-    - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v6.0.0
-      hooks:
-        - id: trailing-whitespace
-        - id: end-of-file-fixer
-        - id: check-yaml
-        - id: debug-statements
-    - repo: https://github.com/asottile/reorder-python-imports
-      rev: v3.16.0
-      hooks:
-      - id: reorder-python-imports
-        args: [--py310-plus]
-    - repo: https://github.com/asottile/add-trailing-comma
-      rev: v4.0.0
-      hooks:
-        - id: add-trailing-comma
-    - repo: https://github.com/frnmst/md-toc
-      rev: 9.0.0
-      hooks:
-          - id: md-toc
-            args: [--in-place, github, --header-levels, '6']
-            stages:
-              - manual
-    - repo: https://github.com/igorshubovych/markdownlint-cli
-      rev: v0.48.0
-      hooks:
-          - id: markdownlint
-            args: [--fix]
-            stages:
-                - manual
-    - repo: https://github.com/executablebooks/mdformat
-      rev: 1.0.0
-      hooks:
-          - id: mdformat
-            additional_dependencies:
-                - mdformat-gfm
-            stages:
-                - manual
-    - repo: https://github.com/lovesegfault/beautysh
-      rev: v6.4.3
-      hooks:
-          - id: beautysh
-            args: [--indent-size, '4']
-    - repo: https://github.com/openstack/bashate
-      rev: 2.1.1
-      hooks:
-          - id: bashate
-            args: ['--ignore=E006,E020']
-    - repo: https://github.com/jendrikseipp/vulture
-      rev: v2.16
-      hooks:
-        - id: vulture
-          args: ["pre_commit_hooks/"]
-          stages:
-              - manual
-    - repo: https://github.com/astral-sh/ruff-pre-commit
-      rev: v0.15.8
-      hooks:
-          - id: ruff
-            args: [--config=config-tools/ruff.toml, --fix]
-          - id: ruff-format
-            args: [--config=config-tools/ruff.toml]
-    - repo: https://github.com/pre-commit/mirrors-pylint
-      rev: v3.0.0a5
-      hooks:
-          - id: pylint
-            args: [--rcfile=setup.cfg, --reports=no, --persistent=no, --score=no, --disable=E0401]
-            stages:
-                - manual
-    - repo: https://github.com/pre-commit/mirrors-mypy
-      rev: v1.19.1
-      hooks:
-          - id: mypy
-            args: [--config-file=setup.cfg]
-            stages:
-                - manual
-    - repo: https://github.com/pre-commit/pygrep-hooks
-      rev: v1.10.0
-      hooks:
-          - id: python-no-eval
-          - id: python-no-log-warn
-          - id: python-use-type-annotations
-          - id: rst-backticks
-    - repo: https://github.com/MarcoGorelli/auto-walrus
-      rev: v0.2.2
-      hooks:
-          - id: auto-walrus
-    - repo: https://github.com/dannysepler/rm_unneeded_f_str
-      rev: v0.2.0
-      hooks:
-          - id: rm-unneeded-f-str
-    - repo: https://github.com/PyCQA/bandit
-      rev: 1.9.4
-      hooks:
-          - id: bandit
-            args: [-c, config-tools/bandit.yaml]
-    - repo: https://github.com/asottile/pyupgrade
-      rev: v3.21.2
-      hooks:
-          - id: pyupgrade
-            args: [--py3-only, --py310-plus]
-    - repo: https://github.com/chrysa/pre-commit-tools
-      rev: '0.0.60'
-      hooks:
-          - id: python-print-detection
-          - id: python-pprint-detection
-          - id: debugger-detection
-          - id: yaml-sorter
-            additional_dependencies: [PyYAML]
-          - id: json-sorter
-          - id: requirements-sort
-          - id: env-file-check
-          - id: python-logger-detection
-          - id: python-unreachable-code
-          - id: python-dead-code
-            stages: [manual]
-    - repo: https://github.com/chrysa/pre-commit-hooks-changelog
-      rev: 'v0.1.4'
-      hooks:
-          - id: generate-changelog
-            stages: [manual]
+- hooks:
+  - id: setup-cfg-fmt
+  repo: https://github.com/asottile/setup-cfg-fmt
+  rev: v3.2.0
+- hooks:
+  - id: trailing-whitespace
+  - id: end-of-file-fixer
+  - id: check-yaml
+  - id: debug-statements
+  repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: f1dff44d3a9ae852957f34def96390f28719c232
+- hooks:
+  - args:
+    - --py310-plus
+    id: reorder-python-imports
+  repo: https://github.com/asottile/reorder-python-imports
+  rev: 10322d36ca8efbf9e1e847f3aa76cf9aec25f41d
+- hooks:
+  - id: add-trailing-comma
+  repo: https://github.com/asottile/add-trailing-comma
+  rev: 756490e3dd6602fbb18d5ad51deb43c4e21de0a0
+- hooks:
+  - args:
+    - --in-place
+    - github
+    - --header-levels
+    - '6'
+    id: md-toc
+    stages:
+    - manual
+  repo: https://github.com/frnmst/md-toc
+  rev: 9.0.0
+- hooks:
+  - args:
+    - --fix
+    id: markdownlint
+    stages:
+    - manual
+  repo: https://github.com/igorshubovych/markdownlint-cli
+  rev: f7ed74202ac8ec26bab4a68359556c5243df142f
+- hooks:
+  - additional_dependencies:
+    - mdformat-gfm
+    id: mdformat
+    stages:
+    - manual
+  repo: https://github.com/executablebooks/mdformat
+  rev: 56b24ef0c6cfdab501844925971204f858185547
+- hooks:
+  - args:
+    - --indent-size
+    - '4'
+    id: beautysh
+  repo: https://github.com/lovesegfault/beautysh
+  rev: 34c3b3da0233e76d7d1ad90a78f3679185ecf31c
+- hooks:
+  - args:
+    - --ignore=E006,E020
+    id: bashate
+  repo: https://github.com/openstack/bashate
+  rev: ec2f2400915200d633299612a02d7d285e4be24c
+- hooks:
+  - args:
+    - pre_commit_hooks/
+    id: vulture
+    stages:
+    - manual
+  repo: https://github.com/jendrikseipp/vulture
+  rev: 51a13e9467e3dea6ea5ddb74422a0eba87367ef5
+- hooks:
+  - args:
+    - --config=config-tools/ruff.toml
+    - --fix
+    id: ruff
+  - args:
+    - --config=config-tools/ruff.toml
+    id: ruff-format
+  repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.15.8
+- hooks:
+  - args:
+    - --rcfile=setup.cfg
+    - --reports=no
+    - --persistent=no
+    - --score=no
+    - --disable=E0401
+    id: pylint
+    stages:
+    - manual
+  repo: https://github.com/pre-commit/mirrors-pylint
+  rev: a1b176a5ee919967cf01e87c0222bd64b94fe0de
+- hooks:
+  - args:
+    - --config-file=setup.cfg
+    id: mypy
+    stages:
+    - manual
+  repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v1.19.1
+- hooks:
+  - id: python-no-eval
+  - id: python-no-log-warn
+  - id: python-use-type-annotations
+  - id: rst-backticks
+  repo: https://github.com/pre-commit/pygrep-hooks
+  rev: 84aa5ebaf906144146cbc33c5e71b364cda3d719
+- hooks:
+  - id: auto-walrus
+  repo: https://github.com/MarcoGorelli/auto-walrus
+  rev: a5b68c175abc5d75c9279f42ac6c49a8d536d985
+- hooks:
+  - id: rm-unneeded-f-str
+  repo: https://github.com/dannysepler/rm_unneeded_f_str
+  rev: df396a8bfdeced1a011c7d9d6787aa7f49ac8634
+- hooks:
+  - id: pip-audit
+  repo: https://github.com/pypa/pip-audit
+  rev: e04691292eda1515277abe8a98ae440f2e5b19df
+- hooks:
+  - args:
+    - --baseline
+    - .secrets.baseline
+    exclude: \.pre-commit-config\.yaml
+    id: detect-secrets
+  repo: https://github.com/Yelp/detect-secrets
+  rev: 50119d658ab48021cad234fc5c8d3253263b2ec0
+- hooks:
+  - args:
+    - --py3-only
+    - --py310-plus
+    id: pyupgrade
+    stages:
+    - manual
+  repo: https://github.com/asottile/pyupgrade
+  rev: 369aea6489e38ca74a18df494f191857ba484950
+- hooks:
+  - entry: print-detection
+    id: python-print-detection
+    language: python
+    name: detect print on python code
+    types:
+    - python
+  - entry: pprint-detection
+    id: python-pprint-detection
+    language: python
+    name: detect pprint on python code
+    types:
+    - python
+  - entry: debugger-detection
+    id: debugger-detection
+    language: python
+    name: detect debugger statements
+  - additional_dependencies:
+    - PyYAML
+    entry: yaml-sorter
+    id: yaml-sorter
+    language: python
+    name: sort yaml files
+    types:
+    - yaml
+  - entry: json-sorter
+    id: json-sorter
+    language: python
+    name: sort json files
+    types:
+    - json
+  - entry: requirements-sort
+    files: requirements.*\.txt$
+    id: requirements-sort
+    language: python
+    name: sort requirements files
+    types:
+    - text
+  - entry: env-file-check
+    files: \.env
+    id: env-file-check
+    language: python
+    name: check env files for secrets
+    types:
+    - text
+  - entry: logger-detection
+    id: python-logger-detection
+    language: python
+    name: detect root logger usage
+    types:
+    - python
+  - entry: unreachable-code-detection
+    id: python-unreachable-code
+    language: python
+    name: detect unreachable code
+    types:
+    - python
+  - additional_dependencies:
+    - vulture>=2.0
+    entry: dead-code-detection
+    id: python-dead-code
+    language: python
+    name: detect dead/unused code
+    stages:
+    - manual
+    types:
+    - python
+  repo: local
+- hooks:
+  - id: generate-changelog
+    stages:
+    - manual
+  repo: https://github.com/chrysa/pre-commit-hooks-changelog
+  rev: 40d13585c4c845c36108a565f00c23f2b946e9d9

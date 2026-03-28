@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Hook to detect unreachable code (statements after return/raise/break/continue)."""
+
 from __future__ import annotations
 
 import ast
@@ -14,12 +15,19 @@ _TERMINAL_NODES: tuple[type[ast.stmt], ...] = (ast.Return, ast.Raise, ast.Break,
 Violation = tuple[str, int, str]
 
 
-def _check_body(body: list[ast.stmt], filename: str) -> list[Violation]:
+def _check_body(
+    body: list[ast.stmt],
+    filename: str,
+    source_lines: list[str],
+) -> list[Violation]:
     """Return violations for unreachable statements in a flat block."""
     violations: list[Violation] = []
     for i, node in enumerate(body):
         if isinstance(node, _TERMINAL_NODES) and i + 1 < len(body):
             next_node = body[i + 1]
+            line_idx = next_node.lineno - 1
+            if 0 <= line_idx < len(source_lines) and '# unreachable-code: disable' in source_lines[line_idx]:
+                break
             stmt_type = type(node).__name__.lower()
             violations.append((filename, next_node.lineno, f'unreachable code after {stmt_type}'))
             break  # report only the first dead statement per block
@@ -27,24 +35,25 @@ def _check_body(body: list[ast.stmt], filename: str) -> list[Violation]:
 
 
 class _UnreachableVisitor(ast.NodeVisitor):
-    def __init__(self, filename: str) -> None:
+    def __init__(self, filename: str, source_lines: list[str]) -> None:
         self._filename: str = filename
+        self._source_lines: list[str] = source_lines
         self.violations: list[Violation] = []
 
     def _visit_body(self, body: list[ast.stmt]) -> None:
-        self.violations.extend(_check_body(body, self._filename))
+        self.violations.extend(_check_body(body, self._filename, self._source_lines))
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         self._visit_body(node.body)
         self.generic_visit(node)
 
-    visit_AsyncFunctionDef = visit_FunctionDef
+    visit_AsyncFunctionDef = visit_FunctionDef  # noqa: N815
 
     def visit_For(self, node: ast.For) -> None:
         self._visit_body(node.body)
         self.generic_visit(node)
 
-    visit_AsyncFor = visit_For
+    visit_AsyncFor = visit_For  # noqa: N815
 
     def visit_While(self, node: ast.While) -> None:
         self._visit_body(node.body)
@@ -60,7 +69,7 @@ class _UnreachableVisitor(ast.NodeVisitor):
         self._visit_body(node.body)
         self.generic_visit(node)
 
-    visit_AsyncWith = visit_With
+    visit_AsyncWith = visit_With  # noqa: N815
 
     def visit_Try(self, node: ast.Try) -> None:
         self._visit_body(node.body)
@@ -74,7 +83,7 @@ class _UnreachableVisitor(ast.NodeVisitor):
 
     if sys.version_info >= (3, 11):
 
-        def visit_TryStar(self, node: ast.AST) -> None:
+        def visit_TryStar(self, node: ast.AST) -> None:  # noqa: N802
             """Handle Python 3.11+ except* syntax."""
             body: list[ast.stmt] = getattr(node, 'body', [])
             if body:
@@ -99,7 +108,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             tree = ast.parse(source, filename=filename)
         except SyntaxError:
             continue
-        visitor = _UnreachableVisitor(filename)
+        visitor = _UnreachableVisitor(filename, source.splitlines())
         visitor.visit(tree)
         for fname, lineno, msg in visitor.violations:
             print(f'[{fname}:{lineno}] {msg}')  # print-detection: disable

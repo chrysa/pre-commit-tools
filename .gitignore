@@ -7,3 +7,5 @@ __pycache__/
 build/
 dist/
 **/pre_commit_hooks_tools.egg-info/
+.ruff_cache
+.pytest_cache

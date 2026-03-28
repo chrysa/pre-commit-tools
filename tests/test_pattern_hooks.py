@@ -1,4 +1,5 @@
 """Tests for print_detection, pprint_detection, debugger_detection, logger_detection."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -10,8 +11,8 @@ from pre_commit_hooks.logger_detection import main as logger_main
 from pre_commit_hooks.pprint_detection import main as pprint_main
 from pre_commit_hooks.print_detection import main as print_main
 
-
 # ── helpers ──────────────────────────────────────────────────────────────────
+
 
 def _write(tmp_path: Path, name: str, content: str) -> str:
     p = tmp_path / name
@@ -20,6 +21,7 @@ def _write(tmp_path: Path, name: str, content: str) -> str:
 
 
 # ── print_detection ───────────────────────────────────────────────────────────
+
 
 class TestPrintDetection:
     def test_clean_file_returns_0(self, tmp_path: Path) -> None:
@@ -50,6 +52,7 @@ class TestPrintDetection:
 
 # ── pprint_detection ──────────────────────────────────────────────────────────
 
+
 class TestPprintDetection:
     def test_clean_returns_0(self, tmp_path: Path) -> None:
         f = _write(tmp_path, 'ok.py', 'x = 1\n')
@@ -70,13 +73,17 @@ class TestPprintDetection:
 
 # ── debugger_detection ────────────────────────────────────────────────────────
 
+
 class TestDebuggerDetection:
-    @pytest.mark.parametrize('stmt', [
-        'breakpoint()\n',
-        'pdb.set_trace()\n',
-        'ipdb.set_trace()\n',
-        'pudb.set_trace()\n',
-    ])
+    @pytest.mark.parametrize(
+        'stmt',
+        [
+            'breakpoint()\n',
+            'pdb.set_trace()\n',
+            'ipdb.set_trace()\n',
+            'pudb.set_trace()\n',
+        ],
+    )
     def test_debugger_stmt_returns_1(self, tmp_path: Path, stmt: str) -> None:
         f = _write(tmp_path, 'dbg.py', stmt)
         assert debugger_main([f]) == 1
@@ -95,6 +102,7 @@ class TestDebuggerDetection:
 
 
 # ── logger_detection ──────────────────────────────────────────────────────────
+
 
 class TestLoggerDetection:
     @pytest.mark.parametrize('level', ['debug', 'info', 'warning', 'error', 'critical', 'exception'])

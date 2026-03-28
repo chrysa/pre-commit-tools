@@ -1,4 +1,5 @@
 """Tests for dead_code_detection (requires vulture)."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -39,6 +40,7 @@ class TestDeadCodeDetectionMain:
         mock_item.name = '_never_called'
 
         import vulture as vlt
+
         with patch.object(vlt.Vulture, 'get_unused_code', return_value=[mock_item]):
             result = main(['--min-confidence=60', f])
         assert result == 1

@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Shared detection engine used by pattern-based pre-commit hooks."""
+
 from __future__ import annotations
 
 import re
@@ -53,4 +54,3 @@ class PatternDetection:
                         print(f'[{file_path}:{line_number}] {line_content.strip()}')  # print-detection: disable
                         ret_val = 1
         return ret_val
-

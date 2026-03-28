@@ -1,0 +1,17 @@
+---
+# Hadolint configuration for Dockerfile linting
+# https://github.com/hadolint/hadolint
+# Reference: args: [-c, config-tools/.hadolint.yaml]
+
+failure-threshold: error
+
+ignored:
+    - DL3008 # Pin versions in apt-get install
+    - DL3009 # Delete the apt-get lists after installing something
+    - DL3015 # Avoid additional packages by specifying --no-install-recommends
+    - DL4006 # Set the SHELL option -o pipefail before RUN with a pipe in
+
+trustedRegistries:
+    - docker.io
+    - gcr.io
+    - registry.hub.docker.com

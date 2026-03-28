@@ -151,3 +151,66 @@
   minimum_pre_commit_version: '2.20.0'
   name: detect duplicate CSS properties and IDs
   types: ["css"]
+- id: css-unused-variable
+  description: detect CSS custom properties (--var) declared but never used via var()
+  entry: css-unused-variable-detection
+  files: \.css$
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect unused CSS custom properties
+  types: ["css"]
+- id: react-console-error-detection
+  description: detect console.error() calls in JavaScript/TypeScript/React files
+  entry: react-console-error-detection
+  files: \.(js|ts|jsx|tsx)$
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect console.error() calls
+  types_or: ["ts", "tsx", "javascript", "file"]
+- id: no-bare-except
+  description: detect bare except clauses (without exception type) in Python files
+  entry: no-bare-except-detection
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect bare except clauses
+  types: ["python"]
+- id: no-print-in-migration
+  description: detect print() calls in Django migration files
+  entry: no-print-in-migration
+  files: 'migrations/.*\.py$'
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect print() in migrations
+  types: ["python"]
+- id: django-hardcoded-secret
+  description: detect hardcoded secrets (SECRET_KEY, PASSWORD, API_KEY, TOKEN) in Python settings
+  entry: django-hardcoded-secret-detection
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect hardcoded secrets in settings
+  types: ["python"]
+- id: dockerfile-no-latest
+  description: detect FROM image:latest (non-pinned) instructions in Dockerfiles
+  entry: dockerfile-no-latest-detection
+  files: '(^|/)Dockerfile[^/]*$'
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect FROM :latest in Dockerfiles
+  types_or: ["dockerfile", "file"]
+- id: env-example-sync
+  description: check that .env and .env.example files contain the same keys
+  entry: env-example-sync
+  files: '\.env(\.example)?$'
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: check .env/.env.example sync
+  pass_filenames: true
+  types: ["text"]
+

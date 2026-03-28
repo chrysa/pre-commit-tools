@@ -1,5 +1,16 @@
 # pre-commit-tools
 
+[![CI](https://github.com/chrysa/pre-commit-tools/actions/workflows/ci.yml/badge.svg)](https://github.com/chrysa/pre-commit-tools/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/chrysa/pre-commit-tools/branch/main/graph/badge.svg)](https://codecov.io/gh/chrysa/pre-commit-tools)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=chrysa_pre-commit-tools&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=chrysa_pre-commit-tools)
+[![Coverage (Sonar)](https://sonarcloud.io/api/project_badges/measure?project=chrysa_pre-commit-tools&metric=coverage)](https://sonarcloud.io/summary/new_code?id=chrysa_pre-commit-tools)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=chrysa_pre-commit-tools&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=chrysa_pre-commit-tools)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=chrysa_pre-commit-tools&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=chrysa_pre-commit-tools)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=chrysa_pre-commit-tools&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=chrysa_pre-commit-tools)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 <!--TOC-->
 
 - [pre-commit-tools](#pre-commit-tools)
@@ -11,17 +22,24 @@
     - [console-debug-detection](#console-debug-detection)
     - [console-log-detection](#console-log-detection)
     - [console-table-detection](#console-table-detection)
+    - [react-console-error-detection](#react-console-error-detection)
     - [pylint-html-report](#pylint-html-report)
     - [yaml-sorter](#yaml-sorter)
     - [debugger-detection](#debugger-detection)
     - [json-sorter](#json-sorter)
     - [requirements-sort](#requirements-sort)
     - [env-file-check](#env-file-check)
+    - [env-example-sync](#env-example-sync)
     - [python-logger-detection](#python-logger-detection)
     - [python-unreachable-code](#python-unreachable-code)
     - [python-dead-code](#python-dead-code)
+    - [no-bare-except](#no-bare-except)
+    - [no-print-in-migration](#no-print-in-migration)
+    - [django-hardcoded-secret](#django-hardcoded-secret)
+    - [dockerfile-no-latest](#dockerfile-no-latest)
     - [ts-unreachable-code](#ts-unreachable-code)
     - [css-duplicate-property](#css-duplicate-property)
+    - [css-unused-variable](#css-unused-variable)
 
 <!--TOC-->
 
@@ -38,14 +56,20 @@ Add this to your `.pre-commit-config.yaml`
           - id: console-debug-detection
           - id: console-log-detection
           - id: console-table-detection
+          - id: react-console-error-detection
           - id: format-dockerfiles
+          - id: dockerfile-no-latest
           - id: python-print-detection
           - id: python-pprint-detection
+          - id: no-bare-except
+          - id: no-print-in-migration
+          - id: django-hardcoded-secret
           - id: yaml-sorter
           - id: debugger-detection
           - id: json-sorter
           - id: requirements-sort
           - id: env-file-check
+          - id: env-example-sync
           - id: python-logger-detection
           - id: python-unreachable-code
           # optional — run manually: pre-commit run python-dead-code --hook-stage manual --all-files
@@ -53,6 +77,7 @@ Add this to your `.pre-commit-config.yaml`
             stages: [manual]
           - id: ts-unreachable-code
           - id: css-duplicate-property
+          - id: css-unused-variable
 ```
 
 ## Hooks available
@@ -259,4 +284,102 @@ Use `/* css-duplicate-id: disable */` on the duplicate ID selector line to suppr
 ```
 
 Nested rule blocks are tracked independently (each `{…}` scope has its own seen-properties map).
+
+### css-unused-variable
+
+Detect **CSS custom properties** (`--var-name`) that are declared but never used anywhere in the file via `var(--var-name)`.
+
+**Language**: CSS (`.css`). SCSS/Less are not currently supported.
+
+Use `/* css-unused-variable: disable */` on the declaration line to suppress a specific violation.
+
+```css
+:root {
+  --color-primary: #007bff;  /* ← used below */
+  --color-ghost: #aaa;       /* ← detected: declared but never used */
+}
+.btn { color: var(--color-primary); }
+```
+
+### react-console-error-detection
+
+Detect `console.error()` calls in JavaScript/TypeScript/React files. Complements `console-log-detection`, `console-debug-detection` and `console-table-detection`.
+
+**Language**: `.js`, `.ts`, `.jsx`, `.tsx`.
+
+Use `// console-error-detection: disable` on the line to suppress a specific violation.
+
+### no-bare-except
+
+Detect bare `except:` clauses (without specifying an exception type) in Python files. Bare excepts catch all exceptions including `SystemExit`, `KeyboardInterrupt` and `GeneratorExit`, which can mask serious errors.
+
+Use `# no-bare-except: disable` to suppress a specific line.
+
+```python
+# WRONG
+try:
+    do_something()
+except:          # ← detected
+    pass
+
+# OK
+try:
+    do_something()
+except ValueError:
+    pass
+```
+
+### no-print-in-migration
+
+Detect `print()` calls in Django migration files (`migrations/*.py`). Print statements committed in migrations will be shown every time migrations run.
+
+Use `# no-print-in-migration: disable` to suppress a specific line.
+
+### django-hardcoded-secret
+
+Detect hardcoded secrets directly assigned in Python files. Catches patterns like `SECRET_KEY = "..."`, `PASSWORD = "..."`, `API_KEY = "..."`, `TOKEN = "..."` and `PRIVATE_KEY = "..."`.
+
+Values referencing environment variables (`os.environ`, `os.getenv`, `env()`, `config()`, etc.) are **not** flagged.
+
+Use `# django-hardcoded-secret: disable` to suppress a specific line.
+
+```python
+# WRONG — detected
+SECRET_KEY = 'django-insecure-abc123'
+
+# OK — not flagged
+SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = env('SECRET_KEY')
+```
+
+### dockerfile-no-latest
+
+Detect `FROM image:latest` instructions in Dockerfiles. Using `:latest` makes builds non-reproducible.
+`FROM scratch` is always allowed.
+
+Use `# dockerfile-no-latest: disable` to suppress a specific line.
+
+```dockerfile
+# WRONG
+FROM python:latest
+
+# OK
+FROM python:3.12-slim
+```
+
+### env-example-sync
+
+Check that `.env` and `.env.example` files contain the same set of keys. Ensures that new environment variables added to `.env` are documented in `.env.example` (with empty or placeholder values), and vice-versa.
+
+```yaml
+- id: env-example-sync
+  args:
+    - '--env-file=.env'           # default
+    - '--example-file=.env.example'  # default
+```
+
+| Option | Default | Description |
+|---|---|---|
+| `--env-file` | `.env` | Path to the private `.env` file |
+| `--example-file` | `.env.example` | Path to the public example file |
 

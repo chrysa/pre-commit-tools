@@ -1,13 +1,13 @@
 """Tests for unreachable_code_detection."""
+
 from __future__ import annotations
 
+import ast
 from pathlib import Path
 
 import pytest
 
 from pre_commit_hooks.unreachable_code_detection import _check_body, main
-
-import ast
 
 
 def _write(tmp_path: Path, name: str, content: str) -> str:
@@ -26,25 +26,31 @@ def _parse_body(src: str) -> list[ast.stmt]:
 class TestCheckBody:
     def test_no_terminal_returns_empty(self) -> None:
         body = _parse_body('def f():\n    x = 1\n    y = 2\n')
-        assert _check_body(body, 'f.py') == []
+        assert _check_body(body, 'f.py', []) == []
 
     def test_return_at_end_returns_empty(self) -> None:
         body = _parse_body('def f():\n    x = 1\n    return x\n')
-        assert _check_body(body, 'f.py') == []
+        assert _check_body(body, 'f.py', []) == []
 
     def test_return_before_stmt_returns_violation(self) -> None:
         body = _parse_body('def f():\n    return 1\n    x = 2\n')
-        violations = _check_body(body, 'test.py')
+        violations = _check_body(body, 'test.py', [])
         assert len(violations) == 1
-        filename, lineno, msg = violations[0]
+        filename, _lineno, msg = violations[0]
         assert filename == 'test.py'
         assert 'unreachable' in msg
         assert 'return' in msg
 
     def test_raise_before_stmt_returns_violation(self) -> None:
         body = _parse_body('def f():\n    raise ValueError()\n    x = 1\n')
-        violations = _check_body(body, 'test.py')
+        violations = _check_body(body, 'test.py', [])
         assert len(violations) == 1
+
+    def test_disable_comment_suppresses_violation(self) -> None:
+        body = _parse_body('def f():\n    return 1\n    x = 2\n')
+        # Unreachable line is source line index 2 (0-based)
+        source_lines = ['def f():', '    return 1', '    x = 2  # unreachable-code: disable']
+        assert _check_body(body, 'test.py', source_lines) == []
 
 
 class TestUnreachableCodeMain:
@@ -85,13 +91,6 @@ class TestUnreachableCodeMain:
     @pytest.mark.parametrize('py_version', ['3.13', '3.14'])
     def test_try_block_unreachable(self, tmp_path: Path, py_version: str) -> None:
         """Ensure try-block analysis doesn't crash on supported Python versions."""
-        code = (
-            'def f():\n'
-            '    try:\n'
-            '        raise ValueError()\n'
-            '        x = 1\n'
-            '    except ValueError:\n'
-            '        pass\n'
-        )
+        code = 'def f():\n    try:\n        raise ValueError()\n        x = 1\n    except ValueError:\n        pass\n'
         f = _write(tmp_path, 'try_dead.py', code)
         assert main([f]) == 1

@@ -1,4 +1,5 @@
 """Tests for console_debug_detection, console_log_detection, console_table_detection."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -16,11 +17,14 @@ def _write(tmp_path: Path, name: str, content: str) -> str:
     return str(p)
 
 
-@pytest.mark.parametrize('main_fn,stmt,disable_key', [
-    (debug_main, 'console.debug("x");\n', 'console-debug-detection'),
-    (log_main, 'console.log("x");\n', 'console-log-detection'),
-    (table_main, 'console.table(data);\n', 'console-table-detection'),
-])
+@pytest.mark.parametrize(
+    'main_fn,stmt,disable_key',
+    [
+        (debug_main, 'console.debug("x");\n', 'console-debug-detection'),
+        (log_main, 'console.log("x");\n', 'console-log-detection'),
+        (table_main, 'console.table(data);\n', 'console-table-detection'),
+    ],
+)
 class TestConsoleDetection:
     def test_statement_returns_1(
         self,

@@ -1,4 +1,5 @@
 """Tests for yaml_sorter."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -15,44 +16,44 @@ def _write(tmp_path: Path, name: str, content: str) -> str:
 class TestSortYamlFile:
     def test_already_sorted_returns_no_change(self) -> None:
         data = {'a': 1, 'b': 2, 'c': 3}
-        changed, result = sort_yaml_file(False, data, {})
-        assert not changed
+        _changed, result = sort_yaml_file(False, data, {})
+        assert not _changed
         assert list(result.keys()) == ['a', 'b', 'c']
 
     def test_unsorted_returns_change(self) -> None:
         data = {'c': 3, 'a': 1, 'b': 2}
-        changed, result = sort_yaml_file(False, data, {})
-        assert changed
+        _changed, result = sort_yaml_file(False, data, {})
+        assert _changed
         assert list(result.keys()) == ['a', 'b', 'c']
 
     def test_nested_dict_sorted(self) -> None:
         data = {'z': {'b': 1, 'a': 2}}
-        changed, result = sort_yaml_file(False, data, {})
+        _changed, result = sort_yaml_file(False, data, {})
         assert list(result['z'].keys()) == ['a', 'b']
 
     def test_bool_keys_do_not_raise(self) -> None:
         """Regression test for issue #37 — YAML booleans as dict keys."""
         data = {True: 'yes', False: 'no'}
         # Should not raise TypeError
-        changed, result = sort_yaml_file(False, data, {})
+        _changed, result = sort_yaml_file(False, data, {})
         assert isinstance(result, dict)
 
     def test_mixed_type_keys_do_not_raise(self) -> None:
         """Regression test for issue #37 — mixed-type keys."""
         data = {1: 'int', 'b': 'str', None: 'null'}
-        changed, result = sort_yaml_file(False, data, {})
+        _changed, result = sort_yaml_file(False, data, {})
         assert isinstance(result, dict)
 
     def test_list_of_scalars_sorted(self) -> None:
         data = {'items': ['c', 'a', 'b']}
-        changed, result = sort_yaml_file(False, data, {})
+        _changed, result = sort_yaml_file(False, data, {})
         assert result['items'] == ['a', 'b', 'c']
 
     def test_list_of_dicts_not_sorted(self) -> None:
         """Lists containing dicts should be left as-is."""
         inner = [{'z': 1}, {'a': 2}]
         data = {'items': inner}
-        changed, result = sort_yaml_file(False, data, {})
+        _changed, result = sort_yaml_file(False, data, {})
         assert result['items'] == inner
 
 

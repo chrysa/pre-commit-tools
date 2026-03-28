@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Hook to detect direct use of the root logging module instead of a named logger."""
+
 from __future__ import annotations
 
 import re

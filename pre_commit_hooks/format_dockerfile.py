@@ -1,14 +1,13 @@
 #!/usr/bin/python3
 """Hook to format Dockerfiles: add shebang, merge consecutive identical instructions."""
+
 from __future__ import annotations
 
 import logging
 import re
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import NewType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NewType
 
 from dockerfile_parse import DockerfileParser
 
@@ -41,7 +40,7 @@ class FormatDockerfile:
     dockerfile: Path = None
     content: str = ''
     origin_content: list[dict] = field(default_factory=list)
-    parser: DockerfileParser = DockerfileParser()
+    parser: DockerfileParser = field(default_factory=DockerfileParser)
     return_value: int = 0
 
     @staticmethod
@@ -88,13 +87,13 @@ class FormatDockerfile:
         if self._is_same_as_previous(index=index):
             self.content += data
         else:
-            self.content += "\n"
+            self.content += '\n'
             if data.startswith(' \\\n    && '):
                 data = data.replace(' \\\n    && ', '', 1)
             self.content += '\n' + 'RUN ' + data
 
     def _split_run_content(self, line_content: str) -> str:
-        if line_content.startswith("--"):
+        if line_content.startswith('--'):
             split_list = list(map(str.strip, line_content.split('&&')))
             return ' \\\n    && '.join(split_list)
         elif '&&' in line_content:
@@ -116,7 +115,7 @@ class FormatDockerfile:
             logger.debug('shebang is present ..........')
             self._format_simple_line(
                 line_content=self._get_line_content(line=self.parser.structure[0]),
-                line_instruction="COMMENT",
+                line_instruction='COMMENT',
             )
             return self.parser.structure[1:]
         else:
@@ -149,13 +148,13 @@ class FormatDockerfile:
             self._add_newline_if_needed(index=index)
             self._format_simple_line(line_content=line_content, line_instruction=line_instruction)
         elif self._is_type(line=line, instruction_type='ENV'):
-            self.content += "\n"
+            self.content += '\n'
             self._format_env_line(line_content=line_content)
         elif self._is_type(line=line, instruction_type='FROM'):
-            self.content += "\n\n"
+            self.content += '\n\n'
             self._format_simple_line(line_content=line_content, line_instruction=line_instruction)
         elif self._is_type(line=line, instruction_type='HEALTHCHECK'):
-            self.content += "\n"
+            self.content += '\n'
             self._format_healthcheck_line(line_content=line_content)
         elif self._is_type(line=line, instruction_type='RUN'):
             self._format_run_line(index=index, line_content=line_content)
@@ -164,9 +163,9 @@ class FormatDockerfile:
 
     def _add_newline_if_needed(self, *, index: int) -> None:
         if self._is_same_as_previous(index=index):
-            self.content += "\n"
+            self.content += '\n'
         else:
-            self.content += "\n\n"
+            self.content += '\n\n'
 
     def format_file(self) -> None:
         logger.debug('format file')

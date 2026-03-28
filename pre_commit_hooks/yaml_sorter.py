@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Hook to sort YAML files keys alphabetically."""
+
 from __future__ import annotations
 
 from collections import OrderedDict
@@ -34,7 +35,7 @@ def sort_yaml_file(
     return changed_file_state, sorted_data
 
 
-def main(argv: Sequence[str] | None = None) -> int:  # noqa: C901
+def main(argv: Sequence[str] | None = None) -> int:
     """Sort YAML file keys alphabetically and return 1 if any file was modified."""
     tools_instance = PreCommitTools()
     tools_instance.set_params(help_msg='sort yaml file')

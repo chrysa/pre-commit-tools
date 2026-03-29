@@ -63,14 +63,14 @@ jobs:
         run: ruff format --check --config=config-tools/ruff.toml pre_commit_hooks tests
 
       - name: ruff — produce JSON report
-        if: matrix.python-version == '3.13'
+        if: always() && matrix.python-version == '3.13'
         run: |
           mkdir -p reports
           ruff check --config=config-tools/ruff.toml --output-format=json pre_commit_hooks tests > reports/ruff.json || true
           echo "ruff.json size: $(wc -c < reports/ruff.json) bytes"
 
       - name: Upload ruff report artifact
-        if: matrix.python-version == '3.13'
+        if: always() && matrix.python-version == '3.13'
         uses: actions/upload-artifact@v7
         with:
           name: ruff-report
@@ -115,6 +115,20 @@ jobs:
 
       - name: mypy — type check
         run: mypy --config-file=setup.cfg pre_commit_hooks
+
+      - name: mypy — produce text report
+        if: always() && matrix.python-version == '3.13'
+        run: |
+          mkdir -p reports
+          mypy --config-file=setup.cfg --no-error-summary pre_commit_hooks > reports/mypy.txt 2>&1 || true
+          echo "mypy.txt size: $(wc -c < reports/mypy.txt) bytes"
+
+      - name: Upload mypy report artifact
+        if: always() && matrix.python-version == '3.13'
+        uses: actions/upload-artifact@v7
+        with:
+          name: mypy-report
+          path: reports/mypy.txt
 
   test:
     name: Test (${{ matrix.python-version }})
@@ -198,7 +212,8 @@ jobs:
 
   sonar:
     name: SonarCloud analysis
-    needs: [ruff, test]
+    needs: [ruff, mypy, test]
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -210,6 +225,7 @@ jobs:
         with:
           name: test-results-3.13
           path: reports/
+        continue-on-error: true
 
       - name: Download ruff report
         uses: actions/download-artifact@v8
@@ -218,8 +234,15 @@ jobs:
           path: reports/
         continue-on-error: true
 
+      - name: Download mypy report
+        uses: actions/download-artifact@v8
+        with:
+          name: mypy-report
+          path: reports/
+        continue-on-error: true
+
       - name: List reports available for SonarCloud
-        run: ls -lh reports/
+        run: ls -lh reports/ || echo "reports/ directory is empty or missing"
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v5
@@ -234,6 +257,7 @@ jobs:
             -Dsonar.python.version=3.14
             -Dsonar.python.coverage.reportPaths=reports/coverage.xml
             -Dsonar.python.ruff.reportPaths=reports/ruff.json
+            -Dsonar.python.mypy.reportPaths=reports/mypy.txt
             -Dsonar.python.xunit.reportPath=reports/junit.xml
             -Dsonar.exclusions=**/__pycache__/**,**/*.egg-info/**,**/.git/**
             -Dsonar.qualitygate.wait=true

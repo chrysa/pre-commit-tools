@@ -37,7 +37,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: '3.14'  # keep in sync with config job in ci.yml
       - name: Update version in setup.cfg
         run: |
           sed -i "s/^version = .*/version = ${{ needs.version.outputs.majorMinorPatch }}/" setup.cfg

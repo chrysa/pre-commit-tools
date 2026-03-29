@@ -1,18 +1,20 @@
-true:
+name: pre-commit
+
+on:
   pull_request:
     branches:
-    - main
+      - main
   push:
     branches:
-    - main
+      - main
+
 jobs:
   pre-commit:
     name: Run pre-commit hooks
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
-    - uses: actions/setup-python@v6
-      with:
-        python-version: '3.13'
-    - uses: pre-commit/action@v3.0.1
-name: pre-commit
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: pre-commit/action@v3.0.1

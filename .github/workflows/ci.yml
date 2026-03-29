@@ -20,16 +20,27 @@ permissions:
   statuses: write
 
 jobs:
+  config:
+    name: Build matrix config
+    runs-on: ubuntu-latest
+    outputs:
+      python-versions: ${{ steps.matrix.outputs.python-versions }}
+      latest-python: ${{ steps.matrix.outputs.latest-python }}
+    steps:
+      - id: matrix
+        shell: bash
+        run: |
+          echo 'python-versions=["3.12","3.13","3.14"]' >> $GITHUB_OUTPUT
+          echo 'latest-python=3.14' >> $GITHUB_OUTPUT
+
   ruff:
     name: Ruff (${{ matrix.python-version }})
+    needs: config
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version:
-          - '3.12'
-          - '3.13'
-          - '3.14'
+        python-version: ${{ fromJson(needs.config.outputs.python-versions) }}
     steps:
       - uses: actions/checkout@v6
 
@@ -44,11 +55,8 @@ jobs:
       - name: Check ruff version
         run: ruff --version
 
-      - name: Install package (core extras)
-        run: pip install -e '.[format_dockerfile,yaml,dead_code]'
-
-      - name: Install tree-sitter
-        run: pip install 'tree-sitter>=0.23,<0.26' 'tree-sitter-typescript>=0.23,<0.24'
+      - name: Install project dependencies
+        uses: ./.github/actions/install-project
 
       - name: ruff — lint check
         run: ruff check --config=config-tools/ruff.toml pre_commit_hooks tests
@@ -57,14 +65,14 @@ jobs:
         run: ruff format --check --config=config-tools/ruff.toml pre_commit_hooks tests
 
       - name: ruff — produce JSON report
-        if: always() && matrix.python-version == '3.14'
+        if: always() && matrix.python-version == needs.config.outputs.latest-python
         run: |
           mkdir -p reports
           ruff check --config=config-tools/ruff.toml --output-format=json pre_commit_hooks tests > reports/ruff.json || true
           echo "ruff.json size: $(wc -c < reports/ruff.json) bytes"
 
       - name: Upload ruff report artifact
-        if: always() && matrix.python-version == '3.14'
+        if: always() && matrix.python-version == needs.config.outputs.latest-python
         uses: actions/upload-artifact@v7
         with:
           name: ruff-report
@@ -72,15 +80,13 @@ jobs:
 
   mypy:
     name: Mypy (${{ matrix.python-version }})
+    needs: config
     runs-on: ubuntu-latest
     continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
-        python-version:
-          - '3.12'
-          - '3.13'
-          - '3.14'
+        python-version: ${{ fromJson(needs.config.outputs.python-versions) }}
     steps:
       - uses: actions/checkout@v6
 
@@ -95,24 +101,21 @@ jobs:
       - name: Check mypy version
         run: mypy --version
 
-      - name: Install package (core extras)
-        run: pip install -e '.[format_dockerfile,yaml,dead_code]'
-
-      - name: Install tree-sitter
-        run: pip install 'tree-sitter>=0.23,<0.26' 'tree-sitter-typescript>=0.23,<0.24'
+      - name: Install project dependencies
+        uses: ./.github/actions/install-project
 
       - name: mypy — type check
         run: mypy --config-file=setup.cfg pre_commit_hooks
 
       - name: mypy — produce text report
-        if: always() && matrix.python-version == '3.14'
+        if: always() && matrix.python-version == needs.config.outputs.latest-python
         run: |
           mkdir -p reports
           mypy --config-file=setup.cfg --no-error-summary pre_commit_hooks > reports/mypy.txt 2>&1 || true
           echo "mypy.txt size: $(wc -c < reports/mypy.txt) bytes"
 
       - name: Upload mypy report artifact
-        if: always() && matrix.python-version == '3.14'
+        if: always() && matrix.python-version == needs.config.outputs.latest-python
         uses: actions/upload-artifact@v7
         with:
           name: mypy-report
@@ -120,14 +123,12 @@ jobs:
 
   test:
     name: Test (${{ matrix.python-version }})
+    needs: config
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version:
-          - '3.12'
-          - '3.13'
-          - '3.14'
+        python-version: ${{ fromJson(needs.config.outputs.python-versions) }}
     steps:
       - uses: actions/checkout@v6
 
@@ -148,11 +149,10 @@ jobs:
       - name: Install vulture (dead code)
         run: pip install vulture
 
-      - name: Install tree-sitter
-        run: pip install 'tree-sitter>=0.23,<0.26' 'tree-sitter-typescript>=0.23,<0.24'
-
-      - name: Install package (all extras)
-        run: pip install -e '.[format_dockerfile,yaml,ts_unreachable_code,dead_code]'
+      - name: Install project dependencies
+        uses: ./.github/actions/install-project
+        with:
+          extras: 'format_dockerfile,yaml,ts_unreachable_code,dead_code'
 
       - name: List installed packages
         run: pip list --format=columns | grep -E "tree.sitter|vulture|pytest|dockerfile"
@@ -178,7 +178,7 @@ jobs:
           path: reports/
 
       - name: Publish test results to PR
-        if: always() && matrix.python-version == '3.14'
+        if: always() && matrix.python-version == needs.config.outputs.latest-python
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
           files: reports/junit.xml
@@ -186,7 +186,7 @@ jobs:
           check_name: pytest
 
       - name: Upload coverage to Codecov
-        if: matrix.python-version == '3.14'
+        if: matrix.python-version == needs.config.outputs.latest-python
         uses: codecov/codecov-action@v6
         with:
           files: reports/coverage.xml
@@ -194,7 +194,7 @@ jobs:
 
   sonar:
     name: SonarCloud analysis
-    needs: [ruff, mypy, test]
+    needs: [config, ruff, mypy, test]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -202,10 +202,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download test results (3.14)
+      - name: Download test results (${{ needs.config.outputs.latest-python }})
         uses: actions/download-artifact@v8
         with:
-          name: test-results-3.14
+          name: test-results-${{ needs.config.outputs.latest-python }}
           path: reports/
         continue-on-error: true
 
@@ -236,7 +236,7 @@ jobs:
             -Dsonar.sourceEncoding=UTF-8
             -Dsonar.sources=pre_commit_hooks
             -Dsonar.tests=tests
-            -Dsonar.python.version=3.14
+            -Dsonar.python.version=${{ needs.config.outputs.latest-python }}
             -Dsonar.python.coverage.reportPaths=reports/coverage.xml
             -Dsonar.python.ruff.reportPaths=reports/ruff.json
             -Dsonar.python.mypy.reportPaths=reports/mypy.txt

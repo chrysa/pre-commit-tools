@@ -1,0 +1,36 @@
+name: Ruff check
+description: Run ruff lint/format checks and upload JSON report
+
+inputs:
+  python-version:
+    required: true
+    description: Current Python version (matrix)
+  latest-python:
+    required: true
+    description: Latest Python version (for conditional report upload)
+
+runs:
+  using: composite
+  steps:
+    - name: ruff — lint check
+      run: ruff check --config=config-tools/ruff.toml pre_commit_hooks tests
+      shell: bash
+
+    - name: ruff — format check
+      run: ruff format --check --config=config-tools/ruff.toml pre_commit_hooks tests
+      shell: bash
+
+    - name: ruff — produce JSON report
+      if: always() && inputs.python-version == inputs.latest-python
+      run: |
+        mkdir -p reports
+        ruff check --config=config-tools/ruff.toml --output-format=json pre_commit_hooks tests > reports/ruff.json || true
+        echo "ruff.json size: $(wc -c < reports/ruff.json) bytes"
+      shell: bash
+
+    - name: Upload ruff report artifact
+      if: always() && inputs.python-version == inputs.latest-python
+      uses: actions/upload-artifact@v7
+      with:
+        name: ruff-report
+        path: reports/ruff.json

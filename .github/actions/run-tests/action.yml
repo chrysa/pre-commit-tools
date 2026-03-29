@@ -1,0 +1,51 @@
+name: Run tests
+description: Run pytest suite, upload results, publish to PR and send coverage to Codecov
+
+inputs:
+  python-version:
+    required: true
+    description: Current Python version (matrix)
+  latest-python:
+    required: true
+    description: Latest Python version (for conditional publish/codecov)
+
+runs:
+  using: composite
+  steps:
+    - name: List installed packages
+      run: pip list --format=columns | grep -E "tree.sitter|vulture|pytest|dockerfile"
+      shell: bash
+
+    - name: Run test suite
+      run: |
+        mkdir -p reports
+        pytest \
+          --cov=pre_commit_hooks \
+          --cov-branch \
+          --cov-report=xml:reports/coverage.xml \
+          --cov-report=term-missing \
+          --junitxml=reports/junit.xml \
+          -v
+      shell: bash
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: test-results-${{ inputs.python-version }}
+        path: reports/
+
+    - name: Publish test results to PR
+      if: always() && inputs.python-version == inputs.latest-python
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      with:
+        files: reports/junit.xml
+        comment_title: Test Results
+        check_name: pytest
+
+    - name: Upload coverage to Codecov
+      if: inputs.python-version == inputs.latest-python
+      uses: codecov/codecov-action@v6
+      with:
+        files: reports/coverage.xml
+        fail_ci_if_error: false

@@ -1,0 +1,23 @@
+name: Setup Python
+description: Common Python environment setup (version check + pip upgrade)
+
+inputs:
+  python-version:
+    required: true
+    description: Python version to set up
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python ${{ inputs.python-version }}
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Check Python version
+      run: python --version
+      shell: bash
+
+    - name: Upgrade pip
+      run: python -m pip install --upgrade pip
+      shell: bash

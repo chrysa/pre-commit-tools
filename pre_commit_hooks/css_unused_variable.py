@@ -47,6 +47,7 @@ def detect_unused_variables(source: str, filename: str) -> list[Violation]:
 def main(argv: Sequence[str] | None = None) -> int:
     """Detect unused CSS custom properties and return 1 if any are found."""
     import argparse
+
     parser = argparse.ArgumentParser(description='Detect unused CSS custom properties')
     parser.add_argument('filenames', nargs='*')
     args = parser.parse_args(argv)

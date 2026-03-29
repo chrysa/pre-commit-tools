@@ -213,4 +213,73 @@
   name: check .env/.env.example sync
   pass_filenames: true
   types: ["text"]
+- id: no-console-warn
+  description: detect console.warn() calls in JavaScript/TypeScript/React files
+  entry: no-console-warn
+  files: \.(js|gs|ts|jsx|tsx)$
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect console.warn() calls
+  types_or: ["ts", "tsx", "javascript", "file"]
+- id: react-direct-dom
+  description: detect direct DOM manipulation (document.getElementById etc.) in React files
+  entry: react-direct-dom
+  files: \.(jsx|tsx)$
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect direct DOM manipulation in React
+  types_or: ["tsx", "jsx", "file"]
+- id: import-no-relative-parent
+  description: detect deep relative parent imports (../../) in TypeScript/JavaScript
+  entry: import-no-relative-parent
+  files: \.(js|ts|jsx|tsx)$
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect deep relative parent imports
+  types_or: ["ts", "tsx", "javascript", "file"]
+- id: no-debug-in-settings
+  description: detect DEBUG = True in Django settings files
+  entry: no-debug-in-settings
+  files: settings.*\.py$
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect DEBUG=True in settings
+  types: ["python"]
+- id: django-no-raw-sql
+  description: detect raw SQL queries (.raw() and cursor.execute()) in Django code
+  entry: django-no-raw-sql
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect raw SQL in Django
+  types: ["python"]
+- id: no-sync-in-async
+  description: detect synchronous blocking calls (time.sleep, requests.*) inside async functions
+  entry: no-sync-in-async
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect blocking calls in async functions
+  types: ["python"]
+- id: fastapi-missing-response-model
+  description: detect FastAPI routes missing the response_model parameter
+  entry: fastapi-missing-response-model
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: detect FastAPI routes without response_model
+  types: ["python"]
+- id: js-syntax-check
+  description: validate JavaScript and Google Apps Script (.gs) syntax using Node.js
+  entry: js-syntax-check
+  files: \.(js|gs)$
+  language: python
+  language_version: '3.12'
+  minimum_pre_commit_version: '2.20.0'
+  name: validate JS/.gs syntax (node --check)
+  types_or: ["javascript", "file"]
 

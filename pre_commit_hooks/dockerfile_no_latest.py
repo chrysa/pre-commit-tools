@@ -30,6 +30,7 @@ def detect_from_latest(source: str, filename: str) -> list[Violation]:
 def main(argv: Sequence[str] | None = None) -> int:
     """Detect FROM :latest tags in Dockerfiles and return 1 if any are found."""
     import argparse
+
     parser = argparse.ArgumentParser(description='Detect FROM :latest in Dockerfiles')
     parser.add_argument('filenames', nargs='*')
     args = parser.parse_args(argv)

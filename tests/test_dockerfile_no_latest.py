@@ -44,11 +44,14 @@ class TestDetectFromLatest:
         src = 'FROM PYTHON:LATEST\n'
         assert len(detect_from_latest(src, 'Dockerfile')) == 1
 
-    @pytest.mark.parametrize('src', [
-        'FROM python:3.12\n',
-        'FROM node:18-alpine\n',
-        'FROM golang:1.21.0\n',
-    ])
+    @pytest.mark.parametrize(
+        'src',
+        [
+            'FROM python:3.12\n',
+            'FROM node:18-alpine\n',
+            'FROM golang:1.21.0\n',
+        ],
+    )
     def test_pinned_images_ok(self, src: str) -> None:
         assert detect_from_latest(src, 'Dockerfile') == []
 

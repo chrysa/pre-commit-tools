@@ -37,7 +37,7 @@ def _strip_block_comments(content: str) -> str:
 
 def detect_duplicate_properties(content: str, filename: str) -> list[Violation]:
     """Return violations for duplicate CSS property declarations within the same rule block."""
-    original_lines = content.splitlines()          # keep for disable-comment lookup
+    original_lines = content.splitlines()  # keep for disable-comment lookup
     stripped_content = _strip_block_comments(content)
     lines = stripped_content.splitlines()
     violations: list[Violation] = []

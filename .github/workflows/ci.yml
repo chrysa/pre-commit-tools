@@ -48,7 +48,7 @@ jobs:
         uses: ./.github/actions/tool-setup
         with:
           python-version: ${{ matrix.python-version }}
-          requirements: lint
+          extras: 'lint,format_dockerfile,yaml,dead_code'
 
       - name: ruff — lint check
         run: ruff check --config=config-tools/ruff.toml pre_commit_hooks tests
@@ -86,7 +86,7 @@ jobs:
         uses: ./.github/actions/tool-setup
         with:
           python-version: ${{ matrix.python-version }}
-          requirements: typecheck
+          extras: 'typecheck,format_dockerfile,yaml,dead_code'
 
       - name: mypy — type check
         run: mypy --config-file=setup.cfg pre_commit_hooks
@@ -123,8 +123,7 @@ jobs:
         uses: ./.github/actions/tool-setup
         with:
           python-version: ${{ matrix.python-version }}
-          requirements: test
-          extras: 'format_dockerfile,yaml,ts_unreachable_code,dead_code'
+          extras: 'test,format_dockerfile,yaml,ts_unreachable_code,dead_code'
 
       - name: List installed packages
         run: pip list --format=columns | grep -E "tree.sitter|vulture|pytest|dockerfile"

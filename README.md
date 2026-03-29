@@ -397,8 +397,6 @@ Check that `.env` and `.env.example` files contain the same set of keys. Ensures
 
 ---
 
-## New Hooks
-
 ### no-console-warn
 
 Detect `console.warn()` calls in JavaScript/TypeScript/React files (`.js`, `.gs`, `.ts`, `.jsx`, `.tsx`).

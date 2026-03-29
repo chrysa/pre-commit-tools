@@ -1,17 +1,13 @@
 name: Tool setup
-description: Python environment + tool install (from requirements/) + project install
+description: Python environment + project install (extras defined in setup.cfg)
 
 inputs:
   python-version:
     required: true
     description: Python version to set up
-  requirements:
-    required: true
-    description: File name under requirements/ without .txt (e.g. lint, typecheck, test)
   extras:
-    required: false
-    default: 'format_dockerfile,yaml,dead_code'
-    description: pip extras to pass to install-project
+    required: true
+    description: pip extras from setup.cfg (comma-separated, e.g. lint,format_dockerfile,yaml,dead_code)
 
 runs:
   using: composite
@@ -20,10 +16,6 @@ runs:
       uses: ./.github/actions/python-setup
       with:
         python-version: ${{ inputs.python-version }}
-
-    - name: Install tools from requirements/${{ inputs.requirements }}.txt
-      run: pip install -r requirements/${{ inputs.requirements }}.txt
-      shell: bash
 
     - name: Install project dependencies
       uses: ./.github/actions/install-project

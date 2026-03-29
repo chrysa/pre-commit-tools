@@ -1,117 +1,127 @@
+---
 name: Publish to PyPI
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
 
 jobs:
-  version:
-    name: Calculate version
-    runs-on: ubuntu-latest
-    outputs:
-      fullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}
-      majorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}
-      preReleaseTag: ${{ steps.gitversion.outputs.preReleaseTag }}
-      semVer: ${{ steps.gitversion.outputs.semVer }}
-      should-release: ${{ steps.tag-check.outputs.should-release }}
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-      - name: Determine version
-        id: gitversion
-        uses: chrysa/github-actions/gitversion@v1
-      - name: Check if version tag already exists
-        id: tag-check
-        run: |
-          VERSION="v${{ steps.gitversion.outputs.majorMinorPatch }}"
-          if git ls-remote --tags origin "refs/tags/$VERSION" | grep -q .; then
-            echo "should-release=false" >> $GITHUB_OUTPUT
-            echo "Tag $VERSION already exists — skipping release"
-          else
-            echo "should-release=true" >> $GITHUB_OUTPUT
-            echo "Tag $VERSION does not exist — proceeding with release"
-          fi
+    version:
+        name: Calculate version
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        outputs:
+            fullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}
+            majorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}
+            preReleaseTag: ${{ steps.gitversion.outputs.preReleaseTag }}
+            semVer: ${{ steps.gitversion.outputs.semVer }}
+            should-release: ${{ steps.tag-check.outputs.should-release }}
+        steps:
+            - uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+            - name: Determine version
+              id: gitversion
+              uses: chrysa/github-actions/gitversion@v1
+            - name: Check if version tag already exists
+              id: tag-check
+              shell: bash
+              run: |
+                  VERSION="v${{ steps.gitversion.outputs.majorMinorPatch }}"
+                  if git ls-remote --tags origin "refs/tags/$VERSION" | grep -q .; then
+                      echo "should-release=false" >> $GITHUB_OUTPUT
+                      echo "Tag $VERSION already exists — skipping release"
+                  else
+                      echo "should-release=true" >> $GITHUB_OUTPUT
+                      echo "Tag $VERSION does not exist — proceeding with release"
+                  fi
 
-  build:
-    name: Build distribution
-    needs: version
-    if: needs.version.outputs.should-release == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.14'  # keep in sync with config job in ci.yml
-      - name: Update version in setup.cfg
-        run: |
-          sed -i "s/^version = .*/version = ${{ needs.version.outputs.majorMinorPatch }}/" setup.cfg
-      - name: Install build
-        run: pip install build
-      - name: Build package
-        run: python -m build
-      - uses: actions/upload-artifact@v7
-        with:
-          name: dist
-          path: dist/
+    build:
+        name: Build distribution
+        needs: version
+        if: needs.version.outputs.should-release == 'true'
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        steps:
+            - uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+            - uses: actions/setup-python@v6
+              with:
+                  python-version: '3.14'  # keep in sync with config job in ci.yml
+            - name: Update version in setup.cfg
+              shell: bash
+              run: |
+                  sed -i "s/^version = .*/version = ${{ needs.version.outputs.majorMinorPatch }}/" setup.cfg
+            - name: Install build
+              shell: bash
+              run: pip install build
+            - name: Build package
+              shell: bash
+              run: python -m build
+            - uses: actions/upload-artifact@v7
+              with:
+                  name: dist
+                  path: dist/
 
-  publish:
-    name: Publish to PyPI
-    needs:
-      - build
-      - version
-    if: needs.version.outputs.preReleaseTag == ''
-    runs-on: ubuntu-latest
-    environment: pypi
-    permissions:
-      id-token: write
-    steps:
-      - uses: actions/download-artifact@v8
-        with:
-          name: dist
-          path: dist/
-      - uses: pypa/gh-action-pypi-publish@release/v1
+    publish:
+        name: Publish to PyPI
+        needs:
+            - build
+            - version
+        if: needs.version.outputs.preReleaseTag == ''
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        environment: pypi
+        permissions:
+            id-token: write
+        steps:
+            - uses: actions/download-artifact@v8
+              with:
+                  name: dist
+                  path: dist/
+            - uses: pypa/gh-action-pypi-publish@release/v1
 
-  release:
-    name: Create GitHub Release
-    needs:
-      - publish
-      - version
-    if: needs.version.outputs.preReleaseTag == ''
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+    release:
+        name: Create GitHub Release
+        needs:
+            - publish
+            - version
+        if: needs.version.outputs.preReleaseTag == ''
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
 
-      - name: Generate changelog
-        id: cliff
-        uses: orhun/git-cliff-action@v4
-        with:
-          config: cliff.toml
-          args: --unreleased --tag v${{ needs.version.outputs.majorMinorPatch }} --strip header
-        env:
-          OUTPUT: CHANGELOG.md
-          GITHUB_REPO: ${{ github.repository }}
+            - name: Generate changelog
+              id: cliff
+              uses: orhun/git-cliff-action@v4
+              with:
+                  config: cliff.toml
+                  args: --unreleased --tag v${{ needs.version.outputs.majorMinorPatch }} --strip header
+              env:
+                  OUTPUT: CHANGELOG.md
+                  GITHUB_REPO: ${{ github.repository }}
 
-      - name: Commit CHANGELOG.md and create tag
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add CHANGELOG.md
-          git diff --cached --quiet || git commit --no-verify -m "chore(changelog): update for v${{ needs.version.outputs.majorMinorPatch }}"
-          git tag -a "v${{ needs.version.outputs.majorMinorPatch }}" -m "Release v${{ needs.version.outputs.majorMinorPatch }}"
-          git push origin HEAD:main "v${{ needs.version.outputs.majorMinorPatch }}"
+            - name: Commit CHANGELOG.md and create tag
+              shell: bash
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git add CHANGELOG.md
+                  git diff --cached --quiet || git commit --no-verify -m "chore(changelog): update for v${{ needs.version.outputs.majorMinorPatch }}"
+                  git tag -a "v${{ needs.version.outputs.majorMinorPatch }}" -m "Release v${{ needs.version.outputs.majorMinorPatch }}"
+                  git push origin HEAD:main "v${{ needs.version.outputs.majorMinorPatch }}"
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ needs.version.outputs.majorMinorPatch }}
-          name: v${{ needs.version.outputs.majorMinorPatch }}
-          body: ${{ steps.cliff.outputs.content }}
+            - name: Create GitHub Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: v${{ needs.version.outputs.majorMinorPatch }}
+                  name: v${{ needs.version.outputs.majorMinorPatch }}
+                  body: ${{ steps.cliff.outputs.content }}

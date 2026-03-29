@@ -1,136 +1,141 @@
+---
 name: CI
 
 on:
-  pull_request:
-    branches:
-      - main
-  push:
-    branches:
-      - feature/**
-      - fix/**
-      - main
-      - release/**
-  workflow_dispatch:
+    pull_request:
+        branches:
+            - main
+    push:
+        branches:
+            - feature/**
+            - fix/**
+            - main
+            - release/**
+    workflow_dispatch:
 
 # Required for publish-unit-test-result-action and SonarCloud
 permissions:
-  checks: write
-  contents: read
-  pull-requests: write
-  statuses: write
+    checks: write
+    contents: read
+    pull-requests: write
+    statuses: write
 
 jobs:
-  config:
-    name: Build matrix config
-    runs-on: ubuntu-latest
-    outputs:
-      python-versions: ${{ steps.matrix.outputs.python-versions }}
-      latest-python: ${{ steps.matrix.outputs.latest-python }}
-    steps:
-      - id: matrix
-        shell: bash
-        run: |
-          echo 'python-versions=["3.12","3.13","3.14"]' >> $GITHUB_OUTPUT
-          echo 'latest-python=3.14' >> $GITHUB_OUTPUT
+    config:
+        name: Build matrix config
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        outputs:
+            python-versions: ${{ steps.matrix.outputs.python-versions }}
+            latest-python: ${{ steps.matrix.outputs.latest-python }}
+        steps:
+            - id: matrix
+              shell: bash
+              run: |
+                  echo 'python-versions=["3.12","3.13","3.14"]' >> $GITHUB_OUTPUT
+                  echo 'latest-python=3.14' >> $GITHUB_OUTPUT
 
-  ruff:
-    name: Ruff (${{ matrix.python-version }})
-    needs: config
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ${{ fromJson(needs.config.outputs.python-versions) }}
-    steps:
-      - uses: actions/checkout@v6
+    ruff:
+        name: Ruff (${{ matrix.python-version }})
+        needs: config
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        strategy:
+            fail-fast: false
+            matrix:
+                python-version: ${{ fromJson(needs.config.outputs.python-versions) }}
+        steps:
+            - uses: actions/checkout@v6
 
-      - name: Setup environment
-        uses: chrysa/github-actions/tool-setup@v1
-        with:
-          python-version: ${{ matrix.python-version }}
-          extras: 'lint,format_dockerfile,yaml,dead_code'
+            - name: Setup environment
+              uses: chrysa/github-actions/tool-setup@v1
+              with:
+                  python-version: ${{ matrix.python-version }}
+                  extras: 'lint,format_dockerfile,yaml,dead_code'
 
-      - name: Ruff checks
-        uses: chrysa/github-actions/ruff-check@v1
-        with:
-          python-version: ${{ matrix.python-version }}
-          latest-python: ${{ needs.config.outputs.latest-python }}
-          config: config-tools/ruff.toml
-          sources: 'pre_commit_hooks tests'
+            - name: Ruff checks
+              uses: chrysa/github-actions/ruff-check@v1
+              with:
+                  python-version: ${{ matrix.python-version }}
+                  latest-python: ${{ needs.config.outputs.latest-python }}
+                  config: config-tools/ruff.toml
+                  sources: 'pre_commit_hooks tests'
 
-  mypy:
-    name: Mypy (${{ matrix.python-version }})
-    needs: config
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ${{ fromJson(needs.config.outputs.python-versions) }}
-    steps:
-      - uses: actions/checkout@v6
+    mypy:
+        name: Mypy (${{ matrix.python-version }})
+        needs: config
+        runs-on: ubuntu-latest
+        continue-on-error: true
+        timeout-minutes: 20
+        strategy:
+            fail-fast: false
+            matrix:
+                python-version: ${{ fromJson(needs.config.outputs.python-versions) }}
+        steps:
+            - uses: actions/checkout@v6
 
-      - name: Setup environment
-        uses: chrysa/github-actions/tool-setup@v1
-        with:
-          python-version: ${{ matrix.python-version }}
-          extras: 'typecheck,format_dockerfile,yaml,dead_code'
+            - name: Setup environment
+              uses: chrysa/github-actions/tool-setup@v1
+              with:
+                  python-version: ${{ matrix.python-version }}
+                  extras: 'typecheck,format_dockerfile,yaml,dead_code'
 
-      - name: Mypy checks
-        uses: chrysa/github-actions/mypy-check@v1
-        with:
-          python-version: ${{ matrix.python-version }}
-          latest-python: ${{ needs.config.outputs.latest-python }}
-          config-file: setup.cfg
-          sources: pre_commit_hooks
+            - name: Mypy checks
+              uses: chrysa/github-actions/mypy-check@v1
+              with:
+                  python-version: ${{ matrix.python-version }}
+                  latest-python: ${{ needs.config.outputs.latest-python }}
+                  config-file: setup.cfg
+                  sources: pre_commit_hooks
 
-  test:
-    name: Test (${{ matrix.python-version }})
-    needs: config
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ${{ fromJson(needs.config.outputs.python-versions) }}
-    steps:
-      - uses: actions/checkout@v6
+    test:
+        name: Test (${{ matrix.python-version }})
+        needs: config
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        strategy:
+            fail-fast: false
+            matrix:
+                python-version: ${{ fromJson(needs.config.outputs.python-versions) }}
+        steps:
+            - uses: actions/checkout@v6
 
-      - name: Check Node.js version
-        run: node --version || echo "node not available — js-syntax-check tests will be skipped"
+            - name: Check Node.js version
+              shell: bash
+              run: node --version || echo "node not available"
 
-      - name: Setup environment
-        uses: chrysa/github-actions/tool-setup@v1
-        with:
-          python-version: ${{ matrix.python-version }}
-          extras: 'test,format_dockerfile,yaml,ts_unreachable_code,dead_code'
+            - name: Setup environment
+              uses: chrysa/github-actions/tool-setup@v1
+              with:
+                  python-version: ${{ matrix.python-version }}
+                  extras: 'test,format_dockerfile,yaml,ts_unreachable_code,dead_code'
 
-      - name: Run tests
-        uses: chrysa/github-actions/run-tests@v1
-        with:
-          python-version: ${{ matrix.python-version }}
-          latest-python: ${{ needs.config.outputs.latest-python }}
-          cov-module: pre_commit_hooks
+            - name: Run tests
+              uses: chrysa/github-actions/run-tests@v1
+              with:
+                  python-version: ${{ matrix.python-version }}
+                  latest-python: ${{ needs.config.outputs.latest-python }}
+                  cov-module: pre_commit_hooks
 
-  sonar:
-    name: SonarCloud analysis
-    needs: [config, ruff, mypy, test]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+    sonar:
+        name: SonarCloud analysis
+        needs: [config, ruff, mypy, test]
+        if: always()
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        steps:
+            - uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
 
-      - name: SonarCloud scan
-        uses: chrysa/github-actions/sonar-scan@v1
-        with:
-          latest-python: ${{ needs.config.outputs.latest-python }}
-          sonar-token: ${{ secrets.SONAR_TOKEN }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          project-key: chrysa_pre-commit-tools
-          organization: chrysa
-          project-name: pre-commit-tools
-          sources: pre_commit_hooks
-          tests: tests
-
-
+            - name: SonarCloud scan
+              uses: chrysa/github-actions/sonar-scan@v1
+              with:
+                  latest-python: ${{ needs.config.outputs.latest-python }}
+                  sonar-token: ${{ secrets.SONAR_TOKEN }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  project-key: chrysa_pre-commit-tools
+                  organization: chrysa
+                  project-name: pre-commit-tools
+                  sources: pre_commit_hooks
+                  tests: tests

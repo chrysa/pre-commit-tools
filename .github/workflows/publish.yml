@@ -1,91 +1,94 @@
-true:
+name: Publish to PyPI
+
+on:
   push:
     branches:
-    - main
-  workflow_dispatch: null
-jobs:
-  build:
-    name: Build distribution
-    needs: version
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
-    - uses: actions/setup-python@v6
-      with:
-        python-version: '3.13'
-    - name: Update version in setup.cfg
-      run: 'sed -i "s/^version = .*/version = ${{ needs.version.outputs.majorMinorPatch
-        }}/" setup.cfg
+      - main
+  workflow_dispatch:
 
-        '
-    - name: Install build
-      run: pip install build
-    - name: Build package
-      run: python -m build
-    - uses: actions/upload-artifact@v7
-      with:
-        name: dist
-        path: dist/
-  publish:
-    environment: pypi
-    if: needs.version.outputs.preReleaseTag == ''
-    name: Publish to PyPI
-    needs:
-    - build
-    - version
-    permissions:
-      id-token: write
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/download-artifact@v8
-      with:
-        name: dist
-        path: dist/
-    - uses: pypa/gh-action-pypi-publish@release/v1
+jobs:
   version:
     name: Calculate version
+    runs-on: ubuntu-latest
     outputs:
       fullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}
       majorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}
       preReleaseTag: ${{ steps.gitversion.outputs.preReleaseTag }}
       semVer: ${{ steps.gitversion.outputs.semVer }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v4.4.2
+        with:
+          versionSpec: 6.x
+      - name: Determine version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v4.4.2
+
+  build:
+    name: Build distribution
+    needs: version
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
-    - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v4.4.2
-      with:
-        versionSpec: 6.x
-    - id: gitversion
-      name: Determine version
-      uses: gittools/actions/gitversion/execute@v4.4.2
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Update version in setup.cfg
+        run: |
+          sed -i "s/^version = .*/version = ${{ needs.version.outputs.majorMinorPatch }}/" setup.cfg
+      - name: Install build
+        run: pip install build
+      - name: Build package
+        run: python -m build
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Publish to PyPI
+    needs:
+      - build
+      - version
+    if: needs.version.outputs.preReleaseTag == ''
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
   release:
     name: Create GitHub Release
-    if: needs.version.outputs.preReleaseTag == ''
     needs:
-    - publish
-    - version
+      - publish
+      - version
+    if: needs.version.outputs.preReleaseTag == ''
+    runs-on: ubuntu-latest
     permissions:
       contents: write
-    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
-    - name: Create and push version tag
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git tag -a "v${{ needs.version.outputs.majorMinorPatch }}" -m "Release v${{ needs.version.outputs.majorMinorPatch }}"
-        git push origin "v${{ needs.version.outputs.majorMinorPatch }}"
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: v${{ needs.version.outputs.majorMinorPatch }}
-        name: v${{ needs.version.outputs.majorMinorPatch }}
-        generate_release_notes: true
-name: Publish to PyPI
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Create and push version tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${{ needs.version.outputs.majorMinorPatch }}" -m "Release v${{ needs.version.outputs.majorMinorPatch }}"
+          git push origin "v${{ needs.version.outputs.majorMinorPatch }}"
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.version.outputs.majorMinorPatch }}
+          name: v${{ needs.version.outputs.majorMinorPatch }}
+          generate_release_notes: true

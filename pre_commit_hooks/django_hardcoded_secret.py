@@ -50,6 +50,7 @@ def detect_hardcoded_secrets(source: str, filename: str) -> list[Violation]:
 def main(argv: Sequence[str] | None = None) -> int:
     """Detect hardcoded secrets in settings files and return 1 if any are found."""
     import argparse
+
     parser = argparse.ArgumentParser(description='Detect hardcoded secrets in Python files')
     parser.add_argument('filenames', nargs='*')
     args = parser.parse_args(argv)

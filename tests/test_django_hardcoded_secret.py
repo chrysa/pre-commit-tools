@@ -44,11 +44,14 @@ class TestDetectHardcodedSecrets:
         src = 'SECRET_KEY = "abc123xyz456"  # django-hardcoded-secret: disable\n'
         assert detect_hardcoded_secrets(src, 'settings.py') == []
 
-    @pytest.mark.parametrize('src', [
-        'API_KEY = "mykey1234"\n',
-        'MY_TOKEN = "tok_abc123"\n',
-        'PRIVATE_KEY = "-----BEGIN RSA-----"\n',
-    ])
+    @pytest.mark.parametrize(
+        'src',
+        [
+            'API_KEY = "mykey1234"\n',
+            'MY_TOKEN = "tok_abc123"\n',
+            'PRIVATE_KEY = "-----BEGIN RSA-----"\n',
+        ],
+    )
     def test_various_secret_patterns(self, src: str) -> None:
         violations = detect_hardcoded_secrets(src, 'settings.py')
         assert len(violations) == 1

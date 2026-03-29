@@ -2,6 +2,7 @@
 
 Skipped automatically when dockerfile-parse is not installed.
 """
+
 from __future__ import annotations
 
 from pathlib import Path

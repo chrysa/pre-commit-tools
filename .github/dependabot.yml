@@ -1,29 +1,75 @@
-updates:
-- directory: /
-  labels:
-  - dependencies
-  - python
-  open-pull-requests-limit: 10
-  package-ecosystem: pip
-  schedule:
-    day: monday
-    interval: weekly
-- directory: /
-  labels:
-  - dependencies
-  - github-actions
-  open-pull-requests-limit: 10
-  package-ecosystem: github-actions
-  schedule:
-    day: monday
-    interval: weekly
-- directory: /
-  labels:
-  - dependencies
-  - pre-commit
-  open-pull-requests-limit: 10
-  package-ecosystem: pre-commit
-  schedule:
-    day: monday
-    interval: weekly
 version: 2
+
+updates:
+  # Python dependencies — grouped by category to limit PR noise
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - python
+    groups:
+      testing:
+        patterns:
+          - pytest*
+          - coverage*
+          - pytest-cov*
+      linting:
+        patterns:
+          - ruff*
+          - mypy*
+      tree-sitter:
+        patterns:
+          - tree-sitter*
+      docker:
+        patterns:
+          - dockerfile-parse*
+      yaml:
+        patterns:
+          - PyYAML*
+      security:
+        patterns:
+          - detect-secrets*
+          - bandit*
+          - pip-audit*
+
+  # GitHub Actions — grouped by provider
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - github-actions
+    groups:
+      actions-core:
+        patterns:
+          - actions/*
+      gittools:
+        patterns:
+          - gittools/*
+      sonar:
+        patterns:
+          - SonarSource/*
+      codecov:
+        patterns:
+          - codecov/*
+      reporting:
+        patterns:
+          - EnricoMi/*
+
+  # pre-commit hooks
+  - package-ecosystem: pre-commit
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - pre-commit

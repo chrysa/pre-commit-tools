@@ -64,7 +64,7 @@ class PylintHtmlReport(PreCommitTools):
         logger.debug('run pylint')
         Run(self.pylint_args)
 
-    def set_params(self) -> None:
+    def set_params(self, *, help_msg: str = '', arguments: list[tuple[str, dict[str, object]]] | None = None) -> None:
         """Configure the argument parser with Pylint report specific arguments."""
         logger.debug('define parser')
         super().set_params(help_msg='run pylint and generate an HTML report')

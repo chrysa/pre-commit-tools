@@ -47,13 +47,17 @@ class _UnreachableVisitor(ast.NodeVisitor):
         self._visit_body(node.body)
         self.generic_visit(node)
 
-    visit_AsyncFunctionDef = visit_FunctionDef  # noqa: N815
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+        self._visit_body(node.body)
+        self.generic_visit(node)
 
     def visit_For(self, node: ast.For) -> None:
         self._visit_body(node.body)
         self.generic_visit(node)
 
-    visit_AsyncFor = visit_For  # noqa: N815
+    def visit_AsyncFor(self, node: ast.AsyncFor) -> None:
+        self._visit_body(node.body)
+        self.generic_visit(node)
 
     def visit_While(self, node: ast.While) -> None:
         self._visit_body(node.body)
@@ -69,7 +73,9 @@ class _UnreachableVisitor(ast.NodeVisitor):
         self._visit_body(node.body)
         self.generic_visit(node)
 
-    visit_AsyncWith = visit_With  # noqa: N815
+    def visit_AsyncWith(self, node: ast.AsyncWith) -> None:
+        self._visit_body(node.body)
+        self.generic_visit(node)
 
     def visit_Try(self, node: ast.Try) -> None:
         self._visit_body(node.body)

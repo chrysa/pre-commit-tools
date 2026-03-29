@@ -10,12 +10,14 @@ from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 
 Violation = tuple[str, int, str]
 
-_TERMINAL_TYPES: frozenset[str] = frozenset({
-    'return_statement',
-    'throw_statement',
-    'break_statement',
-    'continue_statement',
-})
+_TERMINAL_TYPES: frozenset[str] = frozenset(
+    {
+        'return_statement',
+        'throw_statement',
+        'break_statement',
+        'continue_statement',
+    }
+)
 
 # Node types whose direct named children are statement lists
 _BLOCK_TYPES: frozenset[str] = frozenset({'statement_block'})

@@ -5,18 +5,15 @@ from __future__ import annotations
 
 import logging
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, NewType
+from typing import NewType
 
+import tomllib
 from dockerfile_parse import DockerfileParser
 
-from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    Line = NewType('Line', dict[str, int | str])
+Line = NewType('Line', dict[str, int | str])
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -28,20 +25,79 @@ logger.addHandler(ch)
 
 SHEBANG = '# syntax=docker/dockerfile:1.4'
 
+# Matches ARG lines that reference another variable: ARG FOO=${BAR} or ARG FOO=${BAR}-extra
+_ARG_VAR_PATTERN = re.compile(r'ARG\s+\w+\s*=\s*.*\$\{')
 
-# TODO: separate block for litteral ARGS and ARGS composed with variable
-# TODO: order alphabeticly ARGS
-# TODO: order alphabeticly ENV
-# TODO: add config file support
+
+def _load_config(config_path: Path) -> dict[str, bool]:
+    """Load formatter config from a TOML file. Returns empty dict if not found."""
+    if not config_path.exists():
+        return {}
+    try:
+        data = tomllib.loads(config_path.read_text(encoding='utf-8'))
+        return data.get('format-dockerfiles', {})
+    except (OSError, tomllib.TOMLDecodeError):
+        return {}
+
+
+def _sort_arg_env_blocks(content: str, *, sort_args: bool, sort_envs: bool, separate_arg_blocks: bool) -> str:
+    """Post-process Dockerfile content to sort consecutive ARG/ENV blocks."""
+    lines = content.split('\n')
+    result: list[str] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        stripped = line.strip()
+        instruction = stripped.split()[0].upper() if stripped.split() else ''
+
+        if instruction == 'ARG' and (sort_args or separate_arg_blocks):
+            # Collect consecutive ARG lines
+            block: list[str] = []
+            while i < len(lines) and lines[i].strip().upper().startswith('ARG'):
+                block.append(lines[i])
+                i += 1
+            if separate_arg_blocks:
+                literal = [ln for ln in block if not _ARG_VAR_PATTERN.search(ln)]
+                variable = [ln for ln in block if _ARG_VAR_PATTERN.search(ln)]
+                if sort_args:
+                    literal.sort(key=str.casefold)
+                    variable.sort(key=str.casefold)
+                if literal and variable:
+                    result.extend(literal)
+                    result.append('')
+                    result.extend(variable)
+                else:
+                    result.extend(literal + variable)
+            elif sort_args:
+                block.sort(key=str.casefold)
+                result.extend(block)
+            else:
+                result.extend(block)
+        elif instruction == 'ENV' and sort_envs:
+            block = []
+            while i < len(lines) and lines[i].strip().upper().startswith('ENV'):
+                block.append(lines[i])
+                i += 1
+            block.sort(key=str.casefold)
+            result.extend(block)
+        else:
+            result.append(line)
+            i += 1
+    return '\n'.join(result)
+
+
 @dataclass
 class FormatDockerfile:
     """Dataclass that parses and reformats a Dockerfile in-place."""
 
-    dockerfile: Path = None
+    dockerfile: Path | None = None
     content: str = ''
-    origin_content: list[dict] = field(default_factory=list)
+    origin_content: list[dict] = field(default_factory=list)  # type: ignore[type-arg]
     parser: DockerfileParser = field(default_factory=DockerfileParser)
     return_value: int = 0
+    sort_args: bool = False
+    sort_envs: bool = False
+    separate_arg_blocks: bool = False
 
     @staticmethod
     def _get_line_instruction(*, line: Line) -> str:
@@ -173,6 +229,13 @@ class FormatDockerfile:
         self.origin_content = self._validate_header()
         for index, line in enumerate(self.origin_content):
             self._format_line(index=index, line=line)
+        if self.sort_args or self.sort_envs or self.separate_arg_blocks:
+            self.content = _sort_arg_env_blocks(
+                self.content,
+                sort_args=self.sort_args,
+                sort_envs=self.sort_envs,
+                separate_arg_blocks=self.separate_arg_blocks,
+            )
 
     def load_dockerfile(self, *, dockerfile_path: Path) -> None:
         logger.debug(f'read {dockerfile_path} ..........')
@@ -195,17 +258,43 @@ class FormatDockerfile:
 
 def main(argv: Sequence[str] | None = None) -> int:
     """Format each Dockerfile in args and return 1 if any file was modified."""
-    format_dockerfile_class = FormatDockerfile()
-    tools_instance = PreCommitTools()
-    tools_instance.set_params(help_msg='format dockerfile')
-    args, _ = tools_instance.get_args(argv=argv)
+    import argparse
+
+    parser = argparse.ArgumentParser(description='format dockerfile')
+    parser.add_argument('filenames', nargs='*')
+    parser.add_argument('-c', '--config', default=None, help='Path to .format-dockerfiles.toml config file')
+    parser.add_argument('--sort-args', action='store_true', default=False, help='Sort ARG instructions alphabetically')
+    parser.add_argument('--sort-envs', action='store_true', default=False, help='Sort ENV instructions alphabetically')
+    parser.add_argument(
+        '--separate-arg-blocks',
+        action='store_true',
+        default=False,
+        help='Separate literal ARGs from variable-dependent ARGs',
+    )
+    args = parser.parse_args(argv)
+
+    # Load config file (--config overrides default search)
+    cfg: dict[str, bool] = {}
+    config_path = Path(args.config) if args.config else Path('.format-dockerfiles.toml')
+    cfg = _load_config(config_path)
+
+    sort_args: bool = args.sort_args or bool(cfg.get('sort_args', False))
+    sort_envs: bool = args.sort_envs or bool(cfg.get('sort_envs', False))
+    separate_arg_blocks: bool = args.separate_arg_blocks or bool(cfg.get('separate_arg_blocks', False))
+
+    format_dockerfile_class = FormatDockerfile(
+        sort_args=sort_args,
+        sort_envs=sort_envs,
+        separate_arg_blocks=separate_arg_blocks,
+    )
     any_formatted = False
     for file in args.filenames:
-        file = Path(file)
+        filepath = Path(file)
         format_dockerfile_class.content = ''
-        format_dockerfile_class.load_dockerfile(dockerfile_path=file)
+        format_dockerfile_class.return_value = 0
+        format_dockerfile_class.load_dockerfile(dockerfile_path=filepath)
         format_dockerfile_class.format_file()
-        format_dockerfile_class.save(file=file)
+        format_dockerfile_class.save(file=filepath)
         if format_dockerfile_class.return_value == 1:
             any_formatted = True
     return 1 if any_formatted else 0

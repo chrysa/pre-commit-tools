@@ -7,7 +7,7 @@ from collections import OrderedDict
 from collections.abc import Sequence
 from typing import Any
 
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 
@@ -42,7 +42,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args, _ = tools_instance.get_args(argv=argv)
     changed_file_state = False
     for file in args.filenames:
-        sorted_data = OrderedDict()
+        sorted_data: dict[Any, Any] = {}
         with open(file) as file_stream:
             raw = yaml.safe_load(file_stream)
         if not isinstance(raw, dict):

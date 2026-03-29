@@ -92,7 +92,7 @@ class FormatDockerfile:
 
     dockerfile: Path | None = None
     content: str = ''
-    origin_content: list[dict] = field(default_factory=list)  # type: ignore[type-arg]
+    origin_content: list[Line] = field(default_factory=list)
     parser: DockerfileParser = field(default_factory=DockerfileParser)
     return_value: int = 0
     sort_args: bool = False
@@ -102,12 +102,12 @@ class FormatDockerfile:
     @staticmethod
     def _get_line_instruction(*, line: Line) -> str:
         logger.debug(f'get instuction type for {line}')
-        return line['instruction']
+        return str(line['instruction'])
 
     @staticmethod
     def _get_line_content(*, line: Line) -> str:
         logger.debug(f'get line content {line} ..........')
-        return line['content'].strip()
+        return str(line['content']).strip()
 
     @staticmethod
     def _remove_split_lines(*, content: str) -> str:

@@ -10,6 +10,8 @@
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/pre-commit-hooks-tools)](https://pypi.org/project/pre-commit-hooks-tools/)
+[![Publish](https://github.com/chrysa/pre-commit-tools/actions/workflows/publish.yml/badge.svg)](https://github.com/chrysa/pre-commit-tools/actions/workflows/publish.yml)
 
 <!--TOC-->
 

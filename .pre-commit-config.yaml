@@ -71,7 +71,7 @@ repos:
     stages:
     - manual
   repo: https://github.com/jendrikseipp/vulture
-  rev: 51a13e9467e3dea6ea5ddb74422a0eba87367ef5
+  rev: v2.16
 - hooks:
   - args:
     - --config=config-tools/ruff.toml
@@ -137,7 +137,7 @@ repos:
     stages:
     - manual
   repo: https://github.com/asottile/pyupgrade
-  rev: 369aea6489e38ca74a18df494f191857ba484950
+  rev: v3.21.2
 - hooks:
   - entry: print-detection
     id: python-print-detection

@@ -26,7 +26,7 @@ jobs:
       fullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}
       semVer: ${{ steps.gitversion.outputs.semVer }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Install GitVersion
@@ -49,8 +49,8 @@ jobs:
           - '3.13'
           - '3.14'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
@@ -70,7 +70,7 @@ jobs:
           ruff check --config=config-tools/ruff.toml --output-format=json pre_commit_hooks > reports/ruff.json || true
       - name: Upload ruff report
         if: matrix.python-version == '3.13'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ruff-report
           path: reports/ruff.json
@@ -89,8 +89,8 @@ jobs:
           - '3.13'
           - '3.14'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
@@ -113,7 +113,7 @@ jobs:
             -v
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-results-${{ matrix.python-version }}
           path: reports/
@@ -136,10 +136,10 @@ jobs:
     needs: [lint, test]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
           allow-prereleases: true
@@ -159,7 +159,7 @@ jobs:
             --junitxml=reports/junit.xml \
             -v
       - name: Download ruff report
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: ruff-report
           path: reports/

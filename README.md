@@ -80,6 +80,8 @@ Add this to your `.pre-commit-config.yaml`
           - id: ts-unreachable-code
           - id: css-duplicate-property
           - id: css-unused-variable
+          # requires helm in PATH
+          - id: helm-lint
 ```
 
 ## Hooks available
@@ -458,5 +460,26 @@ Requires Node.js to be installed in PATH. If Node.js is not available, the hook 
 ```yaml
 - id: js-syntax-check
   files: '\.(js|gs)$'
+```
+
+### helm-lint
+
+Run `helm lint --strict` on all charts found in `charts/<namespace>/<service>/` (depth 2 under `charts/`).
+Requires `helm` to be installed in PATH.
+
+Expected directory structure:
+
+```text
+charts/
+  <namespace>/
+    <service>/     ← helm lint --strict is run here
+      Chart.yaml
+      values.yaml
+```
+
+```yaml
+- id: helm-lint
+  files: ^charts/
+  pass_filenames: false
 ```
 

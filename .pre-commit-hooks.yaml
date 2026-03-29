@@ -5,58 +5,57 @@
   entry: format-dockerfile
   files: Dockerfile, .[dD]ockerfile$
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '3.7.1'
+  minimum_pre_commit_version: '4.1.0'
   name: format dockerfiles
   types: ["dockerfile"]
 - id: console-debug-detection
+  description: detect console.debug() calls in JavaScript/AppScript files
   entry: console-debug-detection
   files: \.(js|gs)$
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '3.7.1'
+  minimum_pre_commit_version: '4.1.0'
   name: detect console.debug on javascript/appscript code
   types_or: ["javascript", "file"]
 - id: console-log-detection
+  description: detect console.log() calls in JavaScript/AppScript files
   entry: console-log-detection
   files: \.(js|gs)$
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '3.7.1'
+  minimum_pre_commit_version: '4.1.0'
   name: detect console.log on javascript/appscript code
   types_or: ["javascript", "file"]
 - id: console-table-detection
+  description: detect console.table() calls in JavaScript/AppScript files
   entry: console-table-detection
   files: \.(js|gs)$
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '3.7.1'
+  minimum_pre_commit_version: '4.1.0'
   name: detect console.table on javascript/appscript code
   types_or: ["javascript", "file"]
 - id: python-print-detection
+  description: detect print() calls in Python files
   entry: print-detection
   files: .py$
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '3.7.1'
+  minimum_pre_commit_version: '4.1.0'
   name: detect print on python code
   types: ["python"]
 - id: python-pprint-detection
+  description: detect pprint() calls in Python files
   entry: pprint-detection
   files: .py$
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '3.7.1'
+  minimum_pre_commit_version: '4.1.0'
   name: detect pprint on python code
   types: ["python"]
 - id: pylint-with-html-report
   additional_dependencies:
     - pylint
     - pylint-report
-  description: genereate html report from pylint
+  description: generate html report from pylint
   entry: pylint-report-html
   language: python
-  minimum_pre_commit_version: '3.7.1'
+  minimum_pre_commit_version: '4.1.0'
   name: pylint html report
 - id: yaml-sorter
   additional_dependencies:
@@ -64,23 +63,20 @@
   description: sort yaml files keys alphabetically
   entry: yaml-sorter
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: sort yaml files
   types: ["yaml"]
 - id: debugger-detection
   description: detect debugger statements (breakpoint, pdb, ipdb, pudb)
   entry: debugger-detection
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect debugger statements
 - id: json-sorter
   description: sort json files keys alphabetically
   entry: json-sorter
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: sort json files
   types: ["json"]
 - id: requirements-sort
@@ -88,8 +84,7 @@
   entry: requirements-sort
   files: '(requirements.*\.txt|setup\.cfg)$'
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: sort requirements files
   types: ["text"]
 - id: env-file-check
@@ -97,24 +92,21 @@
   entry: env-file-check
   files: '\.env'
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: check env files for secrets
   types: ["text"]
 - id: python-logger-detection
   description: detect direct use of root logging module instead of named logger
   entry: logger-detection
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect root logger usage
   types: ["python"]
 - id: python-unreachable-code
   description: detect unreachable code after return/raise/break/continue statements
   entry: unreachable-code-detection
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect unreachable code
   types: ["python"]
 - id: python-dead-code
@@ -124,8 +116,7 @@
   description: detect unused/dead code (functions, variables, imports) using vulture
   entry: dead-code-detection
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect dead/unused code
   pass_filenames: true
   stages: [manual]
@@ -138,8 +129,7 @@
   entry: ts-unreachable-code-detection
   files: \.(ts|tsx|js|jsx)$
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect unreachable code in TypeScript/JSX
   types_or: ["ts", "tsx", "javascript", "file"]
 - id: css-duplicate-property
@@ -147,8 +137,7 @@
   entry: css-duplicate-property-detection
   files: \.css$
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect duplicate CSS properties and IDs
   types: ["css"]
 - id: css-unused-variable
@@ -156,8 +145,7 @@
   entry: css-unused-variable-detection
   files: \.css$
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect unused CSS custom properties
   types: ["css"]
 - id: react-console-error-detection
@@ -165,16 +153,14 @@
   entry: react-console-error-detection
   files: \.(js|ts|jsx|tsx)$
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect console.error() calls
   types_or: ["ts", "tsx", "javascript", "file"]
 - id: no-bare-except
   description: detect bare except clauses (without exception type) in Python files
   entry: no-bare-except-detection
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect bare except clauses
   types: ["python"]
 - id: no-print-in-migration
@@ -182,16 +168,14 @@
   entry: no-print-in-migration
   files: 'migrations/.*\.py$'
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect print() in migrations
   types: ["python"]
 - id: django-hardcoded-secret
   description: detect hardcoded secrets (SECRET_KEY, PASSWORD, API_KEY, TOKEN) in Python settings
   entry: django-hardcoded-secret-detection
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect hardcoded secrets in settings
   types: ["python"]
 - id: dockerfile-no-latest
@@ -199,8 +183,7 @@
   entry: dockerfile-no-latest-detection
   files: '(^|/)Dockerfile[^/]*$'
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect FROM :latest in Dockerfiles
   types_or: ["dockerfile", "file"]
 - id: env-example-sync
@@ -208,8 +191,7 @@
   entry: env-example-sync
   files: '\.env(\.example)?$'
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: check .env/.env.example sync
   pass_filenames: true
   types: ["text"]
@@ -218,8 +200,7 @@
   entry: no-console-warn
   files: \.(js|gs|ts|jsx|tsx)$
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect console.warn() calls
   types_or: ["ts", "tsx", "javascript", "file"]
 - id: react-direct-dom
@@ -227,8 +208,7 @@
   entry: react-direct-dom
   files: \.(jsx|tsx)$
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect direct DOM manipulation in React
   types_or: ["tsx", "jsx", "file"]
 - id: import-no-relative-parent
@@ -236,8 +216,7 @@
   entry: import-no-relative-parent
   files: \.(js|ts|jsx|tsx)$
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect deep relative parent imports
   types_or: ["ts", "tsx", "javascript", "file"]
 - id: no-debug-in-settings
@@ -245,32 +224,28 @@
   entry: no-debug-in-settings
   files: settings.*\.py$
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect DEBUG=True in settings
   types: ["python"]
 - id: django-no-raw-sql
   description: detect raw SQL queries (.raw() and cursor.execute()) in Django code
   entry: django-no-raw-sql
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect raw SQL in Django
   types: ["python"]
 - id: no-sync-in-async
   description: detect synchronous blocking calls (time.sleep, requests.*) inside async functions
   entry: no-sync-in-async
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect blocking calls in async functions
   types: ["python"]
 - id: fastapi-missing-response-model
   description: detect FastAPI routes missing the response_model parameter
   entry: fastapi-missing-response-model
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: detect FastAPI routes without response_model
   types: ["python"]
 - id: js-syntax-check
@@ -278,8 +253,7 @@
   entry: js-syntax-check
   files: \.(js|gs)$
   language: python
-  language_version: '3.12'
-  minimum_pre_commit_version: '2.20.0'
+  minimum_pre_commit_version: '4.1.0'
   name: validate JS/.gs syntax (node --check)
   types_or: ["javascript", "file"]
 

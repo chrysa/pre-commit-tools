@@ -88,11 +88,23 @@ Add this to your `.pre-commit-config.yaml`
 - Group consecutive same-instruction blocks without blank lines
 - Merge consecutive `RUN` or `ENV` instructions on one command line with continuation
 
-Open enhancements tracked as GitHub issues:
-- [#43](https://github.com/chrysa/pre-commit-tools/issues/43) Separate literal `ARG` blocks from variable-dependent `ARG`s
-- [#44](https://github.com/chrysa/pre-commit-tools/issues/44) Sort `ARG` instructions alphabetically
-- [#47](https://github.com/chrysa/pre-commit-tools/issues/47) Sort `ENV` instructions alphabetically
-- [#48](https://github.com/chrysa/pre-commit-tools/issues/48) Add config file support
+**New options:**
+
+| Option | Description |
+|---|---|
+| `--sort-args` | Sort `ARG` instructions alphabetically |
+| `--sort-envs` | Sort `ENV` instructions alphabetically |
+| `--separate-arg-blocks` | Separate literal `ARG` from variable-dependent `ARG` (e.g. `ARG FOO=${BAR}`) |
+| `-c / --config` | Path to a `.format-dockerfiles.toml` config file |
+
+Config file example (`.format-dockerfiles.toml`):
+
+```toml
+[format-dockerfiles]
+sort_args = true
+sort_envs = true
+separate_arg_blocks = true
+```
 
 ### python-print-detection
 
@@ -382,4 +394,69 @@ Check that `.env` and `.env.example` files contain the same set of keys. Ensures
 |---|---|---|
 | `--env-file` | `.env` | Path to the private `.env` file |
 | `--example-file` | `.env.example` | Path to the public example file |
+
+---
+
+## New Hooks
+
+### no-console-warn
+
+Detect `console.warn()` calls in JavaScript/TypeScript/React files (`.js`, `.gs`, `.ts`, `.jsx`, `.tsx`).
+Use `// no-console-warn: disable` to suppress a specific line.
+
+### react-direct-dom
+
+Detect direct DOM manipulation (`document.getElementById`, `document.querySelector`, etc.) in React files (`.jsx`, `.tsx`).
+Direct DOM access bypasses React's virtual DOM — use refs or state instead.
+Use `// react-direct-dom: disable` to suppress a specific line.
+
+### import-no-relative-parent
+
+Detect deep relative parent imports (`../../`) in TypeScript/JavaScript files.
+Use path aliases (`@/`) instead. Two or more `../` levels trigger a violation.
+Use `// import-no-relative-parent: disable` to suppress a specific line.
+
+### no-debug-in-settings
+
+Detect `DEBUG = True` in Django settings files (`settings*.py`).
+Use `# no-debug-in-settings: disable` to suppress a specific line.
+
+### django-no-raw-sql
+
+Detect raw SQL queries (`.raw()` and `cursor.execute()`) in Django Python files.
+These patterns bypass the ORM and risk SQL injection.
+Use `# django-no-raw-sql: disable` to suppress a specific line.
+
+### no-sync-in-async
+
+Detect synchronous blocking calls inside `async def` functions:
+
+| Blocked call | Suggested async replacement |
+|---|---|
+| `time.sleep()` | `asyncio.sleep()` |
+| `requests.get/post/put/delete/patch()` | `httpx.AsyncClient` or `aiohttp` |
+| `subprocess.run/call/check_output()` | `asyncio.create_subprocess_exec` |
+
+Use `# no-sync-in-async: disable` to suppress a specific line.
+
+### fastapi-missing-response-model
+
+Detect FastAPI route handlers (`@app.get`, `@app.post`, etc.) that do not declare a `response_model=` parameter.
+This prevents automatic response schema generation and validation.
+Use `# fastapi-missing-response-model: disable` on the decorator line to suppress.
+
+```yaml
+- id: fastapi-missing-response-model
+  files: '(routers?|views?|api)/.*\.py$'
+```
+
+### js-syntax-check
+
+Validate JavaScript and Google Apps Script (`.js`, `.gs`) file syntax using `node --check`.
+Requires Node.js to be installed in PATH. If Node.js is not available, the hook exits 0 (safe skip).
+
+```yaml
+- id: js-syntax-check
+  files: '\.(js|gs)$'
+```
 

@@ -49,5 +49,5 @@ class PreCommitTools:
         self.parser = argparse.ArgumentParser()
         if arguments is not None:
             for arg in arguments:
-                self.parser.add_argument(arg[0], **arg[1])
+                self.parser.add_argument(arg[0], **arg[1])  # type: ignore[arg-type]
         self.parser.add_argument('filenames', nargs='*', help=help_msg)

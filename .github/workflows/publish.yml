@@ -15,6 +15,7 @@ jobs:
       majorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}
       preReleaseTag: ${{ steps.gitversion.outputs.preReleaseTag }}
       semVer: ${{ steps.gitversion.outputs.semVer }}
+      should-release: ${{ steps.tag-check.outputs.should-release }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -26,10 +27,22 @@ jobs:
       - name: Determine version
         id: gitversion
         uses: gittools/actions/gitversion/execute@v4.4.2
+      - name: Check if version tag already exists
+        id: tag-check
+        run: |
+          VERSION="v${{ steps.gitversion.outputs.majorMinorPatch }}"
+          if git ls-remote --tags origin "refs/tags/$VERSION" | grep -q .; then
+            echo "should-release=false" >> $GITHUB_OUTPUT
+            echo "Tag $VERSION already exists — skipping release"
+          else
+            echo "should-release=true" >> $GITHUB_OUTPUT
+            echo "Tag $VERSION does not exist — proceeding with release"
+          fi
 
   build:
     name: Build distribution
     needs: version
+    if: needs.version.outputs.should-release == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6

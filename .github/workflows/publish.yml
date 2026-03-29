@@ -59,8 +59,33 @@ jobs:
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v4.4.2
       with:
-        versionSpec: 6.7.x
+        versionSpec: 6.x
     - id: gitversion
       name: Determine version
       uses: gittools/actions/gitversion/execute@v4.4.2
+  release:
+    name: Create GitHub Release
+    if: needs.version.outputs.preReleaseTag == ''
+    needs:
+    - publish
+    - version
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+    - name: Create and push version tag
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git tag -a "v${{ needs.version.outputs.majorMinorPatch }}" -m "Release v${{ needs.version.outputs.majorMinorPatch }}"
+        git push origin "v${{ needs.version.outputs.majorMinorPatch }}"
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v${{ needs.version.outputs.majorMinorPatch }}
+        name: v${{ needs.version.outputs.majorMinorPatch }}
+        generate_release_notes: true
 name: Publish to PyPI

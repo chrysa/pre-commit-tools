@@ -1,0 +1,19 @@
+name: Install project
+description: Install package extras and tree-sitter dependencies
+
+inputs:
+  extras:
+    required: false
+    default: 'format_dockerfile,yaml,dead_code'
+    description: pip extras to install (comma-separated)
+
+runs:
+  using: composite
+  steps:
+    - name: Install package (${{ inputs.extras }})
+      run: pip install -e '.[${{ inputs.extras }}]'
+      shell: bash
+
+    - name: Install tree-sitter
+      run: pip install 'tree-sitter>=0.23,<0.26' 'tree-sitter-typescript>=0.23,<0.24'
+      shell: bash

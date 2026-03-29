@@ -166,6 +166,20 @@ jobs:
         continue-on-error: true
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v5
+        with:
+          args: >
+            -Dsonar.projectKey=chrysa_pre-commit-tools
+            -Dsonar.organization=chrysa
+            -Dsonar.projectName=pre-commit-tools
+            -Dsonar.sourceEncoding=UTF-8
+            -Dsonar.sources=pre_commit_hooks
+            -Dsonar.tests=tests
+            -Dsonar.python.version=3.14
+            -Dsonar.python.coverage.reportPaths=reports/coverage.xml
+            -Dsonar.python.ruff.reportPaths=reports/ruff.json
+            -Dsonar.python.xunit.reportPath=reports/junit.xml
+            -Dsonar.exclusions=**/__pycache__/**,**/*.egg-info/**,**/.git/**
+            -Dsonar.qualitygate.wait=true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

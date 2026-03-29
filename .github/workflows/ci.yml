@@ -50,25 +50,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
           extras: 'lint,format_dockerfile,yaml,dead_code'
 
-      - name: ruff — lint check
-        run: ruff check --config=config-tools/ruff.toml pre_commit_hooks tests
-
-      - name: ruff — format check
-        run: ruff format --check --config=config-tools/ruff.toml pre_commit_hooks tests
-
-      - name: ruff — produce JSON report
-        if: always() && matrix.python-version == needs.config.outputs.latest-python
-        run: |
-          mkdir -p reports
-          ruff check --config=config-tools/ruff.toml --output-format=json pre_commit_hooks tests > reports/ruff.json || true
-          echo "ruff.json size: $(wc -c < reports/ruff.json) bytes"
-
-      - name: Upload ruff report artifact
-        if: always() && matrix.python-version == needs.config.outputs.latest-python
-        uses: actions/upload-artifact@v7
+      - name: Ruff checks
+        uses: ./.github/actions/ruff-check
         with:
-          name: ruff-report
-          path: reports/ruff.json
+          python-version: ${{ matrix.python-version }}
+          latest-python: ${{ needs.config.outputs.latest-python }}
 
   mypy:
     name: Mypy (${{ matrix.python-version }})
@@ -88,22 +74,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
           extras: 'typecheck,format_dockerfile,yaml,dead_code'
 
-      - name: mypy — type check
-        run: mypy --config-file=setup.cfg pre_commit_hooks
-
-      - name: mypy — produce text report
-        if: always() && matrix.python-version == needs.config.outputs.latest-python
-        run: |
-          mkdir -p reports
-          mypy --config-file=setup.cfg --no-error-summary pre_commit_hooks > reports/mypy.txt 2>&1 || true
-          echo "mypy.txt size: $(wc -c < reports/mypy.txt) bytes"
-
-      - name: Upload mypy report artifact
-        if: always() && matrix.python-version == needs.config.outputs.latest-python
-        uses: actions/upload-artifact@v7
+      - name: Mypy checks
+        uses: ./.github/actions/mypy-check
         with:
-          name: mypy-report
-          path: reports/mypy.txt
+          python-version: ${{ matrix.python-version }}
+          latest-python: ${{ needs.config.outputs.latest-python }}
 
   test:
     name: Test (${{ matrix.python-version }})
@@ -125,43 +100,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
           extras: 'test,format_dockerfile,yaml,ts_unreachable_code,dead_code'
 
-      - name: List installed packages
-        run: pip list --format=columns | grep -E "tree.sitter|vulture|pytest|dockerfile"
-
-      - name: Create reports directory
-        run: mkdir -p reports
-
-      - name: Run test suite
-        run: |
-          pytest \
-            --cov=pre_commit_hooks \
-            --cov-branch \
-            --cov-report=xml:reports/coverage.xml \
-            --cov-report=term-missing \
-            --junitxml=reports/junit.xml \
-            -v
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v7
+      - name: Run tests
+        uses: ./.github/actions/run-tests
         with:
-          name: test-results-${{ matrix.python-version }}
-          path: reports/
-
-      - name: Publish test results to PR
-        if: always() && matrix.python-version == needs.config.outputs.latest-python
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        with:
-          files: reports/junit.xml
-          comment_title: Test Results
-          check_name: pytest
-
-      - name: Upload coverage to Codecov
-        if: matrix.python-version == needs.config.outputs.latest-python
-        uses: codecov/codecov-action@v6
-        with:
-          files: reports/coverage.xml
-          fail_ci_if_error: false
+          python-version: ${{ matrix.python-version }}
+          latest-python: ${{ needs.config.outputs.latest-python }}
 
   sonar:
     name: SonarCloud analysis
@@ -173,49 +116,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download test results (${{ needs.config.outputs.latest-python }})
-        uses: actions/download-artifact@v8
+      - name: SonarCloud scan
+        uses: ./.github/actions/sonar-scan
         with:
-          name: test-results-${{ needs.config.outputs.latest-python }}
-          path: reports/
-        continue-on-error: true
-
-      - name: Download ruff report
-        uses: actions/download-artifact@v8
-        with:
-          name: ruff-report
-          path: reports/
-        continue-on-error: true
-
-      - name: Download mypy report
-        uses: actions/download-artifact@v8
-        with:
-          name: mypy-report
-          path: reports/
-        continue-on-error: true
-
-      - name: List reports available for SonarCloud
-        run: ls -lh reports/ || echo "reports/ directory is empty or missing"
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v5
-        with:
-          args: >
-            -Dsonar.projectKey=chrysa_pre-commit-tools
-            -Dsonar.organization=chrysa
-            -Dsonar.projectName=pre-commit-tools
-            -Dsonar.sourceEncoding=UTF-8
-            -Dsonar.sources=pre_commit_hooks
-            -Dsonar.tests=tests
-            -Dsonar.python.version=${{ needs.config.outputs.latest-python }}
-            -Dsonar.python.coverage.reportPaths=reports/coverage.xml
-            -Dsonar.python.ruff.reportPaths=reports/ruff.json
-            -Dsonar.python.mypy.reportPaths=reports/mypy.txt
-            -Dsonar.python.xunit.reportPath=reports/junit.xml
-            -Dsonar.exclusions=**/__pycache__/**,**/*.egg-info/**,**/.git/**
-            -Dsonar.qualitygate.wait=true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          latest-python: ${{ needs.config.outputs.latest-python }}
+          sonar-token: ${{ secrets.SONAR_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
 

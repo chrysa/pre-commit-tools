@@ -44,19 +44,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup Python environment
-        uses: ./.github/actions/python-setup
+      - name: Setup environment
+        uses: ./.github/actions/tool-setup
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Install ruff
-        run: pip install ruff
-
-      - name: Check ruff version
-        run: ruff --version
-
-      - name: Install project dependencies
-        uses: ./.github/actions/install-project
+          requirements: lint
 
       - name: ruff — lint check
         run: ruff check --config=config-tools/ruff.toml pre_commit_hooks tests
@@ -90,19 +82,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup Python environment
-        uses: ./.github/actions/python-setup
+      - name: Setup environment
+        uses: ./.github/actions/tool-setup
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Install mypy
-        run: pip install mypy
-
-      - name: Check mypy version
-        run: mypy --version
-
-      - name: Install project dependencies
-        uses: ./.github/actions/install-project
+          requirements: typecheck
 
       - name: mypy — type check
         run: mypy --config-file=setup.cfg pre_commit_hooks
@@ -132,26 +116,14 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup Python environment
-        uses: ./.github/actions/python-setup
-        with:
-          python-version: ${{ matrix.python-version }}
-
       - name: Check Node.js version
         run: node --version || echo "node not available — js-syntax-check tests will be skipped"
 
-      - name: Install test tools
-        run: pip install pytest pytest-cov
-
-      - name: Check pytest version
-        run: pytest --version
-
-      - name: Install vulture (dead code)
-        run: pip install vulture
-
-      - name: Install project dependencies
-        uses: ./.github/actions/install-project
+      - name: Setup environment
+        uses: ./.github/actions/tool-setup
         with:
+          python-version: ${{ matrix.python-version }}
+          requirements: test
           extras: 'format_dockerfile,yaml,ts_unreachable_code,dead_code'
 
       - name: List installed packages

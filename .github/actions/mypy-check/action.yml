@@ -1,0 +1,32 @@
+name: Mypy check
+description: Run mypy type check and upload text report
+
+inputs:
+  python-version:
+    required: true
+    description: Current Python version (matrix)
+  latest-python:
+    required: true
+    description: Latest Python version (for conditional report upload)
+
+runs:
+  using: composite
+  steps:
+    - name: mypy — type check
+      run: mypy --config-file=setup.cfg pre_commit_hooks
+      shell: bash
+
+    - name: mypy — produce text report
+      if: always() && inputs.python-version == inputs.latest-python
+      run: |
+        mkdir -p reports
+        mypy --config-file=setup.cfg --no-error-summary pre_commit_hooks > reports/mypy.txt 2>&1 || true
+        echo "mypy.txt size: $(wc -c < reports/mypy.txt) bytes"
+      shell: bash
+
+    - name: Upload mypy report artifact
+      if: always() && inputs.python-version == inputs.latest-python
+      uses: actions/upload-artifact@v7
+      with:
+        name: mypy-report
+        path: reports/mypy.txt

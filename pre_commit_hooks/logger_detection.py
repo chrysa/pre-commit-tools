@@ -1,14 +1,12 @@
 #!/usr/bin/python3
 """Hook to detect direct use of the root logging module instead of a named logger."""
+
 from __future__ import annotations
 
 import re
-import typing
+from collections.abc import Sequence
 
 from pre_commit_hooks.tools.pattern_detection import PatternDetection
-
-if typing.TYPE_CHECKING:
-    from collections.abc import Sequence
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -18,7 +16,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         disable_comment=re.compile(r'\blogger-detection\s*:\s*disable'),
         pattern=re.compile(r'\blogging\.(debug|info|warning|error|critical|exception)\s*\('),
     )
-    return pattern_detection.detect()
+    return pattern_detection.detect(argv=argv)
 
 
 if __name__ == '__main__':

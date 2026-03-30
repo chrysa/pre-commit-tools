@@ -62,14 +62,14 @@ repos:
         args: [--ignore=E006,E020]
 
   - repo: https://github.com/jendrikseipp/vulture
-    rev: v2.16
+    rev: 51a13e9467e3dea6ea5ddb74422a0eba87367ef5
     hooks:
       - id: vulture
         args: [pre_commit_hooks/]
         stages: [manual]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.8
+    rev: c53b915162b475dfc95c73f94219e6f87ace2fca
     hooks:
       - id: ruff
         args: [--config=config-tools/ruff.toml, --fix]
@@ -126,7 +126,7 @@ repos:
         exclude: \.pre-commit-config\.yaml
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.2
+    rev: 369aea6489e38ca74a18df494f191857ba484950
     hooks:
       - id: pyupgrade
         args: [--py3-only, --py310-plus]

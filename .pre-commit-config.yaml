@@ -104,7 +104,7 @@ repos:
       - id: rst-backticks
 
   - repo: https://github.com/MarcoGorelli/auto-walrus
-    rev: a5b68c175abc5d75c9279f42ac6c49a8d536d985
+    rev: 7353fddb82fd30f1794e618a300333f41c3a2ef3
     hooks:
       - id: auto-walrus
 

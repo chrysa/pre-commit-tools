@@ -256,4 +256,3 @@
   minimum_pre_commit_version: '4.1.0'
   name: validate JS/.gs syntax (node --check)
   types_or: ["javascript", "file"]
-

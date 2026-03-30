@@ -459,4 +459,3 @@ Requires Node.js to be installed in PATH. If Node.js is not available, the hook 
 - id: js-syntax-check
   files: '\.(js|gs)$'
 ```
-

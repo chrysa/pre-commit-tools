@@ -69,7 +69,7 @@ repos:
         stages: [manual]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.8
+    rev: c53b915162b475dfc95c73f94219e6f87ace2fca
     hooks:
       - id: ruff
         args: [--config=config-tools/ruff.toml, --fix]

@@ -62,7 +62,7 @@ repos:
         args: [--ignore=E006,E020]
 
   - repo: https://github.com/jendrikseipp/vulture
-    rev: v2.16
+    rev: 51a13e9467e3dea6ea5ddb74422a0eba87367ef5
     hooks:
       - id: vulture
         args: [pre_commit_hooks/]
@@ -126,7 +126,7 @@ repos:
         exclude: \.pre-commit-config\.yaml
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.2
+    rev: 369aea6489e38ca74a18df494f191857ba484950
     hooks:
       - id: pyupgrade
         args: [--py3-only, --py310-plus]
@@ -187,10 +187,4 @@ repos:
         language: python
         types: [python]
         additional_dependencies: [vulture>=2.0]
-        stages: [manual]
-
-  - repo: https://github.com/chrysa/pre-commit-hooks-changelog
-    rev: 40d13585c4c845c36108a565f00c23f2b946e9d9
-    hooks:
-      - id: generate-changelog
         stages: [manual]

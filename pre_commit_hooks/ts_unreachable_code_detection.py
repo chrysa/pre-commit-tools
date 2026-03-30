@@ -79,7 +79,7 @@ def _walk(node: object, filename: str, lines: list[str]) -> list[Violation]:
     """Recursively walk the AST and collect unreachable-code violations."""
     violations: list[Violation] = []
 
-    if (stmts := _statements_of(node)):
+    if stmts := _statements_of(node):
         violations.extend(_check_statements(stmts, filename, lines))
 
     for child in node.children:  # type: ignore[attr-defined]

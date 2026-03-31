@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+import tempfile
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -27,8 +28,40 @@ def _check_node_available() -> bool:
         return True
 
 
+def _check_via_temp_js(filename: str) -> list[Violation]:
+    """Check .gs file by copying to a temp .js file (Node.js 24 workaround).
+
+    Node.js 24 raises ERR_UNKNOWN_FILE_EXTENSION for .gs files because it
+    enforces ES module resolution by extension. Copying to a .js temporary
+    file bypasses this restriction without changing the syntax being checked.
+    """
+    source = Path(filename).read_bytes()
+    with tempfile.NamedTemporaryFile(suffix='.js', delete=False) as tmp:
+        tmp.write(source)
+        tmp_path = tmp.name
+    try:
+        result = subprocess.run(
+            ['node', '--check', tmp_path],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except (FileNotFoundError, subprocess.TimeoutExpired) as exc:
+        return [(filename, f'node check failed: {exc}')]
+    finally:
+        Path(tmp_path).unlink(missing_ok=True)
+    if result.returncode != 0:
+        error = (result.stderr or result.stdout).strip().replace(tmp_path, filename)
+        return [(filename, error)]
+    return []
+
+
 def check_syntax(filename: str) -> list[Violation]:
     """Run node --check on the file and return list of (filename, error_message)."""
+    # Node.js 24+ raises ERR_UNKNOWN_FILE_EXTENSION for .gs files.
+    # Use a temp .js file to bypass this limitation.
+    if Path(filename).suffix == '.gs':
+        return _check_via_temp_js(filename)
     try:
         result = subprocess.run(
             ['node', '--check', filename],

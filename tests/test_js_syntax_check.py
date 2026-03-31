@@ -66,3 +66,37 @@ class TestJsSyntaxCheckMain:
 
     def test_empty_args_returns_0(self) -> None:
         assert main([]) == 0
+
+
+class TestCheckViaTempJs:
+    def test_gs_file_clean_returns_empty(self, tmp_path: Path) -> None:
+        f = _write(tmp_path, 'a.gs', 'var x = 1;\n')
+        mock_result = MagicMock()
+        mock_result.returncode = 0
+        mock_result.stderr = ''
+        with patch('subprocess.run', return_value=mock_result):
+            from pre_commit_hooks.js_syntax_check import _check_via_temp_js
+            result = _check_via_temp_js(f)
+        assert result == []
+
+    def test_gs_file_syntax_error_returns_violation(self, tmp_path: Path) -> None:
+        f = _write(tmp_path, 'bad.gs', 'var = ;\n')
+        mock_result = MagicMock()
+        mock_result.returncode = 1
+        mock_result.stderr = 'SyntaxError: Unexpected token'
+        mock_result.stdout = ''
+        with patch('subprocess.run', return_value=mock_result):
+            from pre_commit_hooks.js_syntax_check import _check_via_temp_js
+            result = _check_via_temp_js(f)
+        assert len(result) == 1
+        # Original filename preserved in violation
+        assert result[0][0] == f
+
+    def test_gs_file_routes_through_temp_js(self, tmp_path: Path) -> None:
+        """check_syntax() must use _check_via_temp_js for .gs files."""
+        f = _write(tmp_path, 'a.gs', 'var x = 1;\n')
+        with patch('pre_commit_hooks.js_syntax_check._check_via_temp_js', return_value=[]) as mock_fn:
+            from pre_commit_hooks.js_syntax_check import check_syntax
+            check_syntax(f)
+        mock_fn.assert_called_once_with(f)
+

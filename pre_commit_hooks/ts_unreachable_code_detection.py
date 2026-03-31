@@ -16,7 +16,7 @@ _TERMINAL_TYPES: frozenset[str] = frozenset(
         'throw_statement',
         'break_statement',
         'continue_statement',
-    }
+    },
 )
 
 # Node types whose direct named children are statement lists
@@ -79,8 +79,7 @@ def _walk(node: object, filename: str, lines: list[str]) -> list[Violation]:
     """Recursively walk the AST and collect unreachable-code violations."""
     violations: list[Violation] = []
 
-    stmts = _statements_of(node)
-    if stmts:
+    if stmts := _statements_of(node):
         violations.extend(_check_statements(stmts, filename, lines))
 
     for child in node.children:  # type: ignore[attr-defined]

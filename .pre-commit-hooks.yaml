@@ -3,7 +3,7 @@
     - dockerfile-parse
   description: format dockerfiles
   entry: format-dockerfile
-  files: Dockerfile, .[dD]ockerfile$
+  files: '(^|/)Dockerfile[^/]*$|(^|/)\.[Dd]ockerfile[^/]*$'
   language: python
   minimum_pre_commit_version: '4.1.0'
   name: format dockerfiles

@@ -256,3 +256,11 @@
   minimum_pre_commit_version: '4.1.0'
   name: validate JS/.gs syntax (node --check)
   types_or: ["javascript", "file"]
+- id: helm-lint
+  description: run helm lint --strict on all charts in charts/<namespace>/<service>/ (requires helm in PATH)
+  entry: bash -c 'find charts -mindepth 2 -maxdepth 2 -type d | while read d; do helm lint "$d" --strict || exit 1; done'
+  files: ^charts/
+  language: system
+  minimum_pre_commit_version: '4.1.0'
+  name: helm lint (charts/)
+  pass_filenames: false

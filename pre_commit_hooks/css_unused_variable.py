@@ -5,6 +5,9 @@ from __future__ import annotations
 
 import re
 from collections.abc import Sequence
+from pathlib import Path
+
+from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 
 _DISABLE_COMMENT = '/* css-unused-variable: disable */'
 _COMMENT_RE = re.compile(r'/\*.*?\*/', re.DOTALL)
@@ -46,21 +49,18 @@ def detect_unused_variables(source: str, filename: str) -> list[Violation]:
 
 def main(argv: Sequence[str] | None = None) -> int:
     """Detect unused CSS custom properties and return 1 if any are found."""
-    import argparse
-
-    parser = argparse.ArgumentParser(description='Detect unused CSS custom properties')
-    parser.add_argument('filenames', nargs='*')
-    args = parser.parse_args(argv)
+    tools = PreCommitTools()
+    tools.set_params(help_msg='detect unused CSS custom properties')
+    args, _ = tools.get_args(argv=argv)
 
     retval = 0
     for filename in args.filenames:
         try:
-            with open(filename, encoding='utf-8') as f:
-                source = f.read()
+            source = Path(filename).read_text(encoding='utf-8')
         except (OSError, UnicodeDecodeError):
             continue
         for fname, lineno, msg in detect_unused_variables(source, filename):
-            print(f'{fname}:{lineno}: {msg}')
+            print(f'{fname}:{lineno}: {msg}')  # print-detection: disable
             retval = 1
     return retval
 

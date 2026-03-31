@@ -10,18 +10,12 @@ repos:
       - id: setup-cfg-fmt
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: f1dff44d3a9ae852957f34def96390f28719c232
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
       - id: debug-statements
-
-  - repo: https://github.com/asottile/reorder-python-imports
-    rev: 10322d36ca8efbf9e1e847f3aa76cf9aec25f41d
-    hooks:
-      - id: reorder-python-imports
-        args: [--py310-plus]
 
   - repo: https://github.com/asottile/add-trailing-comma
     rev: 756490e3dd6602fbb18d5ad51deb43c4e21de0a0
@@ -36,7 +30,7 @@ repos:
         stages: [manual]
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: f7ed74202ac8ec26bab4a68359556c5243df142f
+    rev: 70466ee0aa1d9bca1fd4ce54bfbba370431ecced
     hooks:
       - id: markdownlint
         args: [--fix]
@@ -69,7 +63,7 @@ repos:
         stages: [manual]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.2
+    rev: c53b915162b475dfc95c73f94219e6f87ace2fca
     hooks:
       - id: ruff
         args: [--config=config-tools/ruff.toml, --fix]
@@ -100,11 +94,12 @@ repos:
     hooks:
       - id: python-no-eval
       - id: python-no-log-warn
+        exclude: ^(pre_commit_hooks/no_console_warn\.py|tests/test_js_hooks_new\.py)$
       - id: python-use-type-annotations
       - id: rst-backticks
 
   - repo: https://github.com/MarcoGorelli/auto-walrus
-    rev: a5b68c175abc5d75c9279f42ac6c49a8d536d985
+    rev: 7353fddb82fd30f1794e618a300333f41c3a2ef3
     hooks:
       - id: auto-walrus
 
@@ -149,6 +144,7 @@ repos:
         entry: debugger-detection
         language: python
       - id: yaml-sorter
+        exclude: ^\.github/workflows/
         name: sort yaml files
         entry: yaml-sorter
         language: python

@@ -26,7 +26,7 @@ mypy --config-file=setup.cfg pre_commit_hooks
 ## Python Version Targets
 
 ```python
-# Use modern syntax — works on 3.12+ 
+# Use modern syntax — works on 3.12+
 x: list[str]           # PEP 585 — not List[str]
 x: str | None          # PEP 604 — not Optional[str]
 x: dict[str, int]      # PEP 585 — not Dict[str, int]
@@ -180,7 +180,7 @@ except:
 
 1. Create `pre_commit_hooks/my_hook.py`
 2. Add entry point in `setup.cfg` → `console_scripts`
-3. Register in `.pre-commit-hooks.yaml`  
+3. Register in `.pre-commit-hooks.yaml`
 4. Write tests in `tests/test_my_hook.py`
 5. Run `ruff check` + `pytest` — both must pass
 6. Add documentation in `README.md`

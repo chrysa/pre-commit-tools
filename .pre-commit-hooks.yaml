@@ -256,6 +256,14 @@
   minimum_pre_commit_version: '4.1.0'
   name: validate JS/.gs syntax (node --check)
   types_or: ["javascript", "file"]
+- id: ts-hardcoded-secret-detection
+  description: detect hardcoded API keys, tokens and passwords in TypeScript/JavaScript files
+  entry: ts-hardcoded-secret-detection
+  files: \.(js|ts|jsx|tsx)$
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect hardcoded secrets in TypeScript/JavaScript
+  types_or: ["javascript", "ts", "tsx", "file"]
 - id: helm-lint
   description: run helm lint --strict on all charts in charts/<namespace>/<service>/ (requires helm in PATH)
   entry: bash -c 'find charts -mindepth 2 -maxdepth 2 -type d | while read d; do helm lint "$d" --strict || exit 1; done'

@@ -9,29 +9,29 @@
   name: format dockerfiles
   types: ["dockerfile"]
 - id: console-debug-detection
-  description: detect console.debug() calls in JavaScript/AppScript files
+  description: detect console.debug() calls in JavaScript/TypeScript/AppScript files
   entry: console-debug-detection
-  files: \.(js|gs)$
+  files: \.(js|gs|ts|tsx)$
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect console.debug on javascript/appscript code
-  types_or: ["javascript", "file"]
+  name: detect console.debug on javascript/typescript/appscript code
+  types_or: ["javascript", "ts", "tsx", "file"]
 - id: console-log-detection
-  description: detect console.log() calls in JavaScript/AppScript files
+  description: detect console.log() calls in JavaScript/TypeScript/AppScript files
   entry: console-log-detection
-  files: \.(js|gs)$
+  files: \.(js|gs|ts|tsx)$
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect console.log on javascript/appscript code
-  types_or: ["javascript", "file"]
+  name: detect console.log on javascript/typescript/appscript code
+  types_or: ["javascript", "ts", "tsx", "file"]
 - id: console-table-detection
-  description: detect console.table() calls in JavaScript/AppScript files
+  description: detect console.table() calls in JavaScript/TypeScript/AppScript files
   entry: console-table-detection
-  files: \.(js|gs)$
+  files: \.(js|gs|ts|tsx)$
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect console.table on javascript/appscript code
-  types_or: ["javascript", "file"]
+  name: detect console.table on javascript/typescript/appscript code
+  types_or: ["javascript", "ts", "tsx", "file"]
 - id: python-print-detection
   description: detect print() calls in Python files
   entry: print-detection

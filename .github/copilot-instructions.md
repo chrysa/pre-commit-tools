@@ -111,3 +111,7 @@ setup.cfg                  # entry points + dependencies
 - **Matrix**: Python 3.12, 3.13, 3.14
 - **SonarCloud**: `sonar-project.properties` at root
 - **Requires secrets**: `SONAR_TOKEN`, `CODECOV_TOKEN` (optional)
+
+## Development Workflow
+
+See [CLAUDE.md](../CLAUDE.md) for the full development workflow: essential commands, known pitfalls, CI/CD details, and optional extras per hook.

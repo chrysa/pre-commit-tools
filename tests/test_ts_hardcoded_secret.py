@@ -39,7 +39,7 @@ class TestDetectHardcodedSecrets:
 
     def test_aws_key_pattern_detected(self) -> None:
         # Use concatenation so the literal is not a detectable secret in source
-        aws_key = 'AKIA' + 'IOSFODNN7EXAMPL3'  # noqa: S105 — fake test key
+        aws_key = 'AKIA' + 'IOSFODNN7EXAMPL3'
         src = f'const key = "{aws_key}";\n'
         result = detect_hardcoded_secrets(src, 'f.ts')
         assert len(result) == 1
@@ -64,8 +64,8 @@ class TestDetectHardcodedSecrets:
 
     @pytest.mark.parametrize('src,label', [
         # Use concatenation so literals are not detected by push protection scanners
-        ('const githubToken = "' + 'ghp_' + 'B' * 36 + '"', 'GITHUB_TOKEN'),  # noqa: S105
-        ('const stripeKey = "' + 'sk_live_' + 'C' * 24 + '"', 'STRIPE_KEY'),  # noqa: S105
+        ('const githubToken = "' + 'ghp_' + 'B' * 36 + '"', 'GITHUB_TOKEN'),
+        ('const stripeKey = "' + 'sk_live_' + 'C' * 24 + '"', 'STRIPE_KEY'),
     ])
     def test_known_patterns_detected(self, src: str, label: str) -> None:
         result = detect_hardcoded_secrets(src, 'f.ts')

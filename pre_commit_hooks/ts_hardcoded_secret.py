@@ -11,8 +11,13 @@ from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 
 _DISABLE_COMMENT = '// ts-hardcoded-secret: disable'
 
-# Patterns that signal hardcoded secrets in TypeScript/JavaScript source
+# Patterns that signal hardcoded secrets in TypeScript/JavaScript source.
+# Specific patterns (AWS, GitHub, Stripe) must come BEFORE generic ones
+# (TOKEN, API_KEY, SECRET) so that the first match is the most precise label.
 _SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
+    ('AWS_KEY', re.compile(r'AKIA[0-9A-Z]{16}')),
+    ('GITHUB_TOKEN', re.compile(r'gh[pors]_[A-Za-z0-9]{36,}')),
+    ('STRIPE_KEY', re.compile(r'(?:sk|pk)_live_[0-9a-zA-Z]{24,}')),
     (
         'API_KEY',
         re.compile(r"""\w*[Aa][Pp][Ii]_?[Kk][Ee][Yy]\w*\s*[=:]\s*['"`][^'"`]{4,}['"`]"""),
@@ -33,9 +38,6 @@ _SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
         'PRIVATE_KEY',
         re.compile(r"""\w*[Pp][Rr][Ii][Vv][Aa][Tt][Ee]_?[Kk][Ee][Yy]\w*\s*[=:]\s*['"`][^'"`]{4,}['"`]"""),
     ),
-    ('AWS_KEY', re.compile(r'AKIA[0-9A-Z]{16}')),
-    ('GITHUB_TOKEN', re.compile(r'gh[pors]_[A-Za-z0-9]{36,}')),
-    ('STRIPE_KEY', re.compile(r'(?:sk|pk)_live_[0-9a-zA-Z]{24,}')),
 ]
 
 # Lines where the value is clearly env-based — skip these

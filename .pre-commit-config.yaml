@@ -10,7 +10,7 @@ repos:
       - id: setup-cfg-fmt
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: f1dff44d3a9ae852957f34def96390f28719c232
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -62,14 +62,14 @@ repos:
         args: [--ignore=E006,E020]
 
   - repo: https://github.com/jendrikseipp/vulture
-    rev: v2.16
+    rev: 51a13e9467e3dea6ea5ddb74422a0eba87367ef5
     hooks:
       - id: vulture
         args: [pre_commit_hooks/]
         stages: [manual]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.8
+    rev: v0.11.2
     hooks:
       - id: ruff
         args: [--config=config-tools/ruff.toml, --fix]
@@ -126,7 +126,7 @@ repos:
         exclude: \.pre-commit-config\.yaml
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.2
+    rev: 369aea6489e38ca74a18df494f191857ba484950
     hooks:
       - id: pyupgrade
         args: [--py3-only, --py310-plus]
@@ -187,10 +187,4 @@ repos:
         language: python
         types: [python]
         additional_dependencies: [vulture>=2.0]
-        stages: [manual]
-
-  - repo: https://github.com/chrysa/pre-commit-hooks-changelog
-    rev: 40d13585c4c845c36108a565f00c23f2b946e9d9
-    hooks:
-      - id: generate-changelog
         stages: [manual]

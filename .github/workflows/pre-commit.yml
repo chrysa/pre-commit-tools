@@ -16,7 +16,7 @@ jobs:
         timeout-minutes: 15
         steps:
             - uses: actions/checkout@v6
-            - uses: actions/setup-python@v5
+            - uses: actions/setup-python@v6
               with:
                   python-version: '3.14'  # keep in sync with config job in ci.yml
             - name: Install package (provides local hook entry points)

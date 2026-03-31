@@ -5,6 +5,9 @@ from __future__ import annotations
 
 import re
 from collections.abc import Sequence
+from pathlib import Path
+
+from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 
 _DISABLE_COMMENT = '# django-hardcoded-secret: disable'
 
@@ -49,21 +52,18 @@ def detect_hardcoded_secrets(source: str, filename: str) -> list[Violation]:
 
 def main(argv: Sequence[str] | None = None) -> int:
     """Detect hardcoded secrets in settings files and return 1 if any are found."""
-    import argparse
-
-    parser = argparse.ArgumentParser(description='Detect hardcoded secrets in Python files')
-    parser.add_argument('filenames', nargs='*')
-    args = parser.parse_args(argv)
+    tools = PreCommitTools()
+    tools.set_params(help_msg='detect hardcoded secrets in Python files')
+    args, _ = tools.get_args(argv=argv)
 
     retval = 0
     for filename in args.filenames:
         try:
-            with open(filename, encoding='utf-8') as f:
-                source = f.read()
+            source = Path(filename).read_text(encoding='utf-8')
         except (OSError, UnicodeDecodeError):
             continue
         for fname, lineno, msg in detect_hardcoded_secrets(source, filename):
-            print(f'{fname}:{lineno}: {msg}')
+            print(f'{fname}:{lineno}: {msg}')  # print-detection: disable
             retval = 1
     return retval
 

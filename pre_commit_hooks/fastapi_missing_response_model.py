@@ -62,7 +62,7 @@ def detect_missing_response_model(source: str, filename: str) -> list[Violation]
                             filename,
                             node.lineno,
                             f'FastAPI route {node.name!r} missing response_model= parameter',
-                        )
+                        ),
                     )
     return violations
 

@@ -111,4 +111,3 @@ setup.cfg                  # entry points + dependencies
 - **Matrix**: Python 3.12, 3.13, 3.14
 - **SonarCloud**: `sonar-project.properties` at root
 - **Requires secrets**: `SONAR_TOKEN`, `CODECOV_TOKEN` (optional)
-

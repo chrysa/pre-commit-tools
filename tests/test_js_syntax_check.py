@@ -76,6 +76,7 @@ class TestCheckViaTempJs:
         mock_result.stderr = ''
         with patch('subprocess.run', return_value=mock_result):
             from pre_commit_hooks.js_syntax_check import _check_via_temp_js
+
             result = _check_via_temp_js(f)
         assert result == []
 
@@ -87,6 +88,7 @@ class TestCheckViaTempJs:
         mock_result.stdout = ''
         with patch('subprocess.run', return_value=mock_result):
             from pre_commit_hooks.js_syntax_check import _check_via_temp_js
+
             result = _check_via_temp_js(f)
         assert len(result) == 1
         # Original filename preserved in violation
@@ -97,6 +99,6 @@ class TestCheckViaTempJs:
         f = _write(tmp_path, 'a.gs', 'var x = 1;\n')
         with patch('pre_commit_hooks.js_syntax_check._check_via_temp_js', return_value=[]) as mock_fn:
             from pre_commit_hooks.js_syntax_check import check_syntax
+
             check_syntax(f)
         mock_fn.assert_called_once_with(f)
-

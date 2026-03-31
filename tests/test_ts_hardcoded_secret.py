@@ -62,11 +62,14 @@ class TestDetectHardcodedSecrets:
         src = 'const token = "abc";\n'
         assert detect_hardcoded_secrets(src, 'f.ts') == []
 
-    @pytest.mark.parametrize('src,label', [
-        # Use concatenation so literals are not detected by push protection scanners
-        ('const githubToken = "' + 'ghp_' + 'B' * 36 + '"', 'GITHUB_TOKEN'),
-        ('const stripeKey = "' + 'sk_live_' + 'C' * 24 + '"', 'STRIPE_KEY'),
-    ])
+    @pytest.mark.parametrize(
+        'src,label',
+        [
+            # Use concatenation so literals are not detected by push protection scanners
+            ('const githubToken = "' + 'ghp_' + 'B' * 36 + '"', 'GITHUB_TOKEN'),
+            ('const stripeKey = "' + 'sk_live_' + 'C' * 24 + '"', 'STRIPE_KEY'),
+        ],
+    )
     def test_known_patterns_detected(self, src: str, label: str) -> None:
         result = detect_hardcoded_secrets(src, 'f.ts')
         assert len(result) == 1

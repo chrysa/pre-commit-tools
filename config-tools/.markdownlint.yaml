@@ -1,12 +1,7 @@
----
-# markdownlint configuration
-# https://github.com/DavidAnson/markdownlint
-# Reference: args: [--config, config-tools/.markdownlint.yaml]
-
 MD013:
-    code_blocks: false
-    line_length: 120
-    stern: false
-    tables: false
+  code_blocks: false
+  line_length: 120
+  stern: false
+  tables: false
 MD028: false
 MD040: false

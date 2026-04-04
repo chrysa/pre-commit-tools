@@ -63,7 +63,7 @@ repos:
         stages: [manual]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: c53b915162b475dfc95c73f94219e6f87ace2fca
+    rev: v0.15.9
     hooks:
       - id: ruff
         args: [--config=config-tools/ruff.toml, --fix]
@@ -83,7 +83,7 @@ repos:
         stages: [manual]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.1
+    rev: v1.20.0
     hooks:
       - id: mypy
         args: [--config-file=setup.cfg]
@@ -109,12 +109,12 @@ repos:
       - id: rm-unneeded-f-str
 
   - repo: https://github.com/pypa/pip-audit
-    rev: e04691292eda1515277abe8a98ae440f2e5b19df
+    rev: b9dba7ef4c16490458264f41d7328fbf17ae3549
     hooks:
       - id: pip-audit
 
   - repo: https://github.com/Yelp/detect-secrets
-    rev: 50119d658ab48021cad234fc5c8d3253263b2ec0
+    rev: 5e141933554a0b74e7341841f318be21e895339c
     hooks:
       - id: detect-secrets
         args: [--baseline, .secrets.baseline]

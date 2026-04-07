@@ -30,7 +30,7 @@ repos:
         stages: [manual]
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: 70466ee0aa1d9bca1fd4ce54bfbba370431ecced
+    rev: fa11558348ca25f74763660527ed502a4e592420
     hooks:
       - id: markdownlint
         args: [--fix]

@@ -82,6 +82,15 @@ Add this to your `.pre-commit-config.yaml`
           - id: css-unused-variable
           # requires helm in PATH
           - id: helm-lint
+
+# Optional — guideline-checker (structural coding guidelines)
+# Validates project structure, naming conventions, and coding standards.
+# See https://github.com/chrysa/guideline-checker
+#-  repo: https://github.com/chrysa/guideline-checker
+#   rev: ''  # Use the ref you want to point at
+#   hooks:
+#     - id: guideline-check
+#       stages: [pre-push, manual]
 ```
 
 ## Hooks available

@@ -127,6 +127,12 @@ repos:
         args: [--py3-only, --py312-plus]
         stages: [manual]
 
+  - repo: https://github.com/chrysa/guideline-checker
+    rev: v0.1.0
+    hooks:
+      - id: guideline-check
+        stages: [pre-push, manual]
+
   - repo: local
     hooks:
       - id: python-print-detection

@@ -42,6 +42,16 @@
     - [ts-unreachable-code](#ts-unreachable-code)
     - [css-duplicate-property](#css-duplicate-property)
     - [css-unused-variable](#css-unused-variable)
+    - [no-console-warn](#no-console-warn)
+    - [react-direct-dom](#react-direct-dom)
+    - [import-no-relative-parent](#import-no-relative-parent)
+    - [no-debug-in-settings](#no-debug-in-settings)
+    - [django-no-raw-sql](#django-no-raw-sql)
+    - [no-sync-in-async](#no-sync-in-async)
+    - [fastapi-missing-response-model](#fastapi-missing-response-model)
+    - [js-syntax-check](#js-syntax-check)
+    - [ts-hardcoded-secret-detection](#ts-hardcoded-secret-detection)
+    - [helm-lint](#helm-lint)
 
 <!--TOC-->
 
@@ -80,6 +90,15 @@ Add this to your `.pre-commit-config.yaml`
           - id: ts-unreachable-code
           - id: css-duplicate-property
           - id: css-unused-variable
+          - id: no-console-warn
+          - id: react-direct-dom
+          - id: import-no-relative-parent
+          - id: no-debug-in-settings
+          - id: django-no-raw-sql
+          - id: no-sync-in-async
+          - id: fastapi-missing-response-model
+          - id: js-syntax-check
+          - id: ts-hardcoded-secret-detection
           # requires helm in PATH
           - id: helm-lint
 
@@ -469,6 +488,23 @@ Requires Node.js to be installed in PATH. If Node.js is not available, the hook 
 ```yaml
 - id: js-syntax-check
   files: '\.(js|gs)$'
+```
+
+### ts-hardcoded-secret-detection
+
+Detect hardcoded API keys, tokens and passwords in TypeScript/JavaScript files (`.js`, `.ts`, `.jsx`, `.tsx`).
+Catches patterns like `const API_KEY = "..."`, `const token = "sk_live_..."`, AWS key prefixes (`AKIA...`), GitHub tokens (`ghp_...`), and Stripe keys (`sk_live_...`).
+
+Values referencing environment variables (`process.env`, `import.meta.env`) are **not** flagged. Short values (< 8 chars) are ignored.
+
+Use `// ts-hardcoded-secret: disable` on the line to suppress a specific violation.
+
+```typescript
+// WRONG — detected
+const API_KEY = 'my-secret-api-key-value-hardcoded';
+
+// OK — not flagged
+const API_KEY = process.env.API_KEY;
 ```
 
 ### helm-lint

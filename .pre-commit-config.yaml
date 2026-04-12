@@ -127,11 +127,13 @@ repos:
         args: [--py3-only, --py312-plus]
         stages: [manual]
 
-  - repo: https://github.com/chrysa/guideline-checker
-    rev: v0.1.0
-    hooks:
-      - id: guideline-check
-        stages: [pre-push, manual]
+  # Optional — guideline-checker (structural coding guidelines)
+  # Uncomment and set rev when chrysa/guideline-checker publishes a release tag
+  # - repo: https://github.com/chrysa/guideline-checker
+  #   rev: ''  # Use the ref you want to point at
+  #   hooks:
+  #     - id: guideline-check
+  #       stages: [pre-push, manual]
 
   - repo: local
     hooks:

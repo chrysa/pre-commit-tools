@@ -65,7 +65,7 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.9
     hooks:
-      - id: ruff
+      - id: ruff-check
         args: [--config=config-tools/ruff.toml, --fix]
       - id: ruff-format
         args: [--config=config-tools/ruff.toml]
@@ -124,7 +124,7 @@ repos:
     rev: 369aea6489e38ca74a18df494f191857ba484950
     hooks:
       - id: pyupgrade
-        args: [--py3-only, --py310-plus]
+        args: [--py3-only, --py312-plus]
         stages: [manual]
 
   - repo: local

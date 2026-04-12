@@ -152,7 +152,7 @@ repos:
         entry: debugger-detection
         language: python
       - id: yaml-sorter
-        exclude: ^\.github/workflows/
+        exclude: ^\.github/
         name: sort yaml files
         entry: yaml-sorter
         language: python

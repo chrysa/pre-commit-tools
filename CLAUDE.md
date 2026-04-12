@@ -1,5 +1,6 @@
 # CLAUDE.md — pre-commit-tools
 
+> @[claude-sonnet-4-6]
 A collection of [pre-commit](https://pre-commit.com) hooks for code quality checks (Python, TypeScript/JS, CSS, Django/FastAPI, Docker, Config).
 
 > **GitHub Copilot**: also read `.github/copilot-instructions.md` and all files under `.github/instructions/` for the full coding conventions.

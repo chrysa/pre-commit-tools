@@ -5,12 +5,12 @@ from __future__ import annotations
 
 import logging
 import re
+import tomllib
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import NewType
 
-import tomllib
 from dockerfile_parse import DockerfileParser
 
 Line = NewType('Line', dict[str, int | str])

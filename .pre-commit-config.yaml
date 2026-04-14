@@ -65,7 +65,7 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.9
     hooks:
-      - id: ruff
+      - id: ruff-check
         args: [--config=config-tools/ruff.toml, --fix]
       - id: ruff-format
         args: [--config=config-tools/ruff.toml]
@@ -124,8 +124,16 @@ repos:
     rev: 369aea6489e38ca74a18df494f191857ba484950
     hooks:
       - id: pyupgrade
-        args: [--py3-only, --py310-plus]
+        args: [--py3-only, --py312-plus]
         stages: [manual]
+
+  # Optional — guideline-checker (structural coding guidelines)
+  # Uncomment and set rev when chrysa/guideline-checker publishes a release tag
+  # - repo: https://github.com/chrysa/guideline-checker
+  #   rev: ''  # Use the ref you want to point at
+  #   hooks:
+  #     - id: guideline-check
+  #       stages: [pre-push, manual]
 
   - repo: local
     hooks:
@@ -144,7 +152,7 @@ repos:
         entry: debugger-detection
         language: python
       - id: yaml-sorter
-        exclude: ^\.github/workflows/
+        exclude: ^\.github/
         name: sort yaml files
         entry: yaml-sorter
         language: python

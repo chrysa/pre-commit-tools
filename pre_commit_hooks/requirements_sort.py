@@ -14,7 +14,7 @@ def sort_requirements(lines: list[str]) -> list[str]:
     """Sort requirements lines: comments/blanks first, packages sorted case-insensitively."""
     comments = [line for line in lines if not line.strip() or line.strip().startswith('#')]
     packages = [line for line in lines if line.strip() and not line.strip().startswith('#')]
-    sorted_packages = sorted(packages, key=lambda x: x.split('#')[0].strip().lower())
+    sorted_packages = sorted(packages, key=_pkg_name_key)
     return comments + sorted_packages
 
 
@@ -32,11 +32,21 @@ def _collect_continuation(lines: list[str], start: int) -> tuple[list[str], int]
     return collected, i
 
 
+def _pkg_name_key(line: str) -> str:
+    """Extract the package name from a dependency line for sorting.
+
+    Strips version specifiers (``>=``, ``==``, etc.), extras (``[…]``) and
+    inline comments so that sorting matches ``setup-cfg-fmt`` behaviour.
+    """
+    raw = line.strip().split('#')[0].strip()
+    return re.split(r'[<>=!~;\[]', raw)[0].strip().lower()
+
+
 def _sort_dep_block(dep_lines: list[str]) -> list[str]:
-    """Sort dependency continuation lines case-insensitively; trailing blank lines last."""
+    """Sort dependency continuation lines by package name; trailing blank lines last."""
     blanks = [ln for ln in dep_lines if not ln.strip()]
     pkgs = [ln for ln in dep_lines if ln.strip()]
-    pkgs.sort(key=lambda x: x.strip().split('#')[0].strip().lower())
+    pkgs.sort(key=_pkg_name_key)
     return pkgs + blanks
 
 
@@ -106,6 +116,9 @@ def sort_setup_cfg(content: str) -> str:
             for key_line, dep_lines in blocks:
                 result.append(key_line)
                 result.extend(_sort_dep_block(dep_lines))
+            # Preserve blank line separator before next section header
+            if i < len(lines) and re.match(r'^\[([^\]]+)\]', lines[i].strip()):
+                result.append('\n')
             continue
 
         result.append(line)

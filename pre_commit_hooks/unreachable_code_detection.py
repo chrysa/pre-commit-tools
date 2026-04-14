@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import ast
-import sys
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -87,18 +86,16 @@ class _UnreachableVisitor(ast.NodeVisitor):
             self._visit_body(node.finalbody)
         self.generic_visit(node)
 
-    if sys.version_info >= (3, 11):
-
-        def visit_TryStar(self, node: ast.AST) -> None:  # noqa: N802
-            """Handle Python 3.11+ except* syntax."""
-            body: list[ast.stmt] = getattr(node, 'body', [])
-            if body:
-                self._visit_body(body)
-            for handler in getattr(node, 'handlers', []):
-                handler_body: list[ast.stmt] = getattr(handler, 'body', [])
-                if handler_body:
-                    self._visit_body(handler_body)
-            self.generic_visit(node)
+    def visit_TryStar(self, node: ast.AST) -> None:
+        """Handle Python 3.11+ except* syntax."""
+        body: list[ast.stmt] = getattr(node, 'body', [])
+        if body:
+            self._visit_body(body)
+        for handler in getattr(node, 'handlers', []):
+            handler_body: list[ast.stmt] = getattr(handler, 'body', [])
+            if handler_body:
+                self._visit_body(handler_body)
+        self.generic_visit(node)
 
 
 def main(argv: Sequence[str] | None = None) -> int:

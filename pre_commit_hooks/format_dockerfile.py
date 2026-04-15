@@ -92,6 +92,7 @@ class FormatDockerfile:
 
     dockerfile: Path | None = None
     content: str = ''
+    _raw_content: str = field(default='', repr=False)
     origin_content: list[Line] = field(default_factory=list)
     parser: DockerfileParser = field(default_factory=DockerfileParser)
     return_value: int = 0
@@ -129,7 +130,7 @@ class FormatDockerfile:
         self.content += '\n' + multiline
 
     def _file_as_changed(self) -> bool:
-        return self.content.strip() != self.parser.content.strip()
+        return (self.content.strip() + '\n') != self._raw_content
 
     def _format_env_line(self, *, line_content: str) -> None:
         logger.debug('format ENV ..........')
@@ -242,6 +243,7 @@ class FormatDockerfile:
         self.parser.dockerfile_path = dockerfile_path
         with open(dockerfile_path) as stream:
             self.parser.content = stream.read()
+        self._raw_content = self.parser.content
 
     def save(self, *, file: Path) -> None:
         if self._file_as_changed():

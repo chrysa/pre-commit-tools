@@ -58,7 +58,8 @@
       {
         "type": "command",
         "command": "notify-send 'Claude Code' 'En attente de ton input' 2>/dev/null || true",
-        "timeout": 3000
+        "timeout": 3000,
+        "name": "notify-user-input"
       }
     ]
   }

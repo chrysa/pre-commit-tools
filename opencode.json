@@ -5,7 +5,7 @@
     "github-copilot": {
       "type": "copilot",
       "options": {
-        "model": "claude-sonnet-4-5"
+        "model": "claude-sonnet-4-6"
       }
     }
   },
@@ -36,5 +36,5 @@
     }
   },
   "instructions": "You are an expert software engineer and ecosystem architect. Default to English in code, docs, and issues. Respect CLAUDE.md per repo. Use GitHub Copilot (latest Claude) as default model.",
-  "_comment_model": "Model auto-selected from latest Claude available via Copilot. Do not hardcode a version. Fallback: anthropic/claude-sonnet-4-5 if Copilot unavailable."
+  "_comment_model": "Model auto-selected from latest Claude available via Copilot. Do not hardcode a version. Fallback: anthropic/claude-sonnet-4-6 if Copilot unavailable."
 }

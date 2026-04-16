@@ -1,5 +1,6 @@
 # CLAUDE.md — pre-commit-tools
 
+> @[claude-sonnet-4-6]
 A collection of [pre-commit](https://pre-commit.com) hooks for code quality checks (Python, TypeScript/JS, CSS, Django/FastAPI, Docker, Config).
 
 > **GitHub Copilot**: also read `.github/copilot-instructions.md` and all files under `.github/instructions/` for the full coding conventions.
@@ -131,3 +132,11 @@ result: Any = ext.call()  # noqa: ANN401 — third-party untyped API
 | `dead_code` | `python-dead-code` (vulture) |
 | `ts_unreachable_code` | `ts-unreachable-code-detection` (tree-sitter) |
 | `pylint_report` | `pylint-report-html` |
+
+## Compact instructions
+
+When compacting, always preserve:
+1. List of all files modified this session (with paths)
+2. Current task description and next steps
+3. Any uncommitted / unpushed changes
+4. Open blockers and errors not yet resolved

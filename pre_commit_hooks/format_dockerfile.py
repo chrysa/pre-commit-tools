@@ -92,6 +92,7 @@ class FormatDockerfile:
 
     dockerfile: Path | None = None
     content: str = ''
+    _raw_content: str = field(default='', repr=False)
     origin_content: list[Line] = field(default_factory=list)
     parser: DockerfileParser = field(default_factory=DockerfileParser)
     return_value: int = 0
@@ -129,7 +130,7 @@ class FormatDockerfile:
         self.content += '\n' + multiline
 
     def _file_as_changed(self) -> bool:
-        return self.content.strip() != self.parser.content.strip()
+        return (self.content.strip() + '\n') != self._raw_content
 
     def _format_env_line(self, *, line_content: str) -> None:
         logger.debug('format ENV ..........')
@@ -241,18 +242,21 @@ class FormatDockerfile:
         logger.debug(f'read {dockerfile_path} ..........')
         self.parser.dockerfile_path = dockerfile_path
         with open(dockerfile_path) as stream:
-            self.parser.content = stream.read()
+            raw_text = stream.read()
+        self._raw_content = raw_text  # Save original BEFORE DockerfileParser writes
+        self.parser.content = raw_text
 
     def save(self, *, file: Path) -> None:
         if self._file_as_changed():
             logger.debug(f'update {file} ..........')
-            with open(file, 'w+') as stream:
-                stream.seek(0)
-                stream.write(self.content.strip())
-                stream.truncate()
+            with open(file, 'w') as stream:
+                stream.write(self.content.strip() + '\n')
             print(f'{file} .......... formatted')
             self.return_value = 1
         else:
+            # Restore original: format_file() writes intermediate content to disk as a side effect
+            with open(file, 'w') as stream:
+                stream.write(self._raw_content)
             print(f'{file} .......... unchanged')
 
 
@@ -282,16 +286,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     sort_envs: bool = args.sort_envs or bool(cfg.get('sort_envs', False))
     separate_arg_blocks: bool = args.separate_arg_blocks or bool(cfg.get('separate_arg_blocks', False))
 
-    format_dockerfile_class = FormatDockerfile(
-        sort_args=sort_args,
-        sort_envs=sort_envs,
-        separate_arg_blocks=separate_arg_blocks,
-    )
     any_formatted = False
     for file in args.filenames:
         filepath = Path(file)
-        format_dockerfile_class.content = ''
-        format_dockerfile_class.return_value = 0
+        format_dockerfile_class = FormatDockerfile(
+            sort_args=sort_args,
+            sort_envs=sort_envs,
+            separate_arg_blocks=separate_arg_blocks,
+        )
         format_dockerfile_class.load_dockerfile(dockerfile_path=filepath)
         format_dockerfile_class.format_file()
         format_dockerfile_class.save(file=filepath)

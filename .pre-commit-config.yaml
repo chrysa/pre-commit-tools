@@ -124,7 +124,7 @@ repos:
         exclude: \.pre-commit-config\.yaml
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: 369aea6489e38ca74a18df494f191857ba484950
+    rev: f201dbc8ebd88c571c04b2287520727ba3d0614b
     hooks:
       - id: pyupgrade
         args: [--py3-only, --py312-plus]

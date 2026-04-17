@@ -93,7 +93,7 @@ repos:
         stages: [manual]
 
   - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: 84aa5ebaf906144146cbc33c5e71b364cda3d719
+    rev: be31e1cd4d91a091b6710bcafd9e79dafff86703
     hooks:
       - id: python-no-eval
       - id: python-no-log-warn

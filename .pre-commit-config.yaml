@@ -21,7 +21,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/asottile/add-trailing-comma
-    rev: 756490e3dd6602fbb18d5ad51deb43c4e21de0a0
+    rev: b5695900a5bcefcdb712917a33baed945269d201
     hooks:
       - id: add-trailing-comma
 

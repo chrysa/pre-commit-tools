@@ -21,7 +21,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/asottile/add-trailing-comma
-    rev: 756490e3dd6602fbb18d5ad51deb43c4e21de0a0
+    rev: b5695900a5bcefcdb712917a33baed945269d201
     hooks:
       - id: add-trailing-comma
 
@@ -33,7 +33,7 @@ repos:
         stages: [manual]
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: fa11558348ca25f74763660527ed502a4e592420
+    rev: cfc833bfc00c7cc40f702bd9e02df34d850d0291
     hooks:
       - id: markdownlint
         args: [--fix]
@@ -86,14 +86,14 @@ repos:
         stages: [manual]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.20.0
+    rev: v1.20.1
     hooks:
       - id: mypy
         args: [--config-file=setup.cfg]
         stages: [manual]
 
   - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: 84aa5ebaf906144146cbc33c5e71b364cda3d719
+    rev: be31e1cd4d91a091b6710bcafd9e79dafff86703
     hooks:
       - id: python-no-eval
       - id: python-no-log-warn
@@ -124,7 +124,7 @@ repos:
         exclude: \.pre-commit-config\.yaml
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: 369aea6489e38ca74a18df494f191857ba484950
+    rev: f201dbc8ebd88c571c04b2287520727ba3d0614b
     hooks:
       - id: pyupgrade
         args: [--py3-only, --py312-plus]

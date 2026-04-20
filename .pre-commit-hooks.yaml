@@ -272,3 +272,30 @@
   minimum_pre_commit_version: '4.1.0'
   name: helm lint (charts/)
   pass_filenames: false
+- id: changelog-check
+  description: validate changelog YAML entries and run format consistency checks (absorbed from chrysa/pre-commit-hooks-changelog, ADR-0010)
+  entry: changelog-check
+  files: (^|/)changelog/.*\.yaml$
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: changelog YAML validator
+  pass_filenames: true
+  types: ["yaml"]
+- id: changelog-generate
+  description: regenerate CHANGELOG.md from changelog/*.yaml entries (absorbed from chrysa/pre-commit-hooks-changelog, ADR-0010)
+  entry: changelog-generate
+  files: (^|/)changelog/.*\.yaml$
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: CHANGELOG.md generator
+  pass_filenames: false
+  stages: [manual]
+- id: coverage-ratchet-hook
+  description: ouvre une GitHub issue par package si coverage réelle dépasse durablement le seuil déclaré (2 pts min)
+  entry: coverage-ratchet-hook
+  files: ^(coverage\.xml|coverage/coverage-summary\.json|coverage/lcov\.info)$
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: coverage ratchet — suggère un bump du seuil
+  pass_filenames: false
+  stages: [manual, post-commit]

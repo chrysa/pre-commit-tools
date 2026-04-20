@@ -1,197 +1,208 @@
----
 default_language_version:
   python: python3.14
 fail_fast: false
 minimum_pre_commit_version: 4.1.0
 repos:
-  - repo: https://github.com/asottile/setup-cfg-fmt
-    rev: v3.2.0
-    hooks:
-      - id: setup-cfg-fmt
-
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: f1dff44d3a9ae852957f34def96390f28719c232
-    hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
-      - id: check-yaml
-        args:
-          - --allow-multiple-documents
-        exclude: ^\.github/ISSUE_TEMPLATE/
-      - id: debug-statements
-
-  - repo: https://github.com/asottile/add-trailing-comma
-    rev: 756490e3dd6602fbb18d5ad51deb43c4e21de0a0
-    hooks:
-      - id: add-trailing-comma
-
-  - repo: https://github.com/frnmst/md-toc
-    rev: 9.0.0
-    hooks:
-      - id: md-toc
-        args: [--in-place, github, --header-levels, '6']
-        stages: [manual]
-
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: fa11558348ca25f74763660527ed502a4e592420
-    hooks:
-      - id: markdownlint
-        args: [--fix]
-        stages: [manual]
-
-  - repo: https://github.com/executablebooks/mdformat
-    rev: 56b24ef0c6cfdab501844925971204f858185547
-    hooks:
-      - id: mdformat
-        additional_dependencies: [mdformat-gfm]
-        stages: [manual]
-
-  - repo: https://github.com/lovesegfault/beautysh
-    rev: 34c3b3da0233e76d7d1ad90a78f3679185ecf31c
-    hooks:
-      - id: beautysh
-        args: [--indent-size, '4']
-
-  - repo: https://github.com/openstack/bashate
-    rev: ec2f2400915200d633299612a02d7d285e4be24c
-    hooks:
-      - id: bashate
-        args: [--ignore=E006,E020]
-
-  - repo: https://github.com/jendrikseipp/vulture
-    rev: 51a13e9467e3dea6ea5ddb74422a0eba87367ef5
-    hooks:
-      - id: vulture
-        args: [pre_commit_hooks/]
-        stages: [manual]
-
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.9
-    hooks:
-      - id: ruff-check
-        args: [--config=config-tools/ruff.toml, --fix]
-      - id: ruff-format
-        args: [--config=config-tools/ruff.toml]
-
-  - repo: https://github.com/pre-commit/mirrors-pylint
-    rev: a1b176a5ee919967cf01e87c0222bd64b94fe0de
-    hooks:
-      - id: pylint
-        args:
-          - --rcfile=setup.cfg
-          - --reports=no
-          - --persistent=no
-          - --score=no
-          - --disable=E0401
-        stages: [manual]
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.20.0
-    hooks:
-      - id: mypy
-        args: [--config-file=setup.cfg]
-        stages: [manual]
-
-  - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: 84aa5ebaf906144146cbc33c5e71b364cda3d719
-    hooks:
-      - id: python-no-eval
-      - id: python-no-log-warn
-        exclude: ^(pre_commit_hooks/no_console_warn\.py|tests/test_js_hooks_new\.py)$
-      - id: python-use-type-annotations
-      - id: rst-backticks
-
-  - repo: https://github.com/MarcoGorelli/auto-walrus
-    rev: 7353fddb82fd30f1794e618a300333f41c3a2ef3
-    hooks:
-      - id: auto-walrus
-
-  - repo: https://github.com/dannysepler/rm_unneeded_f_str
-    rev: df396a8bfdeced1a011c7d9d6787aa7f49ac8634
-    hooks:
-      - id: rm-unneeded-f-str
-
-  - repo: https://github.com/pypa/pip-audit
-    rev: d3dfe2115fbe641433d093189cf37fcedecfdf04
-    hooks:
-      - id: pip-audit
-
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: 5e141933554a0b74e7341841f318be21e895339c
-    hooks:
-      - id: detect-secrets
-        args: [--baseline, .secrets.baseline]
-        exclude: \.pre-commit-config\.yaml
-
-  - repo: https://github.com/asottile/pyupgrade
-    rev: 369aea6489e38ca74a18df494f191857ba484950
-    hooks:
-      - id: pyupgrade
-        args: [--py3-only, --py312-plus]
-        stages: [manual]
-
-  # Optional — guideline-checker (structural coding guidelines)
-  # Uncomment and set rev when chrysa/guideline-checker publishes a release tag
-  # - repo: https://github.com/chrysa/guideline-checker
-  #   rev: ''  # Use the ref you want to point at
-  #   hooks:
-  #     - id: guideline-check
-  #       stages: [pre-push, manual]
-
-  - repo: local
-    hooks:
-      - id: python-print-detection
-        name: detect print on python code
-        entry: print-detection
-        language: python
-        types: [python]
-      - id: python-pprint-detection
-        name: detect pprint on python code
-        entry: pprint-detection
-        language: python
-        types: [python]
-      - id: debugger-detection
-        name: detect debugger statements
-        entry: debugger-detection
-        language: python
-      - id: yaml-sorter
-        exclude: ^\.github/
-        name: sort yaml files
-        entry: yaml-sorter
-        language: python
-        types: [yaml]
-        additional_dependencies: [PyYAML]
-      - id: json-sorter
-        name: sort json files
-        entry: json-sorter
-        language: python
-        types: [json]
-      - id: requirements-sort
-        name: sort requirements files
-        entry: requirements-sort
-        language: python
-        types: [text]
-        files: requirements.*\.txt$
-      - id: env-file-check
-        name: check env files for secrets
-        entry: env-file-check
-        language: python
-        types: [text]
-        files: \.env
-      - id: python-logger-detection
-        name: detect root logger usage
-        entry: logger-detection
-        language: python
-        types: [python]
-      - id: python-unreachable-code
-        name: detect unreachable code
-        entry: unreachable-code-detection
-        language: python
-        types: [python]
-      - id: python-dead-code
-        name: detect dead/unused code
-        entry: dead-code-detection
-        language: python
-        types: [python]
-        additional_dependencies: [vulture>=2.0]
-        stages: [manual]
+- hooks:
+  - id: setup-cfg-fmt
+  repo: https://github.com/asottile/setup-cfg-fmt
+  rev: 051b55b8a03053b7d7b24b5e54a86fcccbe2a6bd
+- hooks:
+  - id: trailing-whitespace
+  - id: end-of-file-fixer
+  - args:
+    - --allow-multiple-documents
+    exclude: ^\.github/ISSUE_TEMPLATE/
+    id: check-yaml
+  - id: debug-statements
+  repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: b89c5eef3ba3a74ecd506d968e63a8b80f697abf
+- hooks:
+  - id: add-trailing-comma
+  repo: https://github.com/asottile/add-trailing-comma
+  rev: b5695900a5bcefcdb712917a33baed945269d201
+- hooks:
+  - args:
+    - --in-place
+    - github
+    - --header-levels
+    - '6'
+    id: md-toc
+    stages:
+    - manual
+  repo: https://github.com/frnmst/md-toc
+  rev: 9.0.0
+- hooks:
+  - args:
+    - --fix
+    id: markdownlint
+    stages:
+    - manual
+  repo: https://github.com/igorshubovych/markdownlint-cli
+  rev: cfc833bfc00c7cc40f702bd9e02df34d850d0291
+- hooks:
+  - additional_dependencies:
+    - mdformat-gfm
+    id: mdformat
+    stages:
+    - manual
+  repo: https://github.com/executablebooks/mdformat
+  rev: 56b24ef0c6cfdab501844925971204f858185547
+- hooks:
+  - args:
+    - --indent-size
+    - '4'
+    id: beautysh
+  repo: https://github.com/lovesegfault/beautysh
+  rev: 34c3b3da0233e76d7d1ad90a78f3679185ecf31c
+- hooks:
+  - args:
+    - --ignore=E006
+    - E020
+    id: bashate
+  repo: https://github.com/openstack/bashate
+  rev: ec2f2400915200d633299612a02d7d285e4be24c
+- hooks:
+  - args:
+    - pre_commit_hooks/
+    id: vulture
+    stages:
+    - manual
+  repo: https://github.com/jendrikseipp/vulture
+  rev: 51a13e9467e3dea6ea5ddb74422a0eba87367ef5
+- hooks:
+  - args:
+    - --config=config-tools/ruff.toml
+    - --fix
+    id: ruff-check
+  - args:
+    - --config=config-tools/ruff.toml
+    id: ruff-format
+  repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.15.11
+- hooks:
+  - args:
+    - --rcfile=setup.cfg
+    - --reports=no
+    - --persistent=no
+    - --score=no
+    - --disable=E0401
+    id: pylint
+    stages:
+    - manual
+  repo: https://github.com/pre-commit/mirrors-pylint
+  rev: a1b176a5ee919967cf01e87c0222bd64b94fe0de
+- hooks:
+  - args:
+    - --config-file=setup.cfg
+    id: mypy
+    stages:
+    - manual
+  repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v1.20.1
+- hooks:
+  - id: python-no-eval
+  - exclude: ^(pre_commit_hooks/no_console_warn\.py|tests/test_js_hooks_new\.py)$
+    id: python-no-log-warn
+  - id: python-use-type-annotations
+  - id: rst-backticks
+  repo: https://github.com/pre-commit/pygrep-hooks
+  rev: be31e1cd4d91a091b6710bcafd9e79dafff86703
+- hooks:
+  - id: auto-walrus
+  repo: https://github.com/MarcoGorelli/auto-walrus
+  rev: 7353fddb82fd30f1794e618a300333f41c3a2ef3
+- hooks:
+  - id: rm-unneeded-f-str
+  repo: https://github.com/dannysepler/rm_unneeded_f_str
+  rev: df396a8bfdeced1a011c7d9d6787aa7f49ac8634
+- hooks:
+  - id: pip-audit
+  repo: https://github.com/pypa/pip-audit
+  rev: cce839c779f52608554d39415464839cdbaa516e
+- hooks:
+  - args:
+    - --baseline
+    - .secrets.baseline
+    exclude: \.pre-commit-config\.yaml
+    id: detect-secrets
+  repo: https://github.com/Yelp/detect-secrets
+  rev: 5e141933554a0b74e7341841f318be21e895339c
+- hooks:
+  - args:
+    - --py3-only
+    - --py312-plus
+    id: pyupgrade
+    stages:
+    - manual
+  repo: https://github.com/asottile/pyupgrade
+  rev: f201dbc8ebd88c571c04b2287520727ba3d0614b
+- hooks:
+  - entry: print-detection
+    id: python-print-detection
+    language: python
+    name: detect print on python code
+    types:
+    - python
+  - entry: pprint-detection
+    id: python-pprint-detection
+    language: python
+    name: detect pprint on python code
+    types:
+    - python
+  - entry: debugger-detection
+    id: debugger-detection
+    language: python
+    name: detect debugger statements
+  - additional_dependencies:
+    - PyYAML
+    entry: yaml-sorter
+    exclude: ^\.github/
+    id: yaml-sorter
+    language: python
+    name: sort yaml files
+    types:
+    - yaml
+  - entry: json-sorter
+    id: json-sorter
+    language: python
+    name: sort json files
+    types:
+    - json
+  - entry: requirements-sort
+    files: requirements.*\.txt$
+    id: requirements-sort
+    language: python
+    name: sort requirements files
+    types:
+    - text
+  - entry: env-file-check
+    files: \.env
+    id: env-file-check
+    language: python
+    name: check env files for secrets
+    types:
+    - text
+  - entry: logger-detection
+    id: python-logger-detection
+    language: python
+    name: detect root logger usage
+    types:
+    - python
+  - entry: unreachable-code-detection
+    id: python-unreachable-code
+    language: python
+    name: detect unreachable code
+    types:
+    - python
+  - additional_dependencies:
+    - vulture>=2.0
+    entry: dead-code-detection
+    id: python-dead-code
+    language: python
+    name: detect dead/unused code
+    stages:
+    - manual
+    types:
+    - python
+  repo: local

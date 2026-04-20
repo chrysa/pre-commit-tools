@@ -2,58 +2,95 @@
 name: Release
 
 on:
-    push:
-        branches: [main, master]
-        paths-ignore:
-            - '**.md'
-            - '.github/**'
-    workflow_dispatch:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
 
 permissions:
-    contents: write
-    pull-requests: read
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-    release:
-        runs-on: ubuntu-latest
-        name: Create release
-        steps:
-            - uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
-                  token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+  release:
+    runs-on: ubuntu-latest
+    name: Create release
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
 
-            - name: Setup GitVersion
-              uses: gittools/actions/gitversion/setup@v3
-              with:
-                  versionSpec: 6.x
+      - name: Check if release needed
+        id: check
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LAST_TAG" ]; then
+              echo "needed=true" >> "$GITHUB_OUTPUT"
+          else
+              COMMITS=$(git log "$LAST_TAG"..HEAD --oneline --grep -E '^(feat|fix|perf|refactor|revert)' 2>/dev/null || true)
+              [ -n "$COMMITS" ] && echo "needed=true" >> "$GITHUB_OUTPUT" || echo "needed=false" >> "$GITHUB_OUTPUT"
+          fi
 
-            - name: Determine version
-              id: gitversion
-              uses: gittools/actions/gitversion/execute@v3
+      - name: Setup GitVersion
+        if: steps.check.outputs.needed == 'true'
+        uses: gittools/actions/gitversion/setup@v3
+        with:
+          versionSpec: 6.x
 
-            - name: Install git-cliff
-              uses: taiki-e/install-action@git-cliff
+      - name: Determine version
+        if: steps.check.outputs.needed == 'true'
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v3
 
-            - name: Generate changelog
-              id: changelog
-              run: |
-                  CURRENT_TAG="v${{ steps.gitversion.outputs.semVer }}"
-                  git cliff --output CHANGELOG_RELEASE.md --tag "$CURRENT_TAG" 2>/dev/null || \
-                    git cliff --unreleased --output CHANGELOG_RELEASE.md
-                  echo "version=$CURRENT_TAG" >> "$GITHUB_OUTPUT"
+      - name: Install git-cliff
+        if: steps.check.outputs.needed == 'true'
+        uses: taiki-e/install-action@git-cliff
 
-            - name: Create tag
-              run: |
-                  git config user.name 'chrysa'
-                  git config user.email 'greau.anthony@gmail.com'
-                  git tag "${{ steps.changelog.outputs.version }}" || echo "Tag already exists"
-                  git push origin "${{ steps.changelog.outputs.version }}" || echo "Tag push skipped"
+      - name: Generate changelog
+        if: steps.check.outputs.needed == 'true'
+        id: changelog
+        run: |
+          CURRENT_TAG="v${{ steps.gitversion.outputs.semVer }}"
+          if git rev-parse "$CURRENT_TAG" >/dev/null 2>&1; then
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              exit 0
+          fi
+          git cliff --unreleased --output CHANGELOG_RELEASE.md
+          if [ ! -s CHANGELOG_RELEASE.md ]; then
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              exit 0
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "version=$CURRENT_TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$CURRENT_TAG" >> "$GITHUB_OUTPUT"
 
-            - name: Create GitHub Release
-              uses: softprops/action-gh-release@v2
-              with:
-                  tag_name: ${{ steps.changelog.outputs.version }}
-                  name: Release ${{ steps.changelog.outputs.version }}
-                  body_path: CHANGELOG_RELEASE.md
-                  token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+      - name: Create tag
+        if: steps.check.outputs.needed == 'true' && steps.changelog.outputs.skip !=
+          'true'
+        run: |
+          git config user.name 'chrysa'
+          git config user.email 'greau.anthony@gmail.com'
+          git tag "${{ steps.changelog.outputs.version }}"
+          git push origin "${{ steps.changelog.outputs.version }}"
+
+      - name: Create GitHub Release
+        if: steps.check.outputs.needed == 'true' && steps.changelog.outputs.skip !=
+          'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.changelog.outputs.version }}
+          name: Release ${{ steps.changelog.outputs.version }}
+          body_path: CHANGELOG_RELEASE.md
+          token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### Release workflow summary" >> $GITHUB_STEP_SUMMARY
+          echo "- needed: ${{ steps.check.outputs.needed }}" >> $GITHUB_STEP_SUMMARY
+          echo "- skipped: ${{ steps.changelog.outputs.skip || 'n/a' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- version: ${{ steps.changelog.outputs.version || 'none' }}" >> $GITHUB_STEP_SUMMARY

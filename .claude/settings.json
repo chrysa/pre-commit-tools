@@ -59,7 +59,8 @@
             "timeout": 5000,
             "type": "command"
           }
-        ]
+        ],
+        "matcher": "*"
       }
     ]
   }

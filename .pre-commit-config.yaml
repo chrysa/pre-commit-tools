@@ -112,7 +112,7 @@ repos:
       - id: rm-unneeded-f-str
 
   - repo: https://github.com/pypa/pip-audit
-    rev: d3dfe2115fbe641433d093189cf37fcedecfdf04
+    rev: 934dc1ddad46b05e7092c4c5d79237680e0a7c7b
     hooks:
       - id: pip-audit
 

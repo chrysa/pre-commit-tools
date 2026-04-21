@@ -13,11 +13,26 @@ _DISABLE_COMMENT = '# django-hardcoded-secret: disable'
 
 # Patterns that indicate a hardcoded secret (not an env-var reference)
 _SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
-    ('SECRET_KEY', re.compile(r"""^\s*SECRET_KEY\s*=\s*['"][^'"]{8,}['"]""", re.IGNORECASE)),
-    ('PASSWORD', re.compile(r"""^\s*\w*PASSWORD\w*\s*=\s*['"][^'"]{4,}['"]""", re.IGNORECASE)),
-    ('API_KEY', re.compile(r"""^\s*\w*API_KEY\w*\s*=\s*['"][^'"]{4,}['"]""", re.IGNORECASE)),
-    ('TOKEN', re.compile(r"""^\s*\w*TOKEN\w*\s*=\s*['"][^'"]{4,}['"]""", re.IGNORECASE)),
-    ('PRIVATE_KEY', re.compile(r"""^\s*\w*PRIVATE_KEY\w*\s*=\s*['"][^'"]{4,}['"]""", re.IGNORECASE)),
+    (
+        'SECRET_KEY',
+        re.compile(r"""^\s*SECRET_KEY\s*=\s*['"][^'"]{8,}['"]""", re.IGNORECASE),
+    ),
+    (
+        'PASSWORD',
+        re.compile(r"""^\s*\w*PASSWORD\w*\s*=\s*['"][^'"]{4,}['"]""", re.IGNORECASE),
+    ),
+    (
+        'API_KEY',
+        re.compile(r"""^\s*\w*API_KEY\w*\s*=\s*['"][^'"]{4,}['"]""", re.IGNORECASE),
+    ),
+    (
+        'TOKEN',
+        re.compile(r"""^\s*\w*TOKEN\w*\s*=\s*['"][^'"]{4,}['"]""", re.IGNORECASE),
+    ),
+    (
+        'PRIVATE_KEY',
+        re.compile(r"""^\s*\w*PRIVATE_KEY\w*\s*=\s*['"][^'"]{4,}['"]""", re.IGNORECASE),
+    ),
 ]
 
 # Lines where the value is clearly using env variables — not flagged

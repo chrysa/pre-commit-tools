@@ -61,7 +61,13 @@ def _check_async_body(
             lineno = node.lineno
             if not _is_disable_comment(source_lines, lineno):
                 hint = _BLOCKING_CALLS[name]
-                violations.append((filename, lineno, f'blocking call {name!r} inside async function — {hint}'))
+                violations.append(
+                    (
+                        filename,
+                        lineno,
+                        f'blocking call {name!r} inside async function — {hint}',
+                    ),
+                )
     return violations
 
 
@@ -72,7 +78,9 @@ class _SyncInAsyncVisitor(ast.NodeVisitor):
         self.violations: list[Violation] = []
 
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
-        self.violations.extend(_check_async_body(node.body, self._filename, self._source_lines))
+        self.violations.extend(
+            _check_async_body(node.body, self._filename, self._source_lines),
+        )
         self.generic_visit(node)
 
 

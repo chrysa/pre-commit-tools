@@ -67,7 +67,9 @@ def detect_duplicate_properties(content: str, filename: str) -> list[Violation]:
                     if _DISABLE_PROPERTY_COMMENT not in original_lines[lineno - 1]:
                         current_scope = scope_stack[-1]
                         if prop in current_scope:
-                            violations.append((filename, lineno, current_scope[prop], prop))
+                            violations.append(
+                                (filename, lineno, current_scope[prop], prop),
+                            )
                         else:
                             current_scope[prop] = lineno
 
@@ -113,7 +115,9 @@ def detect_duplicate_ids(content: str, filename: str) -> list[IdViolation]:
                 for id_name in _ID_SELECTOR_RE.findall(stripped):
                     id_lower = id_name.lower()
                     if id_lower in seen_ids:
-                        violations.append((filename, lineno, seen_ids[id_lower], id_name))
+                        violations.append(
+                            (filename, lineno, seen_ids[id_lower], id_name),
+                        )
                     else:
                         seen_ids[id_lower] = lineno
 
@@ -125,7 +129,9 @@ def detect_duplicate_ids(content: str, filename: str) -> list[IdViolation]:
 def main(argv: Sequence[str] | None = None) -> int:
     """Detect duplicate CSS properties and duplicate ID selectors; return 1 if any violation is found."""
     tools_instance = PreCommitTools()
-    tools_instance.set_params(help_msg='detect duplicate/overridden properties and duplicate ID selectors in CSS files')
+    tools_instance.set_params(
+        help_msg='detect duplicate/overridden properties and duplicate ID selectors in CSS files',
+    )
     args, _ = tools_instance.get_args(argv=argv)
     ret_val = 0
     for filename in args.filenames:
@@ -134,12 +140,18 @@ def main(argv: Sequence[str] | None = None) -> int:
             content = path.read_text(encoding='utf-8')
         except OSError:
             continue
-        for fname, lineno, first_lineno, prop in detect_duplicate_properties(content, filename):
+        for fname, lineno, first_lineno, prop in detect_duplicate_properties(
+            content,
+            filename,
+        ):
             print(  # print-detection: disable
                 f'[{fname}:{lineno}] duplicate property "{prop}" (first declared at line {first_lineno})',
             )
             ret_val = 1
-        for fname, lineno, first_lineno, id_name in detect_duplicate_ids(content, filename):
+        for fname, lineno, first_lineno, id_name in detect_duplicate_ids(
+            content,
+            filename,
+        ):
             print(  # print-detection: disable
                 f'[{fname}:{lineno}] duplicate ID selector "#{id_name}" (first used at line {first_lineno})',
             )

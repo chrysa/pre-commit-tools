@@ -39,7 +39,9 @@ class PatternDetection:
         """Run detection across all files and return 1 if a violation is found."""
         tools_instance = PreCommitTools()
         tools_instance.set_params(help_msg='search print on python code')
-        namespace_args, _ = tools_instance.get_args(argv=argv if argv is not None else [])
+        namespace_args, _ = tools_instance.get_args(
+            argv=argv if argv is not None else [],
+        )
         ret_val: int = 0
         for file in namespace_args.filenames:
             file_path = Path(file)
@@ -51,6 +53,8 @@ class PatternDetection:
                         and not self.is_disabled(line=line_content)
                         and not self.is_commented(line=line_content)
                     ):
-                        print(f'[{file_path}:{line_number}] {line_content.strip()}')  # print-detection: disable
+                        print(
+                            f'[{file_path}:{line_number}] {line_content.strip()}',
+                        )  # print-detection: disable
                         ret_val = 1
         return ret_val

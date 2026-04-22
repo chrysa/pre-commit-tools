@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pre_commit_hooks.fastapi_missing_response_model import detect_missing_response_model
+from pre_commit_hooks.fastapi_missing_response_model import (
+    detect_missing_response_model,
+)
 from pre_commit_hooks.fastapi_missing_response_model import main as main_fastapi
 from pre_commit_hooks.no_sync_in_async import detect_sync_in_async
 from pre_commit_hooks.no_sync_in_async import main as main_sync

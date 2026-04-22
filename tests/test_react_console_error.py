@@ -31,7 +31,11 @@ class TestReactConsoleErrorMain:
         assert main([f]) == 0
 
     def test_disable_comment_suppresses(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, 'ok.js', 'console.error(err); // console-error-detection: disable\n')
+        f = _write(
+            tmp_path,
+            'ok.js',
+            'console.error(err); // console-error-detection: disable\n',
+        )
         assert main([f]) == 0
 
     def test_indented_console_error_returns_1(self, tmp_path: Path) -> None:

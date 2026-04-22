@@ -130,7 +130,9 @@ def sort_setup_cfg(content: str) -> str:
 def main(argv: Sequence[str] | None = None) -> int:
     """Sort requirements files and setup.cfg; return 1 if any file was modified."""
     tools_instance = PreCommitTools()
-    tools_instance.set_params(help_msg='sort requirements file or setup.cfg alphabetically')
+    tools_instance.set_params(
+        help_msg='sort requirements file or setup.cfg alphabetically',
+    )
     args, _ = tools_instance.get_args(argv=argv)
     changed = False
     for file in args.filenames:

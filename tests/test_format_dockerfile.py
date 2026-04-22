@@ -9,7 +9,10 @@ from pathlib import Path
 
 import pytest
 
-dockerfile_parse = pytest.importorskip('dockerfile_parse', reason='dockerfile-parse not installed')
+dockerfile_parse = pytest.importorskip(
+    'dockerfile_parse',
+    reason='dockerfile-parse not installed',
+)
 
 from pre_commit_hooks.format_dockerfile import FormatDockerfile, main  # noqa: E402
 

@@ -272,3 +272,11 @@
   minimum_pre_commit_version: '4.1.0'
   name: helm lint (charts/)
   pass_filenames: false
+- id: generate-changelog
+  description: generate CHANGELOG.md from git history using git-cliff (requires git-cliff in PATH)
+  entry: generate-changelog
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: generate changelog
+  pass_filenames: false
+  stages: [manual]

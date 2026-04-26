@@ -52,6 +52,7 @@
     - [js-syntax-check](#js-syntax-check)
     - [ts-hardcoded-secret-detection](#ts-hardcoded-secret-detection)
     - [helm-lint](#helm-lint)
+    - [generate-changelog](#generate-changelog)
 
 <!--TOC-->
 
@@ -63,7 +64,7 @@ Add this to your `.pre-commit-config.yaml`
 
 ```yaml
 -   repo: https://github.com/chrysa/pre-commit-tools
-    rev: ''  # Use the ref you want to point at
+    - rev: v0.1.1-37
     hooks:
           - id: console-debug-detection
           - id: console-log-detection
@@ -101,6 +102,9 @@ Add this to your `.pre-commit-config.yaml`
           - id: ts-hardcoded-secret-detection
           # requires helm in PATH
           - id: helm-lint
+          # generate-changelog uses git-cliff; run manually or on CI
+          - id: generate-changelog
+            stages: [manual]
 
 # Optional — guideline-checker (structural coding guidelines)
 # Validates project structure, naming conventions, and coding standards.
@@ -526,4 +530,20 @@ charts/
 - id: helm-lint
   files: ^charts/
   pass_filenames: false
+```
+
+### generate-changelog
+
+Generate or update a `CHANGELOG.md` using [git-cliff](https://github.com/orhun/git-cliff) on every commit to `main`.
+Requires `git-cliff` to be installed in PATH.
+
+This hook runs in the `manual` stage by default — trigger it via CI or explicitly:
+
+```bash
+pre-commit run generate-changelog --hook-stage manual
+```
+
+```yaml
+- id: generate-changelog
+  stages: [manual]
 ```

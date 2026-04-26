@@ -59,7 +59,7 @@ repos:
         args: [--ignore=E006,E020]
 
   - repo: https://github.com/jendrikseipp/vulture
-    rev: 51a13e9467e3dea6ea5ddb74422a0eba87367ef5
+    rev: 81fb2ac8f7500d52a61a80e1c41b84dbb651c385
     hooks:
       - id: vulture
         args: [pre_commit_hooks/]

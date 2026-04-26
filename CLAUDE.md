@@ -39,6 +39,10 @@ make test-cov
 
 ---
 
+
+## Language Rules
+
+- Language: English — all code, comments, documentation, instructions, and configuration files must be in English.
 ## Architecture
 
 ```

@@ -65,3 +65,33 @@
 - Max file length: 500 lines when practical.
 - Max cyclomatic complexity: 10.
 - Lint warnings target: 0.
+
+## Regression Prevention (NON-NEGOTIABLE)
+
+Before marking **any** task or sub-task as done, the agent MUST verify that no regression has been introduced.
+
+### Required checks — run in order
+
+1. **Tests** — `make test` (or equivalent): number of passing tests must be **≥ baseline** (count before the change). Zero new failures allowed.
+2. **Coverage** — coverage percentage must be **≥ baseline**. Never decrease. If no baseline exists, record the current value as baseline.
+3. **Lint** — `make lint` (or `ruff check` / `eslint`): warning count must be **= 0**. No increase tolerated.
+4. **Types** — `mypy` / `tsc --noEmit`: error count must be **≤ baseline**. No new type errors allowed.
+5. **Build** — `make build` must exit 0 when applicable.
+
+### Procedure
+
+- Record baseline metrics **before** starting the task (tests passing, coverage %, lint count, type errors).
+- After each implementation step, re-run the relevant checks.
+- **If any check regresses**: stop, fix the regression, re-run all checks before continuing.
+- Do NOT proceed to the next task if any gate is red.
+
+### Reporting
+
+After completing a task, always report:
+```
+Tests : <N> passed (baseline <N>) ✓/✗
+Coverage: <X>% (baseline <X>%) ✓/✗
+Lint    : 0 warnings ✓/✗
+Types   : 0 errors ✓/✗
+Build   : ok ✓/✗
+```

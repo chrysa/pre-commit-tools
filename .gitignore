@@ -10,3 +10,5 @@ dist/
 .ruff_cache
 .pytest_cache
 .offline-markdown-preview/
+.ci-backup-*/
+.gitnexus

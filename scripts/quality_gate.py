@@ -40,7 +40,13 @@ class QualityGate:
             ('Lint', 'lint', 'warning_count', '=', 'make lint'),
             ('Types', 'types', 'error_count', '≤', 'make type-check'),
             ('Build', 'build', 'build_status', '=', 'make build'),
-            ('Secrets', 'security_secrets', 'secret_count', '=', 'detect-secrets scan --all-files 2>&1 || true'),
+            (
+                'Secrets',
+                'security_secrets',
+                'secret_count',
+                '=',
+                'detect-secrets scan --all-files 2>&1 || true',
+            ),
             (
                 'VulnDeps',
                 'security_vulns',
@@ -149,7 +155,13 @@ class QualityGate:
             return current <= target
         return False
 
-    def _run_gate(self, gate_name: str, key: str, metric_name: str, default_cmd: str) -> dict[str, Any]:
+    def _run_gate(
+        self,
+        gate_name: str,
+        key: str,
+        metric_name: str,
+        default_cmd: str,
+    ) -> dict[str, Any]:
         cmd = self.config.get('commands', {}).get(key, default_cmd)
         print(f'RUN_GATE|{gate_name}|{cmd}')
         exit_code, output = self._run(cmd)
@@ -204,7 +216,9 @@ class QualityGate:
             return True
 
         print('OVERALL_RESULT|FAIL')
-        print('ERROR: baseline contains failing gates; fix quality checks before using this baseline')
+        print(
+            'ERROR: baseline contains failing gates; fix quality checks before using this baseline',
+        )
         return False
 
     def verify(self) -> bool:

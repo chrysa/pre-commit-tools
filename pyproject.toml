@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=72", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "pre_commit_hooks_tools"
@@ -39,7 +39,7 @@ css-unused-variable-detection = "pre_commit_hooks.css_unused_variable:main"
 react-console-error-detection = "pre_commit_hooks.react_console_error_detection:main"
 no-bare-except-detection = "pre_commit_hooks.no_bare_except:main"
 no-print-in-migration = "pre_commit_hooks.no_print_in_migration:main"
-django-hardcoded-secret-detection = "pre_commit_hooks.django_hardcoded_secret:main"
+django-hardcoded-secret-detection = "pre_commit_hooks.django_hardcoded_secret:main"  # pragma: allowlist secret
 dockerfile-no-latest-detection = "pre_commit_hooks.dockerfile_no_latest:main"
 env-example-sync = "pre_commit_hooks.env_example_sync:main"
 no-console-warn = "pre_commit_hooks.no_console_warn:main"
@@ -50,7 +50,7 @@ django-no-raw-sql = "pre_commit_hooks.django_no_raw_sql:main"
 no-sync-in-async = "pre_commit_hooks.no_sync_in_async:main"
 fastapi-missing-response-model = "pre_commit_hooks.fastapi_missing_response_model:main"
 js-syntax-check = "pre_commit_hooks.js_syntax_check:main"
-ts-hardcoded-secret-detection = "pre_commit_hooks.ts_hardcoded_secret:main"
+ts-hardcoded-secret-detection = "pre_commit_hooks.ts_hardcoded_secret:main"  # pragma: allowlist secret
 generate-changelog = "pre_commit_hooks.generate_changelog:main"
 
 [project.optional-dependencies]

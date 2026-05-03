@@ -3,10 +3,10 @@ from __future__ import annotations
 import argparse
 import subprocess
 import sys
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Generate CHANGELOG.md using git-cliff.",
     )

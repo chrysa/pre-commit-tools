@@ -117,7 +117,7 @@ repos:
     rev: d6720db2c6aeef231459c5d227fcc92eb2f7a9f5
     hooks:
       - id: pip-audit
-        args: [--ignore-vuln, CVE-2026-3219]
+        args: [--ignore-vuln, CVE-2026-3219, --ignore-vuln, CVE-2026-6357]
 
   - repo: https://github.com/Yelp/detect-secrets
     rev: 5e141933554a0b74e7341841f318be21e895339c

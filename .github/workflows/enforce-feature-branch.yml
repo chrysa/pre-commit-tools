@@ -4,14 +4,24 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   branch-policy:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Validate PR source branch naming
         shell: bash
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
-          branch="${{ github.head_ref }}"
+          branch="$HEAD_REF"
           if [[ "$branch" == dependabot/* ]]; then
             echo "Dependabot branch — policy check skipped"
             exit 0

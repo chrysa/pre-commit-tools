@@ -31,10 +31,10 @@ jobs:
               run: |
                   VERSION="v${{ steps.gitversion.outputs.majorMinorPatch }}"
                   if git ls-remote --tags origin "refs/tags/$VERSION" | grep -q .; then
-                      echo "should-release=false" >> $GITHUB_OUTPUT
+                      echo "should-release=false" >> "$GITHUB_OUTPUT"
                       echo "Tag $VERSION already exists -- skipping release"
                   else
-                      echo "should-release=true" >> $GITHUB_OUTPUT
+                      echo "should-release=true" >> "$GITHUB_OUTPUT"
                       echo "Tag $VERSION does not exist -- proceeding with release"
                   fi
 

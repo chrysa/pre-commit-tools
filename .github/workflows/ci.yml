@@ -85,7 +85,7 @@ jobs:
               with:
                   python-version: ${{ matrix.python-version }}
                   latest-python: ${{ needs.config.outputs.latest-python }}
-                  config-file: setup.cfg
+                  config-file: pyproject.toml
                   sources: pre_commit_hooks
 
     test:

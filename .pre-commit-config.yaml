@@ -114,7 +114,7 @@ repos:
       - id: rm-unneeded-f-str
 
   - repo: https://github.com/pypa/pip-audit
-    rev: 934dc1ddad46b05e7092c4c5d79237680e0a7c7b
+    rev: d6720db2c6aeef231459c5d227fcc92eb2f7a9f5
     hooks:
       - id: pip-audit
         args: [--ignore-vuln, CVE-2026-3219]

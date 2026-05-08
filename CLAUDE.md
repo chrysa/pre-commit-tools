@@ -19,7 +19,7 @@ ruff check --config=config-tools/ruff.toml pre_commit_hooks tests
 ruff format --config=config-tools/ruff.toml pre_commit_hooks
 
 # Type-checking
-mypy --config-file=setup.cfg pre_commit_hooks
+mypy --config-file=pyproject.toml pre_commit_hooks
 
 # Tests
 pytest                             # all tests
@@ -35,6 +35,37 @@ make install-dev
 make quality    # lint + format-check + type-check
 make test
 make test-cov
+```
+
+---
+
+## Local test procedure
+
+All checks must go through `make` targets. Never invoke `ruff`/`pytest`/`mypy` directly on the host outside of the make wrapper.
+
+```bash
+# 1. Install
+make install-dev
+
+# 2. Full quality check (lint + format + type-check)
+make quality
+
+# 3. Run tests
+make test                  # all tests
+make test-fail-fast        # stop on first failure
+make test-cov              # with coverage report
+
+# 4. Run all pre-commit hooks on every file
+make pre-commit
+
+# 5. Validate GitHub Actions workflows (requires actionlint)
+docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:latest
+```
+
+### Regression gate (before every PR)
+```bash
+make quality && make test-cov
+# Coverage must stay >= 85%. Lint warnings must be 0.
 ```
 
 ---

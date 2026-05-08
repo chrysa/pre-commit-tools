@@ -26,21 +26,18 @@ jobs:
     mutation:
         name: Mutmut
         runs-on: ubuntu-latest
+        timeout-minutes: 60
         steps:
             - uses: actions/checkout@v6
 
-            - name: Set up Python
-              uses: actions/setup-python@v6
+            - uses: chrysa/github-actions/tool-setup@v1
               with:
-                  python-version: "3.12"
+                  python-version: "3.14"
+                  extras: dev
 
-            - name: Install dependencies
-              run: |
-                  python -m pip install --upgrade pip
-                  pip install -e ".[dev]" mutmut
+            - run: pip install mutmut
 
             - name: Run mutmut
-              id: mutmut
               run: |
                   mutmut run \
                     --paths-to-mutate "${{ env.MUTATION_PATHS }}" \
@@ -48,42 +45,18 @@ jobs:
                     --no-progress \
                     || true
 
-            - name: Compute mutation score
-              id: score
+            - name: Check mutation score
               run: |
                   KILLED=$(mutmut results 2>/dev/null | grep -c "^Killed" || echo 0)
                   SURVIVED=$(mutmut results 2>/dev/null | grep -c "^Survived" || echo 0)
                   TOTAL=$((KILLED + SURVIVED))
-                  if [ "$TOTAL" -eq 0 ]; then
-                    echo "score=100" >> "$GITHUB_OUTPUT"
-                  else
-                    SCORE=$(( KILLED * 100 / TOTAL ))
-                    echo "score=$SCORE" >> "$GITHUB_OUTPUT"
-                  fi
-                  {
-                    echo "killed=$KILLED"
-                    echo "survived=$SURVIVED"
-                    echo "total=$TOTAL"
-                  } >> "$GITHUB_OUTPUT"
+                  SCORE=$([ "$TOTAL" -eq 0 ] && echo 100 || echo $((KILLED * 100 / TOTAL)))
+                  mutmut results || true
+                  echo "Mutation score: ${SCORE}% (threshold: ${{ env.MUTATION_THRESHOLD }}%)"
+                  [ "$SCORE" -ge "${{ env.MUTATION_THRESHOLD }}" ] || exit 1
 
-            - name: Show surviving mutants
+            - uses: actions/upload-artifact@v7
               if: always()
-              run: mutmut results || true
-
-            - name: Fail if score below threshold
-              run: |
-                  SCORE=${{ steps.score.outputs.score }}
-                  THRESHOLD=${{ env.MUTATION_THRESHOLD }}
-                  echo "Mutation score: ${SCORE}% (threshold: ${THRESHOLD}%)"
-                  if [ "$SCORE" -lt "$THRESHOLD" ]; then
-                    echo "❌ Mutation score ${SCORE}% is below threshold ${THRESHOLD}%"
-                    exit 1
-                  fi
-                  echo "✅ Mutation score ${SCORE}% meets threshold ${THRESHOLD}%"
-
-            - name: Upload mutmut results
-              if: always()
-              uses: actions/upload-artifact@v7
               with:
                   name: mutmut-results
                   path: .mutmut-cache

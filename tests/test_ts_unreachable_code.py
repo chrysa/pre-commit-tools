@@ -97,3 +97,12 @@ class TestTsUnreachableMain:
 
     def test_empty_args_returns_0(self) -> None:
         assert main([]) == 0
+
+    def test_unreadable_file_skipped(self, tmp_path: Path) -> None:
+        f = str(tmp_path / 'nonexistent.ts')
+        assert main([f]) == 0
+
+    def test_switch_case_unreachable(self, tmp_path: Path) -> None:
+        src = 'function f(x: number) {\n  switch (x) {\n    case 1:\n      return 1;\n      const dead = 2;\n  }\n}\n'
+        f = _write(tmp_path, 'switch.ts', src)
+        assert main([f]) == 1

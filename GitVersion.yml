@@ -1,4 +1,7 @@
 branches:
+  feat:
+    increment: Minor
+    regex: ^feat/.*$
   fix:
     increment: Patch
     label: fix

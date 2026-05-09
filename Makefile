@@ -112,3 +112,10 @@ quality-gate-baseline: ## Record baseline metrics for regression detection
 
 quality-gate-verify: ## Verify no regression since baseline
 	@python3 scripts/quality_gate.py verify
+
+# ─── Compat aliases ───────────────────────────────────────────────────────────
+
+typecheck: ## Alias → type-check
+	@$(MAKE) type-check
+
+

@@ -63,11 +63,17 @@ ts_unreachable_code = [
     "tree-sitter>=0.23,<0.26",
     "tree-sitter-typescript>=0.23,<0.24",
 ]
-typecheck = ["mypy"]
+typecheck = ["mypy", "types-PyYAML"]
 yaml = ["PyYAML==6.0.3"]
 
 [tool.setuptools.packages.find]
 exclude = ["tests*", "testing*"]
+
+[tool.coverage.run]
+omit = [
+    "pre_commit_hooks/pylint_report_html.py",
+    "pre_commit_hooks/tools/update_readme.py",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

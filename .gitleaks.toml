@@ -1,0 +1,11 @@
+title = "Gitleaks configuration for pre-commit-tools"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Ignore detect-secrets baseline files — hashed_secret SHA1 values are not real secrets"
+paths = [
+    '''.secrets\.baseline''',
+]
+

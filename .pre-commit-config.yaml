@@ -23,7 +23,7 @@ repos:
         args: [--branch, main]
 
   - repo: https://github.com/asottile/add-trailing-comma
-    rev: b5695900a5bcefcdb712917a33baed945269d201
+    rev: v4.0.0
     hooks:
       - id: add-trailing-comma
 
@@ -35,21 +35,21 @@ repos:
         stages: [manual]
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: cfc833bfc00c7cc40f702bd9e02df34d850d0291
+    rev: v0.9.0
     hooks:
       - id: markdownlint
         args: [--fix]
         stages: [manual]
 
   - repo: https://github.com/executablebooks/mdformat
-    rev: 56b24ef0c6cfdab501844925971204f858185547
+    rev: 1.0.0
     hooks:
       - id: mdformat
         additional_dependencies: [mdformat-gfm]
         stages: [manual]
 
   - repo: https://github.com/lovesegfault/beautysh
-    rev: 34c3b3da0233e76d7d1ad90a78f3679185ecf31c
+    rev: v6.4.3
     hooks:
       - id: beautysh
         args: [--indent-size, '4']
@@ -104,12 +104,12 @@ repos:
       - id: rst-backticks
 
   - repo: https://github.com/MarcoGorelli/auto-walrus
-    rev: 7353fddb82fd30f1794e618a300333f41c3a2ef3
+    rev: 0.4.1
     hooks:
       - id: auto-walrus
 
   - repo: https://github.com/dannysepler/rm_unneeded_f_str
-    rev: df396a8bfdeced1a011c7d9d6787aa7f49ac8634
+    rev: v0.2.0
     hooks:
       - id: rm-unneeded-f-str
 

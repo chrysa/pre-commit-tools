@@ -106,4 +106,3 @@ class TestTsUnreachableMain:
         src = 'function f(x: number) {\n  switch (x) {\n    case 1:\n      return 1;\n      const dead = 2;\n  }\n}\n'
         f = _write(tmp_path, 'switch.ts', src)
         assert main([f]) == 1
-

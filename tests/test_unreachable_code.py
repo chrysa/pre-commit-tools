@@ -124,3 +124,4 @@ class TestUnreachableCodeMain:
         code = 'def f(x):\n    if x:\n        return 1\n    else:\n        return 2\n        dead = True\n'
         f = _write(tmp_path, 'else_dead.py', code)
         assert main([f]) == 1
+

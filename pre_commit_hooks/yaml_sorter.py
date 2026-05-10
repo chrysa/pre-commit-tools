@@ -7,7 +7,7 @@ from collections import OrderedDict
 from collections.abc import Sequence
 from typing import Any
 
-import yaml  # type: ignore[import-untyped]
+import yaml
 
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 

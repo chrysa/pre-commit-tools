@@ -112,3 +112,14 @@ quality-gate-baseline: ## Record baseline metrics for regression detection
 
 quality-gate-verify: ## Verify no regression since baseline
 	@python3 scripts/quality_gate.py verify
+
+# ─── Compat aliases ───────────────────────────────────────────────────────────
+
+typecheck: ## Alias → type-check
+	@$(MAKE) type-check
+
+dev: ## Start development environment (install package in editable mode)
+	pip install -e .[dev]
+
+dev: ## Start development environment (install package in editable mode)
+	pip install -e .[dev]

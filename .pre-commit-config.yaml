@@ -55,13 +55,13 @@ repos:
         args: [--indent-size, '4']
 
   - repo: https://github.com/openstack/bashate
-    rev: ec2f2400915200d633299612a02d7d285e4be24c
+    rev: 2.1.1
     hooks:
       - id: bashate
         args: [--ignore=E006,E020]
 
   - repo: https://github.com/jendrikseipp/vulture
-    rev: 2c21cb0ae2afa657e36f6a397cb573608a65d79e
+    rev: v2.9.1
     hooks:
       - id: vulture
         args: [pre_commit_hooks/]
@@ -76,7 +76,7 @@ repos:
         args: [--config=config-tools/ruff.toml]
 
   - repo: https://github.com/pre-commit/mirrors-pylint
-    rev: a1b176a5ee919967cf01e87c0222bd64b94fe0de
+    rev: v3.0.0a5
     hooks:
       - id: pylint
         args:
@@ -95,7 +95,7 @@ repos:
         stages: [manual]
 
   - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: 4be82de3c7bc83ee187ed5cb7c286f6130258edc
+    rev: v1.9.0
     hooks:
       - id: python-no-eval
       - id: python-no-log-warn
@@ -114,27 +114,27 @@ repos:
       - id: rm-unneeded-f-str
 
   - repo: https://github.com/pypa/pip-audit
-    rev: d6720db2c6aeef231459c5d227fcc92eb2f7a9f5
+    rev: v2.9.0
     hooks:
       - id: pip-audit
         args: [--ignore-vuln, CVE-2026-3219, --ignore-vuln, CVE-2026-6357]
 
   - repo: https://github.com/Yelp/detect-secrets
-    rev: 5e141933554a0b74e7341841f318be21e895339c
+    rev: 0.9.1
     hooks:
       - id: detect-secrets
         args: [--baseline, .secrets.baseline]
         exclude: \.pre-commit-config\.yaml
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: 2fac8f7042206158f42a0f6487a358aee02a3568
+    rev: v3.9.0
     hooks:
       - id: pyupgrade
         args: [--py3-only, --py312-plus]
         stages: [manual]
 
   - repo: https://github.com/chrysa/guideline-checker
-    rev: 5841d42675e29f0270fb264cb898fd1117f6ab62
+    rev: v0.0.1
     hooks:
       - id: guideline-check
         stages: [pre-push, manual]

@@ -92,4 +92,3 @@ updates:
                   - flake8*
       cooldown:
           default-days: 7
-

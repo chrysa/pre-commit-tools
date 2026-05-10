@@ -94,3 +94,33 @@ class TestUnreachableCodeMain:
         code = 'def f():\n    try:\n        raise ValueError()\n        x = 1\n    except ValueError:\n        pass\n'
         f = _write(tmp_path, 'try_dead.py', code)
         assert main([f]) == 1
+
+    def test_async_function_unreachable(self, tmp_path: Path) -> None:
+        code = 'async def f():\n    return 1\n    x = 2\n'
+        f = _write(tmp_path, 'async_dead.py', code)
+        assert main([f]) == 1
+
+    def test_async_for_unreachable(self, tmp_path: Path) -> None:
+        code = 'async def f(it):\n    async for i in it:\n        return 1\n        dead = True\n'
+        f = _write(tmp_path, 'async_for.py', code)
+        assert main([f]) == 1
+
+    def test_while_loop_unreachable(self, tmp_path: Path) -> None:
+        code = 'def f():\n    while True:\n        return 1\n        dead = True\n'
+        f = _write(tmp_path, 'while_dead.py', code)
+        assert main([f]) == 1
+
+    def test_with_block_unreachable(self, tmp_path: Path) -> None:
+        code = 'def f():\n    with open("/dev/null") as fh:\n        return fh\n        dead = True\n'
+        f = _write(tmp_path, 'with_dead.py', code)
+        assert main([f]) == 1
+
+    def test_async_with_unreachable(self, tmp_path: Path) -> None:
+        code = 'async def f(cm):\n    async with cm as x:\n        return x\n        dead = True\n'
+        f = _write(tmp_path, 'async_with.py', code)
+        assert main([f]) == 1
+
+    def test_if_else_branch_unreachable(self, tmp_path: Path) -> None:
+        code = 'def f(x):\n    if x:\n        return 1\n    else:\n        return 2\n        dead = True\n'
+        f = _write(tmp_path, 'else_dead.py', code)
+        assert main([f]) == 1

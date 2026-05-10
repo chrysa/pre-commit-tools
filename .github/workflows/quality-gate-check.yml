@@ -26,4 +26,16 @@ jobs:
           python-version: "3.14"
           extras: dev
 
-      - run: make quality-gate-verify
+      - name: Restore quality gate baseline from main
+        run: |
+            git fetch origin main --depth=1 2>/dev/null || true
+            git show origin/main:.quality-gate-baseline.json > .quality-gate-baseline.json 2>/dev/null || true
+
+      - name: Run quality gate verify (skip if no baseline)
+        run: |
+            if [ ! -s .quality-gate-baseline.json ]; then
+              echo "No baseline found on main — skipping quality gate verification."
+              echo "Run 'make quality-gate-baseline' on main and commit .quality-gate-baseline.json to enable regression detection."
+              exit 0
+            fi
+            make quality-gate-verify

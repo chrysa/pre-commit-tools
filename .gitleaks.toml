@@ -8,4 +8,3 @@ description = "Ignore detect-secrets baseline files — hashed_secret SHA1 value
 paths = [
     '''.secrets\.baseline''',
 ]
-

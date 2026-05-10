@@ -118,4 +118,8 @@ quality-gate-verify: ## Verify no regression since baseline
 typecheck: ## Alias → type-check
 	@$(MAKE) type-check
 
+dev: ## Start development environment (install package in editable mode)
+	pip install -e .[dev]
 
+dev: ## Start development environment (install package in editable mode)
+	pip install -e .[dev]

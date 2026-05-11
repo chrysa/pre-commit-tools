@@ -23,7 +23,11 @@ def sort_yaml_file(
     for key, value in sorted_data.items():
         if isinstance(value, dict):
             sorted_data[key] = {}
-            changed_file_state, sorted_data[key] = sort_yaml_file(changed_file_state, value, sorted_data[key])
+            changed_file_state, sorted_data[key] = sort_yaml_file(
+                changed_file_state,
+                value,
+                sorted_data[key],
+            )
         elif isinstance(value, list):
             if all(not isinstance(item, (dict, list)) for item in value):
                 sorted_data[key] = sorted(value)
@@ -48,7 +52,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         if not isinstance(raw, dict):
             continue
         data = OrderedDict(raw)
-        changed_file_state, sorted_data = sort_yaml_file(changed_file_state, data, sorted_data)
+        changed_file_state, sorted_data = sort_yaml_file(
+            changed_file_state,
+            data,
+            sorted_data,
+        )
         if changed_file_state:
             with open(file, mode='w') as file_stream:
                 yaml.safe_dump(dict(sorted_data), file_stream, default_flow_style=False)

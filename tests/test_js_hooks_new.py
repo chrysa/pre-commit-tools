@@ -66,7 +66,11 @@ class TestReactDirectDom:
         assert main_dom([f]) == 0
 
     def test_disable_comment_suppresses(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, 'Comp.tsx', 'document.getElementById("x"); // react-direct-dom: disable\n')
+        f = _write(
+            tmp_path,
+            'Comp.tsx',
+            'document.getElementById("x"); // react-direct-dom: disable\n',
+        )
         assert main_dom([f]) == 0
 
     def test_empty_args_returns_0(self) -> None:
@@ -95,7 +99,11 @@ class TestImportNoRelativeParent:
         assert main_import([f]) == 1
 
     def test_disable_comment_suppresses(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, 'a.ts', "import { x } from '../../foo'; // import-no-relative-parent: disable\n")
+        f = _write(
+            tmp_path,
+            'a.ts',
+            "import { x } from '../../foo'; // import-no-relative-parent: disable\n",
+        )
         assert main_import([f]) == 0
 
     def test_commented_import_ignored(self, tmp_path: Path) -> None:

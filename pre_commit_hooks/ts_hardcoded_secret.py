@@ -20,7 +20,9 @@ _SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ('STRIPE_KEY', re.compile(r'(?:sk|pk)_live_[0-9a-zA-Z]{24,}')),
     (
         'API_KEY',
-        re.compile(r"""\w*[Aa][Pp][Ii]_?[Kk][Ee][Yy]\w*\s*[=:]\s*['"`][^'"`]{4,}['"`]"""),
+        re.compile(
+            r"""\w*[Aa][Pp][Ii]_?[Kk][Ee][Yy]\w*\s*[=:]\s*['"`][^'"`]{4,}['"`]""",
+        ),
     ),
     (
         'TOKEN',
@@ -28,7 +30,9 @@ _SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ),
     (
         'PASSWORD',
-        re.compile(r"""\w*[Pp][Aa][Ss][Ss][Ww][Oo][Rr][Dd]\w*\s*[=:]\s*['"`][^'"`]{4,}['"`]"""),
+        re.compile(
+            r"""\w*[Pp][Aa][Ss][Ss][Ww][Oo][Rr][Dd]\w*\s*[=:]\s*['"`][^'"`]{4,}['"`]""",
+        ),
     ),
     (
         'SECRET',
@@ -36,7 +40,9 @@ _SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ),
     (
         'PRIVATE_KEY',
-        re.compile(r"""\w*[Pp][Rr][Ii][Vv][Aa][Tt][Ee]_?[Kk][Ee][Yy]\w*\s*[=:]\s*['"`][^'"`]{4,}['"`]"""),
+        re.compile(
+            r"""\w*[Pp][Rr][Ii][Vv][Aa][Tt][Ee]_?[Kk][Ee][Yy]\w*\s*[=:]\s*['"`][^'"`]{4,}['"`]""",
+        ),
     ),
 ]
 

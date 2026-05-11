@@ -43,7 +43,13 @@ def detect_unused_variables(source: str, filename: str) -> list[Violation]:
     violations: list[Violation] = []
     for var_name, lineno in sorted(declared.items(), key=lambda x: x[1]):
         if var_name not in used:
-            violations.append((filename, lineno, f'CSS custom property --{var_name} declared but never used'))
+            violations.append(
+                (
+                    filename,
+                    lineno,
+                    f'CSS custom property --{var_name} declared but never used',
+                ),
+            )
     return violations
 
 

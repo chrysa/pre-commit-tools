@@ -23,7 +23,9 @@ def detect_from_latest(source: str, filename: str) -> list[Violation]:
             continue
         m = _FROM_LATEST_RE.match(line)
         if m:
-            violations.append((filename, lineno, 'FROM with :latest tag is not reproducible'))
+            violations.append(
+                (filename, lineno, 'FROM with :latest tag is not reproducible'),
+            )
     return violations
 
 

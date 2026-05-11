@@ -40,7 +40,13 @@ def _load_config(config_path: Path) -> dict[str, bool]:
         return {}
 
 
-def _sort_arg_env_blocks(content: str, *, sort_args: bool, sort_envs: bool, separate_arg_blocks: bool) -> str:
+def _sort_arg_env_blocks(
+    content: str,
+    *,
+    sort_args: bool,
+    sort_envs: bool,
+    separate_arg_blocks: bool,
+) -> str:
     """Post-process Dockerfile content to sort consecutive ARG/ENV blocks."""
     lines = content.split('\n')
     result: list[str] = []
@@ -126,7 +132,9 @@ class FormatDockerfile:
 
     def _format_healthcheck_line(self, *, line_content: str) -> None:
         logger.debug('format HEALTHCHECK ..........')
-        multiline = ' \\\n    CMD '.join(list(map(str.strip, line_content.split('CMD'))))
+        multiline = ' \\\n    CMD '.join(
+            list(map(str.strip, line_content.split('CMD'))),
+        )
         self.content += '\n' + multiline
 
     def _file_as_changed(self) -> bool:
@@ -183,7 +191,9 @@ class FormatDockerfile:
         return self._get_line_instruction(line=self.origin_content[index - 1])
 
     def _is_same_as_previous(self, *, index: int) -> bool:
-        return self._get_line_instruction(line=self.origin_content[index]) == self._get_previous_instruction(
+        return self._get_line_instruction(
+            line=self.origin_content[index],
+        ) == self._get_previous_instruction(
             index=index,
         )
 
@@ -203,13 +213,19 @@ class FormatDockerfile:
             'WORKDIR',
         ]:
             self._add_newline_if_needed(index=index)
-            self._format_simple_line(line_content=line_content, line_instruction=line_instruction)
+            self._format_simple_line(
+                line_content=line_content,
+                line_instruction=line_instruction,
+            )
         elif self._is_type(line=line, instruction_type='ENV'):
             self.content += '\n'
             self._format_env_line(line_content=line_content)
         elif self._is_type(line=line, instruction_type='FROM'):
             self.content += '\n\n'
-            self._format_simple_line(line_content=line_content, line_instruction=line_instruction)
+            self._format_simple_line(
+                line_content=line_content,
+                line_instruction=line_instruction,
+            )
         elif self._is_type(line=line, instruction_type='HEALTHCHECK'):
             self.content += '\n'
             self._format_healthcheck_line(line_content=line_content)
@@ -266,9 +282,24 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     parser = argparse.ArgumentParser(description='format dockerfile')
     parser.add_argument('filenames', nargs='*')
-    parser.add_argument('-c', '--config', default=None, help='Path to .format-dockerfiles.toml config file')
-    parser.add_argument('--sort-args', action='store_true', default=False, help='Sort ARG instructions alphabetically')
-    parser.add_argument('--sort-envs', action='store_true', default=False, help='Sort ENV instructions alphabetically')
+    parser.add_argument(
+        '-c',
+        '--config',
+        default=None,
+        help='Path to .format-dockerfiles.toml config file',
+    )
+    parser.add_argument(
+        '--sort-args',
+        action='store_true',
+        default=False,
+        help='Sort ARG instructions alphabetically',
+    )
+    parser.add_argument(
+        '--sort-envs',
+        action='store_true',
+        default=False,
+        help='Sort ENV instructions alphabetically',
+    )
     parser.add_argument(
         '--separate-arg-blocks',
         action='store_true',
@@ -284,7 +315,9 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     sort_args: bool = args.sort_args or bool(cfg.get('sort_args', False))
     sort_envs: bool = args.sort_envs or bool(cfg.get('sort_envs', False))
-    separate_arg_blocks: bool = args.separate_arg_blocks or bool(cfg.get('separate_arg_blocks', False))
+    separate_arg_blocks: bool = args.separate_arg_blocks or bool(
+        cfg.get('separate_arg_blocks', False),
+    )
 
     any_formatted = False
     for file in args.filenames:

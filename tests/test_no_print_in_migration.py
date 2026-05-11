@@ -19,7 +19,11 @@ class TestNoPrintInMigrationMain:
         assert main([f]) == 0
 
     def test_print_in_migration_returns_1(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, '0001_initial.py', 'class Migration:\n    def apply(self):\n        print("migrating")\n')
+        f = _write(
+            tmp_path,
+            '0001_initial.py',
+            'class Migration:\n    def apply(self):\n        print("migrating")\n',
+        )
         assert main([f]) == 1
 
     def test_commented_print_ok(self, tmp_path: Path) -> None:
@@ -27,7 +31,11 @@ class TestNoPrintInMigrationMain:
         assert main([f]) == 0
 
     def test_disable_comment_suppresses(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, '0001.py', 'print("x")  # no-print-in-migration: disable\n')
+        f = _write(
+            tmp_path,
+            '0001.py',
+            'print("x")  # no-print-in-migration: disable\n',
+        )
         assert main([f]) == 0
 
     def test_empty_args_returns_0(self) -> None:

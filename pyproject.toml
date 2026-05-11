@@ -84,7 +84,7 @@ addopts = "-v --tb=short --cov-fail-under=85"
 
 [tool.ruff]
 line-length = 120
-target-version = "py312"
+target-version = "py314"
 
 [tool.ruff.lint]
 select = [
@@ -115,7 +115,7 @@ max-complexity = 15
 ban-relative-imports = "all"
 
 [tool.ruff.format]
-quote-style = "single"
+quote-style = "double"
 indent-style = "space"
 line-ending = "lf"
 docstring-code-format = true

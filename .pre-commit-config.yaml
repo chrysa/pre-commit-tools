@@ -156,7 +156,7 @@ repos:
         entry: debugger-detection
         language: python
       - id: yaml-sorter
-        exclude: ^\.github/
+        exclude: '^(\.github/|GitVersion\.yml)'
         name: sort yaml files
         entry: yaml-sorter
         language: python

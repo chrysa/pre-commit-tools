@@ -15,7 +15,7 @@ def define_section(*, name: str, level: int = 1) -> str:
 
 
 def run_command(*, command: str) -> str:
-    with subprocess.Popen(
+    with subprocess.Popen(  # noqa: S602
         command,
         stdout=subprocess.PIPE,
         shell=True,

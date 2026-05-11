@@ -70,7 +70,9 @@ def _check_statements(
             if _DISABLE_COMMENT in src_line:
                 break
             stmt_label = stmt.type.replace('_statement', '')  # type: ignore[attr-defined]
-            violations.append((filename, line_idx + 1, f'unreachable code after {stmt_label}'))
+            violations.append(
+                (filename, line_idx + 1, f'unreachable code after {stmt_label}'),
+            )
             break  # report only the first dead statement per block
     return violations
 
@@ -105,7 +107,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     tsx_language = Language(_tsts.language_tsx())  # also used for .jsx
 
     tools_instance = PreCommitTools()
-    tools_instance.set_params(help_msg='detect unreachable code in TypeScript/TSX/JSX files')
+    tools_instance.set_params(
+        help_msg='detect unreachable code in TypeScript/TSX/JSX files',
+    )
     args, _ = tools_instance.get_args(argv=argv)
 
     ret_val = 0

@@ -35,7 +35,11 @@ class PreCommitTools:
             retval = True
         return retval
 
-    def get_args(self, *, argv: Sequence[str] | None = None) -> tuple[argparse.Namespace, list[str]]:
+    def get_args(
+        self,
+        *,
+        argv: Sequence[str] | None = None,
+    ) -> tuple[argparse.Namespace, list[str]]:
         """Parse and return known arguments from argv."""
         return self.parser.parse_known_args(argv)
 

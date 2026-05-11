@@ -28,7 +28,11 @@ class TestNoDebugInSettings:
         assert main_debug([f]) == 0
 
     def test_disable_comment_suppresses(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, 'settings.py', 'DEBUG = True  # no-debug-in-settings: disable\n')
+        f = _write(
+            tmp_path,
+            'settings.py',
+            'DEBUG = True  # no-debug-in-settings: disable\n',
+        )
         assert main_debug([f]) == 0
 
     def test_indented_debug_detected(self, tmp_path: Path) -> None:
@@ -41,7 +45,11 @@ class TestNoDebugInSettings:
 
 class TestDjangoNoRawSql:
     def test_raw_call_returns_1(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, 'views.py', "User.objects.raw('SELECT * FROM auth_user')\n")
+        f = _write(
+            tmp_path,
+            'views.py',
+            "User.objects.raw('SELECT * FROM auth_user')\n",
+        )
         assert main_raw_sql([f]) == 1
 
     def test_cursor_execute_returns_1(self, tmp_path: Path) -> None:
@@ -53,11 +61,19 @@ class TestDjangoNoRawSql:
         assert main_raw_sql([f]) == 0
 
     def test_commented_raw_ignored(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, 'views.py', "# User.objects.raw('SELECT * FROM auth_user')\n")
+        f = _write(
+            tmp_path,
+            'views.py',
+            "# User.objects.raw('SELECT * FROM auth_user')\n",
+        )
         assert main_raw_sql([f]) == 0
 
     def test_disable_comment_suppresses(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, 'views.py', 'cursor.execute(sql)  # django-no-raw-sql: disable\n')
+        f = _write(
+            tmp_path,
+            'views.py',
+            'cursor.execute(sql)  # django-no-raw-sql: disable\n',
+        )
         assert main_raw_sql([f]) == 0
 
     def test_empty_args_returns_0(self) -> None:

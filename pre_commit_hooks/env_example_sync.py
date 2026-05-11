@@ -46,9 +46,13 @@ def check_env_sync(env_path: Path, example_path: Path) -> list[str]:
     only_in_example = example_keys - env_keys
 
     for key in sorted(only_in_env):
-        errors.append(f'{env_path}: key {key!r} present in .env but missing from .env.example')
+        errors.append(
+            f'{env_path}: key {key!r} present in .env but missing from .env.example',
+        )
     for key in sorted(only_in_example):
-        errors.append(f'{example_path}: key {key!r} present in .env.example but missing from .env')
+        errors.append(
+            f'{example_path}: key {key!r} present in .env.example but missing from .env',
+        )
     return errors
 
 

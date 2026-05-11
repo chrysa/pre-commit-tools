@@ -47,11 +47,19 @@ class TestDetectUnusedVariables:
 
 class TestCssUnusedVariableMain:
     def test_clean_file_returns_0(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, 'ok.css', ':root {\n  --c: red;\n}\n.foo { color: var(--c); }\n')
+        f = _write(
+            tmp_path,
+            'ok.css',
+            ':root {\n  --c: red;\n}\n.foo { color: var(--c); }\n',
+        )
         assert main([f]) == 0
 
     def test_unused_returns_1(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, 'bad.css', ':root {\n  --orphan: red;\n}\n.foo { color: blue; }\n')
+        f = _write(
+            tmp_path,
+            'bad.css',
+            ':root {\n  --orphan: red;\n}\n.foo { color: blue; }\n',
+        )
         assert main([f]) == 1
 
     def test_empty_args_returns_0(self) -> None:

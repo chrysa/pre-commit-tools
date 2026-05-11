@@ -13,13 +13,13 @@ from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 Violation = tuple[str, int, str]
 
 # FastAPI router method names
-_ROUTE_METHODS = frozenset({'get', 'post', 'put', 'delete', 'patch', 'head', 'options'})
+_ROUTE_METHODS = frozenset({"get", "post", "put", "delete", "patch", "head", "options"})
 
 
 def _is_disable_comment(source_lines: list[str], lineno: int) -> bool:
     idx = lineno - 1
     if 0 <= idx < len(source_lines):
-        return 'fastapi-missing-response-model: disable' in source_lines[idx]
+        return "fastapi-missing-response-model: disable" in source_lines[idx]
     return False
 
 
@@ -54,14 +54,14 @@ def detect_missing_response_model(source: str, filename: str) -> list[Violation]
             if method not in _ROUTE_METHODS:
                 continue
             # Found a route decorator — check for response_model keyword
-            if not _has_keyword(dec, 'response_model'):
+            if not _has_keyword(dec, "response_model"):
                 lineno = dec.lineno
                 if not _is_disable_comment(lines, lineno):
                     violations.append(
                         (
                             filename,
                             node.lineno,
-                            f'FastAPI route {node.name!r} missing response_model= parameter',
+                            f"FastAPI route {node.name!r} missing response_model= parameter",
                         ),
                     )
     return violations
@@ -70,19 +70,19 @@ def detect_missing_response_model(source: str, filename: str) -> list[Violation]
 def main(argv: Sequence[str] | None = None) -> int:
     """Check Python files for FastAPI routes without response_model."""
     tools = PreCommitTools()
-    tools.set_params(help_msg='detect FastAPI routes missing response_model')
+    tools.set_params(help_msg="detect FastAPI routes missing response_model")
     args, _ = tools.get_args(argv=argv)
     retval = 0
     for filename in args.filenames:
         try:
-            source = Path(filename).read_text(encoding='utf-8')
-        except (OSError, UnicodeDecodeError):
+            source = Path(filename).read_text(encoding="utf-8")
+        except OSError, UnicodeDecodeError:
             continue
         for fname, lineno, msg in detect_missing_response_model(source, filename):
-            print(f'{fname}:{lineno}: {msg}', file=sys.stderr)
+            print(f"{fname}:{lineno}: {msg}", file=sys.stderr)
             retval = 1
     return retval
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     raise SystemExit(main())

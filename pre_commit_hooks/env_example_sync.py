@@ -9,15 +9,15 @@ import re
 from collections.abc import Sequence
 from pathlib import Path
 
-_KEY_RE = re.compile(r'^([A-Za-z_][A-Za-z0-9_]*)\s*=', re.MULTILINE)
-_COMMENT_RE = re.compile(r'^\s*#')
+_KEY_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_]*)\s*=", re.MULTILINE)
+_COMMENT_RE = re.compile(r"^\s*#")
 
 
 def _parse_keys(path: Path) -> set[str]:
     """Extract all KEY names from an env file, ignoring comments and blank lines."""
     keys: set[str] = set()
     try:
-        with open(path, encoding='utf-8') as f:
+        with open(path, encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if not line or _COMMENT_RE.match(line):
@@ -25,7 +25,7 @@ def _parse_keys(path: Path) -> set[str]:
                 m = _KEY_RE.match(line)
                 if m:
                     keys.add(m.group(1))
-    except (OSError, UnicodeDecodeError):
+    except OSError, UnicodeDecodeError:
         pass
     return keys
 
@@ -36,7 +36,7 @@ def check_env_sync(env_path: Path, example_path: Path) -> list[str]:
     if not env_path.exists():
         return errors
     if not example_path.exists():
-        errors.append(f'{example_path}: missing — create it from {env_path}')
+        errors.append(f"{example_path}: missing — create it from {env_path}")
         return errors
 
     env_keys = _parse_keys(env_path)
@@ -47,11 +47,11 @@ def check_env_sync(env_path: Path, example_path: Path) -> list[str]:
 
     for key in sorted(only_in_env):
         errors.append(
-            f'{env_path}: key {key!r} present in .env but missing from .env.example',
+            f"{env_path}: key {key!r} present in .env but missing from .env.example",
         )
     for key in sorted(only_in_example):
         errors.append(
-            f'{example_path}: key {key!r} present in .env.example but missing from .env',
+            f"{example_path}: key {key!r} present in .env.example but missing from .env",
         )
     return errors
 
@@ -59,22 +59,22 @@ def check_env_sync(env_path: Path, example_path: Path) -> list[str]:
 def main(argv: Sequence[str] | None = None) -> int:
     """Check .env / .env.example synchronisation and return 1 if out of sync."""
     parser = argparse.ArgumentParser(
-        description='Check that .env and .env.example have the same keys',
+        description="Check that .env and .env.example have the same keys",
     )
     parser.add_argument(
-        'filenames',
-        nargs='*',
-        help='.env or .env.example files to check',
+        "filenames",
+        nargs="*",
+        help=".env or .env.example files to check",
     )
     parser.add_argument(
-        '--env-file',
-        default='.env',
-        help='Path to the .env file (default: .env)',
+        "--env-file",
+        default=".env",
+        help="Path to the .env file (default: .env)",
     )
     parser.add_argument(
-        '--example-file',
-        default='.env.example',
-        help='Path to the .env.example file (default: .env.example)',
+        "--example-file",
+        default=".env.example",
+        help="Path to the .env.example file (default: .env.example)",
     )
     args = parser.parse_args(argv)
 
@@ -82,9 +82,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.filenames:
         dirs: set[str] = set()
         for f in args.filenames:
-            dirs.add(os.path.dirname(os.path.abspath(f)) if os.path.dirname(f) else '.')
+            dirs.add(os.path.dirname(os.path.abspath(f)) if os.path.dirname(f) else ".")
     else:
-        dirs = {'.'}
+        dirs = {"."}
 
     retval = 0
     for directory in sorted(dirs):
@@ -96,5 +96,5 @@ def main(argv: Sequence[str] | None = None) -> int:
     return retval
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     raise SystemExit(main())

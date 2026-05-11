@@ -42,7 +42,7 @@ def sort_yaml_file(
 def main(argv: Sequence[str] | None = None) -> int:
     """Sort YAML file keys alphabetically and return 1 if any file was modified."""
     tools_instance = PreCommitTools()
-    tools_instance.set_params(help_msg='sort yaml file')
+    tools_instance.set_params(help_msg="sort yaml file")
     args, _ = tools_instance.get_args(argv=argv)
     changed_file_state = False
     for file in args.filenames:
@@ -58,10 +58,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             sorted_data,
         )
         if changed_file_state:
-            with open(file, mode='w') as file_stream:
+            with open(file, mode="w") as file_stream:
                 yaml.safe_dump(dict(sorted_data), file_stream, default_flow_style=False)
     return int(changed_file_state)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     raise SystemExit(main())

@@ -24,11 +24,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     """Detect deep relative parent imports and return 1 if any are found."""
     pattern_detection = PatternDetection(
         commented=_RELATIVE_PARENT_COMMENTED,
-        disable_comment=re.compile(r'import-no-relative-parent\s*:\s*disable'),
+        disable_comment=re.compile(r"import-no-relative-parent\s*:\s*disable"),
         pattern=_RELATIVE_PARENT,
     )
     return pattern_detection.detect(argv=argv)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     raise SystemExit(main())

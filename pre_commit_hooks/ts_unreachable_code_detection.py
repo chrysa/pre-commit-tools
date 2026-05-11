@@ -12,23 +12,23 @@ Violation = tuple[str, int, str]
 
 _TERMINAL_TYPES: frozenset[str] = frozenset(
     {
-        'return_statement',
-        'throw_statement',
-        'break_statement',
-        'continue_statement',
+        "return_statement",
+        "throw_statement",
+        "break_statement",
+        "continue_statement",
     },
 )
 
 # Node types whose direct named children are statement lists
-_BLOCK_TYPES: frozenset[str] = frozenset({'statement_block'})
+_BLOCK_TYPES: frozenset[str] = frozenset({"statement_block"})
 
 # Case-clause types inside switch bodies
-_CASE_TYPES: frozenset[str] = frozenset({'switch_case', 'switch_default'})
+_CASE_TYPES: frozenset[str] = frozenset({"switch_case", "switch_default"})
 
-_DISABLE_COMMENT = '// unreachable-code: disable'
+_DISABLE_COMMENT = "// unreachable-code: disable"
 
 # Suffixes that use the TSX parser to support JSX syntax
-_TSX_SUFFIXES: frozenset[str] = frozenset({'.tsx', '.jsx'})
+_TSX_SUFFIXES: frozenset[str] = frozenset({".tsx", ".jsx"})
 
 
 def _statements_of(node: object) -> list[object]:
@@ -37,7 +37,7 @@ def _statements_of(node: object) -> list[object]:
     children: list[object] = node.children  # type: ignore[attr-defined]
 
     if node_type in _BLOCK_TYPES:
-        return [c for c in children if c.is_named and c.type not in ('comment', 'ERROR')]  # type: ignore[attr-defined]
+        return [c for c in children if c.is_named and c.type not in ("comment", "ERROR")]  # type: ignore[attr-defined]
 
     if node_type in _CASE_TYPES:
         # Skip tokens up to and including ':' then collect named statement children
@@ -45,10 +45,10 @@ def _statements_of(node: object) -> list[object]:
         stmts: list[object] = []
         for child in children:
             if not past_colon:
-                if child.type == ':':  # type: ignore[attr-defined]
+                if child.type == ":":  # type: ignore[attr-defined]
                     past_colon = True
                 continue
-            if child.is_named and child.type not in ('comment', 'ERROR'):  # type: ignore[attr-defined]
+            if child.is_named and child.type not in ("comment", "ERROR"):  # type: ignore[attr-defined]
                 stmts.append(child)
         return stmts
 
@@ -66,12 +66,12 @@ def _check_statements(
         if stmt.type in _TERMINAL_TYPES and i + 1 < len(stmts):  # type: ignore[attr-defined]
             next_stmt = stmts[i + 1]
             line_idx: int = next_stmt.start_point[0]  # type: ignore[attr-defined]
-            src_line = lines[line_idx] if line_idx < len(lines) else ''
+            src_line = lines[line_idx] if line_idx < len(lines) else ""
             if _DISABLE_COMMENT in src_line:
                 break
-            stmt_label = stmt.type.replace('_statement', '')  # type: ignore[attr-defined]
+            stmt_label = stmt.type.replace("_statement", "")  # type: ignore[attr-defined]
             violations.append(
-                (filename, line_idx + 1, f'unreachable code after {stmt_label}'),
+                (filename, line_idx + 1, f"unreachable code after {stmt_label}"),
             )
             break  # report only the first dead statement per block
     return violations
@@ -97,9 +97,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         from tree_sitter import Language, Parser
     except ImportError:
         print(  # print-detection: disable
-            'tree-sitter and tree-sitter-typescript are required: '
-            'pip install tree-sitter tree-sitter-typescript '
-            '(or add them to additional_dependencies)',
+            "tree-sitter and tree-sitter-typescript are required: "
+            "pip install tree-sitter tree-sitter-typescript "
+            "(or add them to additional_dependencies)",
         )
         return 1
 
@@ -108,7 +108,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     tools_instance = PreCommitTools()
     tools_instance.set_params(
-        help_msg='detect unreachable code in TypeScript/TSX/JSX files',
+        help_msg="detect unreachable code in TypeScript/TSX/JSX files",
     )
     args, _ = tools_instance.get_args(argv=argv)
 
@@ -116,7 +116,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     for filename in args.filenames:
         path = Path(filename)
         try:
-            source = path.read_text(encoding='utf-8')
+            source = path.read_text(encoding="utf-8")
         except OSError:
             continue
         lines = source.splitlines()
@@ -124,11 +124,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser = Parser(lang)
         tree = parser.parse(source.encode())
         for fname, lineno, msg in _walk(tree.root_node, filename, lines):
-            print(f'[{fname}:{lineno}] {msg}')  # print-detection: disable
+            print(f"[{fname}:{lineno}] {msg}")  # print-detection: disable
             ret_val = 1
 
     return ret_val
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     raise SystemExit(main())

@@ -12,25 +12,25 @@ from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 # (filename, duplicate_lineno, first_lineno, property_name)
 Violation = tuple[str, int, int, str]
 
-_BLOCK_COMMENT = re.compile(r'/\*.*?\*/', re.DOTALL)
-_PROPERTY_RE = re.compile(r'^([\w-]+)\s*:')
-_DISABLE_PROPERTY_COMMENT = '/* css-duplicate-property: disable */'
-_DISABLE_ID_COMMENT = '/* css-duplicate-id: disable */'
+_BLOCK_COMMENT = re.compile(r"/\*.*?\*/", re.DOTALL)
+_PROPERTY_RE = re.compile(r"^([\w-]+)\s*:")
+_DISABLE_PROPERTY_COMMENT = "/* css-duplicate-property: disable */"
+_DISABLE_ID_COMMENT = "/* css-duplicate-id: disable */"
 
 # Lines that are selectors/at-rules, not property declarations
 _NOT_PROPERTY_RE = re.compile(
-    r'^\s*(@|&|\.|\#|::|:|>|\*|\[|--|from\b|to\b|\d)',
+    r"^\s*(@|&|\.|\#|::|:|>|\*|\[|--|from\b|to\b|\d)",
 )
 
 # Matches #id-name in a selector line (outside property context)
-_ID_SELECTOR_RE = re.compile(r'#([a-zA-Z][\w-]*)')
+_ID_SELECTOR_RE = re.compile(r"#([a-zA-Z][\w-]*)")
 
 
 def _strip_block_comments(content: str) -> str:
     """Replace block comment content with spaces, preserving line numbers."""
 
     def _sub(m: re.Match[str]) -> str:
-        return '\n' * m.group(0).count('\n')
+        return "\n" * m.group(0).count("\n")
 
     return _BLOCK_COMMENT.sub(_sub, content)
 
@@ -48,19 +48,19 @@ def detect_duplicate_properties(content: str, filename: str) -> list[Violation]:
     for lineno, line in enumerate(lines, 1):
         stripped = line.strip()
 
-        if not stripped or stripped.startswith('//'):
+        if not stripped or stripped.startswith("//"):
             continue
 
         # Update nesting for opening braces
-        open_count = stripped.count('{')
-        close_count = stripped.count('}')
+        open_count = stripped.count("{")
+        close_count = stripped.count("}")
 
         for _ in range(open_count):
             scope_stack.append({})
 
         # Detect property: value pattern (before processing closing braces)
-        if scope_stack and ':' in stripped:
-            if not _NOT_PROPERTY_RE.match(stripped) and not stripped.endswith('{') and not stripped.endswith(','):
+        if scope_stack and ":" in stripped:
+            if not _NOT_PROPERTY_RE.match(stripped) and not stripped.endswith("{") and not stripped.endswith(","):
                 m = _PROPERTY_RE.match(stripped)
                 if m:
                     prop = m.group(1).lower()
@@ -106,8 +106,8 @@ def detect_duplicate_ids(content: str, filename: str) -> list[IdViolation]:
         if not stripped:
             continue
 
-        open_count = stripped.count('{')
-        close_count = stripped.count('}')
+        open_count = stripped.count("{")
+        close_count = stripped.count("}")
 
         # Selector lines: depth == 0 before the opening brace and contain '{'
         if open_count and depth == 0:
@@ -130,14 +130,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     """Detect duplicate CSS properties and duplicate ID selectors; return 1 if any violation is found."""
     tools_instance = PreCommitTools()
     tools_instance.set_params(
-        help_msg='detect duplicate/overridden properties and duplicate ID selectors in CSS files',
+        help_msg="detect duplicate/overridden properties and duplicate ID selectors in CSS files",
     )
     args, _ = tools_instance.get_args(argv=argv)
     ret_val = 0
     for filename in args.filenames:
         path = Path(filename)
         try:
-            content = path.read_text(encoding='utf-8')
+            content = path.read_text(encoding="utf-8")
         except OSError:
             continue
         for fname, lineno, first_lineno, prop in detect_duplicate_properties(
@@ -159,5 +159,5 @@ def main(argv: Sequence[str] | None = None) -> int:
     return ret_val
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     raise SystemExit(main())

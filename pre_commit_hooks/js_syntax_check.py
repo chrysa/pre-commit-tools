@@ -18,11 +18,11 @@ def _check_node_available() -> bool:
     """Return True if node is available in PATH."""
     try:
         subprocess.run(
-            ['node', '--version'],
+            ["node", "--version"],
             capture_output=True,
             timeout=5,
         )
-    except (FileNotFoundError, subprocess.TimeoutExpired):
+    except FileNotFoundError, subprocess.TimeoutExpired:
         return False
     else:
         return True
@@ -36,18 +36,18 @@ def _check_via_temp_js(filename: str) -> list[Violation]:
     file bypasses this restriction without changing the syntax being checked.
     """
     source = Path(filename).read_bytes()
-    with tempfile.NamedTemporaryFile(suffix='.js', delete=False) as tmp:
+    with tempfile.NamedTemporaryFile(suffix=".js", delete=False) as tmp:
         tmp.write(source)
         tmp_path = tmp.name
     try:
         result = subprocess.run(
-            ['node', '--check', tmp_path],
+            ["node", "--check", tmp_path],
             capture_output=True,
             text=True,
             timeout=30,
         )
     except (FileNotFoundError, subprocess.TimeoutExpired) as exc:
-        return [(filename, f'node check failed: {exc}')]
+        return [(filename, f"node check failed: {exc}")]
     finally:
         Path(tmp_path).unlink(missing_ok=True)
     if result.returncode != 0:
@@ -60,17 +60,17 @@ def check_syntax(filename: str) -> list[Violation]:
     """Run node --check on the file and return list of (filename, error_message)."""
     # Node.js 24+ raises ERR_UNKNOWN_FILE_EXTENSION for .gs files.
     # Use a temp .js file to bypass this limitation.
-    if Path(filename).suffix == '.gs':
+    if Path(filename).suffix == ".gs":
         return _check_via_temp_js(filename)
     try:
         result = subprocess.run(
-            ['node', '--check', filename],
+            ["node", "--check", filename],
             capture_output=True,
             text=True,
             timeout=30,
         )
     except (FileNotFoundError, subprocess.TimeoutExpired) as exc:
-        return [(filename, f'node check failed: {exc}')]
+        return [(filename, f"node check failed: {exc}")]
     if result.returncode != 0:
         error = (result.stderr or result.stdout).strip()
         return [(filename, error)]
@@ -80,12 +80,12 @@ def check_syntax(filename: str) -> list[Violation]:
 def main(argv: Sequence[str] | None = None) -> int:
     """Check JavaScript/.gs files for syntax errors using Node.js."""
     tools = PreCommitTools()
-    tools.set_params(help_msg='validate JS/.gs syntax with node --check')
+    tools.set_params(help_msg="validate JS/.gs syntax with node --check")
     args, _ = tools.get_args(argv=argv)
 
     if not _check_node_available():
         print(
-            'js-syntax-check: node not found in PATH, skipping syntax check',
+            "js-syntax-check: node not found in PATH, skipping syntax check",
             file=sys.stderr,
         )
         return 0
@@ -95,10 +95,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         if not Path(filename).exists():
             continue
         for fname, msg in check_syntax(filename):
-            print(f'{fname}: syntax error\n{msg}', file=sys.stderr)
+            print(f"{fname}: syntax error\n{msg}", file=sys.stderr)
             retval = 1
     return retval
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     raise SystemExit(main())

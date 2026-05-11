@@ -43,14 +43,20 @@ class TestCheckSyntax:
 class TestJsSyntaxCheckMain:
     def test_node_not_available_returns_0(self, tmp_path: Path) -> None:
         f = _write(tmp_path, 'a.js', 'const x = 1;\n')
-        with patch('pre_commit_hooks.js_syntax_check._check_node_available', return_value=False):
+        with patch(
+            'pre_commit_hooks.js_syntax_check._check_node_available',
+            return_value=False,
+        ):
             assert main([f]) == 0
 
     def test_clean_js_returns_0(self, tmp_path: Path) -> None:
         f = _write(tmp_path, 'a.js', 'const x = 1;\n')
         mock_result = MagicMock()
         mock_result.returncode = 0
-        with patch('pre_commit_hooks.js_syntax_check._check_node_available', return_value=True):
+        with patch(
+            'pre_commit_hooks.js_syntax_check._check_node_available',
+            return_value=True,
+        ):
             with patch('subprocess.run', return_value=mock_result):
                 assert main([f]) == 0
 
@@ -60,7 +66,10 @@ class TestJsSyntaxCheckMain:
         mock_result.returncode = 1
         mock_result.stderr = 'SyntaxError'
         mock_result.stdout = ''
-        with patch('pre_commit_hooks.js_syntax_check._check_node_available', return_value=True):
+        with patch(
+            'pre_commit_hooks.js_syntax_check._check_node_available',
+            return_value=True,
+        ):
             with patch('subprocess.run', return_value=mock_result):
                 assert main([f]) == 1
 
@@ -97,7 +106,10 @@ class TestCheckViaTempJs:
     def test_gs_file_routes_through_temp_js(self, tmp_path: Path) -> None:
         """check_syntax() must use _check_via_temp_js for .gs files."""
         f = _write(tmp_path, 'a.gs', 'var x = 1;\n')
-        with patch('pre_commit_hooks.js_syntax_check._check_via_temp_js', return_value=[]) as mock_fn:
+        with patch(
+            'pre_commit_hooks.js_syntax_check._check_via_temp_js',
+            return_value=[],
+        ) as mock_fn:
             from pre_commit_hooks.js_syntax_check import check_syntax
 
             check_syntax(f)

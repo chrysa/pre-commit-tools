@@ -17,7 +17,9 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 _handler = logging.StreamHandler()
 _handler.setLevel(logging.DEBUG)
-_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+_handler.setFormatter(
+    logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'),
+)
 logger.addHandler(_handler)
 
 
@@ -38,7 +40,9 @@ class PylintHtmlReport(PreCommitTools):
     def convert_json_to_html(self) -> None:
         """Convert the JSON Pylint report to an HTML file."""
         logger.debug('convert json to html')
-        report_main(argv=[self.output_json.as_posix(), '-o', self.output_html.as_posix()])
+        report_main(
+            argv=[self.output_json.as_posix(), '-o', self.output_html.as_posix()],
+        )
 
     def _resolve_path(self, value: str | Path) -> Path:
         """Resolve a string or Path to an absolute Path and ensure its parent directory exists."""
@@ -51,9 +55,15 @@ class PylintHtmlReport(PreCommitTools):
         """Resolve and store the HTML and JSON output paths."""
         self.output_html = self._resolve_path(self.namespace_args.output_html)
         json_arg = self.namespace_args.output_json
-        self.output_json = self._resolve_path(json_arg if json_arg is not None else 'pylint_report.json')
+        self.output_json = self._resolve_path(
+            json_arg if json_arg is not None else 'pylint_report.json',
+        )
 
-    def get_args(self, *, argv: Sequence[str] | None = None) -> tuple[argparse.Namespace, list[str]]:
+    def get_args(
+        self,
+        *,
+        argv: Sequence[str] | None = None,
+    ) -> tuple[argparse.Namespace, list[str]]:
         """Parse CLI arguments and store them on the instance."""
         logger.debug('parse arguments')
         self.namespace_args, self.pylint_args = super().get_args(argv=argv)
@@ -64,7 +74,12 @@ class PylintHtmlReport(PreCommitTools):
         logger.debug('run pylint')
         Run(self.pylint_args)
 
-    def set_params(self, *, help_msg: str = '', arguments: list[tuple[str, dict[str, object]]] | None = None) -> None:
+    def set_params(
+        self,
+        *,
+        help_msg: str = '',
+        arguments: list[tuple[str, dict[str, object]]] | None = None,
+    ) -> None:
         """Configure the argument parser with Pylint report specific arguments."""
         logger.debug('define parser')
         super().set_params(help_msg='run pylint and generate an HTML report')
@@ -84,9 +99,14 @@ class PylintHtmlReport(PreCommitTools):
     def update_pylint_args(self) -> None:
         """Append Pylint output format and path arguments before running."""
         logger.debug('update pylint args')
-        self.pylint_args.extend(['--exit-zero', '--persistent=n', '--reports=n', '--score=n'])
         self.pylint_args.extend(
-            [f'--output={self.output_json.as_posix()}', '--output-format=pylint_report.CustomJsonReporter'],
+            ['--exit-zero', '--persistent=n', '--reports=n', '--score=n'],
+        )
+        self.pylint_args.extend(
+            [
+                f'--output={self.output_json.as_posix()}',
+                '--output-format=pylint_report.CustomJsonReporter',
+            ],
         )
         self.pylint_args.extend(self.namespace_args.filenames)
 
@@ -101,7 +121,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     instance.run_pylint()
     instance.convert_json_to_html()
     instance.clean_json_report()
-    return int(instance.file_exist(file=instance.output_html) and not instance.file_empty(file=instance.output_html))
+    return int(
+        instance.file_exist(file=instance.output_html) and not instance.file_empty(file=instance.output_html),
+    )
 
 
 if __name__ == '__main__':

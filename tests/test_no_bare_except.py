@@ -31,7 +31,11 @@ class TestNoBareExceptMain:
         assert main([f]) == 0
 
     def test_disable_comment_suppresses(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, 'ok.py', 'try:\n    pass\nexcept:  # no-bare-except: disable\n    pass\n')
+        f = _write(
+            tmp_path,
+            'ok.py',
+            'try:\n    pass\nexcept:  # no-bare-except: disable\n    pass\n',
+        )
         assert main([f]) == 0
 
     def test_commented_except_ok(self, tmp_path: Path) -> None:

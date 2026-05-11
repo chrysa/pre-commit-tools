@@ -57,7 +57,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     v.scavenge(paths, exclude=args.exclude or [])
     unused = list(v.get_unused_code(min_confidence=args.min_confidence))
     for item in unused:
-        print(f'[{item.filename}:{item.first_lineno}] unused {item.typ}: {item.name}')  # print-detection: disable
+        print(
+            f'[{item.filename}:{item.first_lineno}] unused {item.typ}: {item.name}',
+        )  # print-detection: disable
     return int(bool(unused))
 
 

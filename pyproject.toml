@@ -18,6 +18,7 @@ classifiers = [
 Homepage = "https://github.com/chrysa/pre-commit-tools"
 
 [project.scripts]
+adr-gate = "pre_commit_hooks.adr_gate:main"
 console-debug-detection = "pre_commit_hooks.console_debug_detection:main"
 console-log-detection = "pre_commit_hooks.console_log_detection:main"
 console-table-detection = "pre_commit_hooks.console_table_detection:main"

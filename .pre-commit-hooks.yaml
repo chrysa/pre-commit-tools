@@ -1,3 +1,11 @@
+- id: adr-gate
+  description: require DECISIONS.md update when architecture-sensitive files are added
+  entry: adr-gate
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: ADR gate -- require DECISIONS.md on architecture changes
+  pass_filenames: true
+  types: ["text"]
 - id: format-dockerfiles
   additional_dependencies:
     - dockerfile-parse

@@ -105,7 +105,10 @@ class TestDebuggerDetection:
 
 
 class TestLoggerDetection:
-    @pytest.mark.parametrize('level', ['debug', 'info', 'warning', 'error', 'critical', 'exception'])
+    @pytest.mark.parametrize(
+        'level',
+        ['debug', 'info', 'warning', 'error', 'critical', 'exception'],
+    )
     def test_root_logging_returns_1(self, tmp_path: Path, level: str) -> None:
         f = _write(tmp_path, 'log.py', f'logging.{level}("msg")\n')
         assert logger_main([f]) == 1

@@ -49,7 +49,11 @@ class TestCheckBody:
     def test_disable_comment_suppresses_violation(self) -> None:
         body = _parse_body('def f():\n    return 1\n    x = 2\n')
         # Unreachable line is source line index 2 (0-based)
-        source_lines = ['def f():', '    return 1', '    x = 2  # unreachable-code: disable']
+        source_lines = [
+            'def f():',
+            '    return 1',
+            '    x = 2  # unreachable-code: disable',
+        ]
         assert _check_body(body, 'test.py', source_lines) == []
 
 

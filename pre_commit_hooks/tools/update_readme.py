@@ -15,7 +15,11 @@ def define_section(*, name: str, level: int = 1) -> str:
 
 
 def run_command(*, command: str) -> str:
-    with subprocess.Popen(command, stdout=subprocess.PIPE, shell=True) as cmd_process_stream:  # noqa: S602 # nosec
+    with subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        shell=True,
+    ) as cmd_process_stream:  # nosec
         output, _ = cmd_process_stream.communicate()
         cmd_process_stream.wait()
         return bytes.decode(output, 'utf-8')

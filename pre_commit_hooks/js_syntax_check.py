@@ -84,7 +84,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     args, _ = tools.get_args(argv=argv)
 
     if not _check_node_available():
-        print('js-syntax-check: node not found in PATH, skipping syntax check', file=sys.stderr)
+        print(
+            'js-syntax-check: node not found in PATH, skipping syntax check',
+            file=sys.stderr,
+        )
         return 0
 
     retval = 0

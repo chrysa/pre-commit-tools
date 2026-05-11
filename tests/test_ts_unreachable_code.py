@@ -7,7 +7,10 @@ from pathlib import Path
 import pytest
 
 tree_sitter = pytest.importorskip('tree_sitter', reason='tree-sitter not installed')
-tree_sitter_typescript = pytest.importorskip('tree_sitter_typescript', reason='tree-sitter-typescript not installed')
+tree_sitter_typescript = pytest.importorskip(
+    'tree_sitter_typescript',
+    reason='tree-sitter-typescript not installed',
+)
 
 from pre_commit_hooks.ts_unreachable_code_detection import _walk, main  # noqa: E402
 
@@ -80,15 +83,27 @@ class TestTsUnreachableMain:
         assert main([f]) == 0
 
     def test_unreachable_returns_1(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, 'bad.ts', 'function f() {\n  return 1;\n  const x = 2;\n}\n')
+        f = _write(
+            tmp_path,
+            'bad.ts',
+            'function f() {\n  return 1;\n  const x = 2;\n}\n',
+        )
         assert main([f]) == 1
 
     def test_tsx_file_returns_1(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, 'bad.tsx', 'function f() {\n  throw new Error();\n  return 1;\n}\n')
+        f = _write(
+            tmp_path,
+            'bad.tsx',
+            'function f() {\n  throw new Error();\n  return 1;\n}\n',
+        )
         assert main([f]) == 1
 
     def test_jsx_file_returns_1(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, 'bad.jsx', 'function f() {\n  return 1;\n  const x = 2;\n}\n')
+        f = _write(
+            tmp_path,
+            'bad.jsx',
+            'function f() {\n  return 1;\n  const x = 2;\n}\n',
+        )
         assert main([f]) == 1
 
     def test_js_clean_returns_0(self, tmp_path: Path) -> None:

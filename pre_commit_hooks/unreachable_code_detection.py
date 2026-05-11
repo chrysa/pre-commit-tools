@@ -9,7 +9,12 @@ from pathlib import Path
 
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 
-_TERMINAL_NODES: tuple[type[ast.stmt], ...] = (ast.Return, ast.Raise, ast.Break, ast.Continue)
+_TERMINAL_NODES: tuple[type[ast.stmt], ...] = (
+    ast.Return,
+    ast.Raise,
+    ast.Break,
+    ast.Continue,
+)
 
 Violation = tuple[str, int, str]
 
@@ -28,7 +33,9 @@ def _check_body(
             if 0 <= line_idx < len(source_lines) and '# unreachable-code: disable' in source_lines[line_idx]:
                 break
             stmt_type = type(node).__name__.lower()
-            violations.append((filename, next_node.lineno, f'unreachable code after {stmt_type}'))
+            violations.append(
+                (filename, next_node.lineno, f'unreachable code after {stmt_type}'),
+            )
             break  # report only the first dead statement per block
     return violations
 

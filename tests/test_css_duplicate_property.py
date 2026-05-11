@@ -4,7 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pre_commit_hooks.css_duplicate_property_detection import detect_duplicate_ids, detect_duplicate_properties, main
+from pre_commit_hooks.css_duplicate_property_detection import (
+    detect_duplicate_ids,
+    detect_duplicate_properties,
+    main,
+)
 
 
 def _write(tmp_path: Path, name: str, content: str) -> str:
@@ -68,7 +72,11 @@ class TestCssDuplicatePropertyMain:
         assert main([f]) == 1
 
     def test_duplicate_id_returns_1(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, 'bad.css', '#hero {\n  color: red;\n}\n#hero {\n  color: blue;\n}\n')
+        f = _write(
+            tmp_path,
+            'bad.css',
+            '#hero {\n  color: red;\n}\n#hero {\n  color: blue;\n}\n',
+        )
         assert main([f]) == 1
 
     def test_empty_args_returns_0(self) -> None:

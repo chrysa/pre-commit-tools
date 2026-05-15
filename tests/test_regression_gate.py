@@ -6,8 +6,6 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-import pytest
-
 from pre_commit_hooks.regression_gate import (
     _check,
     _load_baseline,
@@ -35,14 +33,14 @@ COVERAGE_XML_90 = """\
 </coverage>
 """
 
-JUNIT_XML_10_PASS = """\
+JUNIT_XML_10_PASS = """\ # noqa: S105
 <?xml version="1.0" ?>
 <testsuites>
     <testsuite tests="10" errors="0" failures="0" name="suite"/>
 </testsuites>
 """
 
-JUNIT_XML_8_PASS = """\
+JUNIT_XML_8_PASS = """\  # noqa: S105
 <?xml version="1.0" ?>
 <testsuites>
     <testsuite tests="10" errors="1" failures="1" name="suite"/>

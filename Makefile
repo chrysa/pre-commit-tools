@@ -60,13 +60,13 @@ format: ## Run ruff formatter
 format-check: ## Check ruff formatting (no changes)
 	ruff format --check --config=config-tools/ruff.toml $(PACKAGE_DIR)
 
-type-check: ## Run mypy type checking
+typecheck: ## Run mypy type checking
 	mypy --config-file=setup.cfg $(PACKAGE_DIR)
 
 pylint: ## Run pylint static analysis
 	pylint --rcfile=setup.cfg --reports=no --score=no --persistent=no $(PACKAGE_DIR)
 
-quality: lint format-check type-check ## Run lint + format-check + type-check
+quality: lint format-check typecheck ## Run lint + format-check + typecheck
 
 pre-commit: ## Run all pre-commit hooks on every file
 	pre-commit run --all-files --verbose
@@ -115,11 +115,7 @@ quality-gate-verify: ## Verify no regression since baseline
 
 # ─── Compat aliases ───────────────────────────────────────────────────────────
 
-typecheck: ## Alias → type-check
-	@$(MAKE) type-check
-
-dev: ## Start development environment (install package in editable mode)
-	pip install -e .[dev]
+type-check: typecheck ## Legacy alias
 
 dev: ## Start development environment (install package in editable mode)
 	pip install -e .[dev]

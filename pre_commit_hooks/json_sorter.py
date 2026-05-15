@@ -23,7 +23,7 @@ def sort_json(data: Any) -> Any:
 def main(argv: Sequence[str] | None = None) -> int:
     """Sort JSON file keys alphabetically and return 1 if any file was modified."""
     tools_instance = PreCommitTools()
-    tools_instance.set_params(help_msg="sort json file keys alphabetically")
+    tools_instance.set_params(help_msg='sort json file keys alphabetically')
     args, _ = tools_instance.get_args(argv=argv)
     changed_file_state = False
     for file in args.filenames:
@@ -32,13 +32,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             original = file_stream.read()
         data = json.loads(original)
         sorted_data = sort_json(data)
-        new_content = json.dumps(sorted_data, indent=2, ensure_ascii=False) + "\n"
+        new_content = json.dumps(sorted_data, indent=2, ensure_ascii=False) + '\n'
         if new_content != original:
-            with open(file, mode="w") as file_stream:
+            with open(file, mode='w') as file_stream:
                 file_stream.write(new_content)
             changed_file_state = True
     return int(changed_file_state)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     raise SystemExit(main())

@@ -12,7 +12,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         import vulture as _vulture
     except ImportError:
         print(
-            "vulture is required: pip install vulture  (or add it to additional_dependencies)",
+            'vulture is required: pip install vulture  (or add it to additional_dependencies)',
         )  # print-detection: disable
         return 1
 
@@ -20,32 +20,32 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     tools_instance = PreCommitTools()
     tools_instance.set_params(
-        help_msg="detect dead/unused code using vulture",
+        help_msg='detect dead/unused code using vulture',
         arguments=[
             (
-                "--min-confidence",
+                '--min-confidence',
                 {
-                    "type": int,
-                    "default": 80,
-                    "help": "Minimum confidence percentage for unused code reports (default: 80)",
+                    'type': int,
+                    'default': 80,
+                    'help': 'Minimum confidence percentage for unused code reports (default: 80)',
                 },
             ),
             (
-                "--exclude",
+                '--exclude',
                 {
-                    "nargs": "*",
-                    "default": [],
-                    "metavar": "PATTERN",
-                    "help": "Glob patterns of paths to exclude (e.g. tests/ migrations/)",
+                    'nargs': '*',
+                    'default': [],
+                    'metavar': 'PATTERN',
+                    'help': 'Glob patterns of paths to exclude (e.g. tests/ migrations/)',
                 },
             ),
             (
-                "--whitelist",
+                '--whitelist',
                 {
-                    "nargs": "*",
-                    "default": [],
-                    "metavar": "FILE",
-                    "help": "Vulture whitelist Python files listing used names to suppress false positives",
+                    'nargs': '*',
+                    'default': [],
+                    'metavar': 'FILE',
+                    'help': 'Vulture whitelist Python files listing used names to suppress false positives',
                 },
             ),
         ],
@@ -58,10 +58,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     unused = list(v.get_unused_code(min_confidence=args.min_confidence))
     for item in unused:
         print(
-            f"[{item.filename}:{item.first_lineno}] unused {item.typ}: {item.name}",
+            f'[{item.filename}:{item.first_lineno}] unused {item.typ}: {item.name}',
         )  # print-detection: disable
     return int(bool(unused))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     raise SystemExit(main())

@@ -19,7 +19,7 @@ class PreCommitTools:
         retval: bool = True
         if not file.exists():
             if display:
-                print(f"{file}: not exist")  # print-detection: disable
+                print(f'{file}: not exist')  # print-detection: disable
             retval = False
         return retval
 
@@ -29,7 +29,7 @@ class PreCommitTools:
         if self.file_exist(file=file, display=display):
             if not file.stat().st_size:
                 if display:
-                    print(f"{file}: is empty")  # print-detection: disable
+                    print(f'{file}: is empty')  # print-detection: disable
                 retval = True
         else:
             retval = True
@@ -54,4 +54,4 @@ class PreCommitTools:
         if arguments is not None:
             for arg in arguments:
                 self.parser.add_argument(arg[0], **arg[1])  # type: ignore[arg-type]
-        self.parser.add_argument("filenames", nargs="*", help=help_msg)
+        self.parser.add_argument('filenames', nargs='*', help=help_msg)

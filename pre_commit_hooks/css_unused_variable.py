@@ -9,10 +9,10 @@ from pathlib import Path
 
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 
-_DISABLE_COMMENT = "/* css-unused-variable: disable */"
-_COMMENT_RE = re.compile(r"/\*.*?\*/", re.DOTALL)
-_DECL_RE = re.compile(r"--([a-zA-Z][\w-]*)\s*:")
-_USAGE_RE = re.compile(r"var\(\s*--([a-zA-Z][\w-]*)")
+_DISABLE_COMMENT = '/* css-unused-variable: disable */'
+_COMMENT_RE = re.compile(r'/\*.*?\*/', re.DOTALL)
+_DECL_RE = re.compile(r'--([a-zA-Z][\w-]*)\s*:')
+_USAGE_RE = re.compile(r'var\(\s*--([a-zA-Z][\w-]*)')
 
 Violation = tuple[str, int, str]
 
@@ -22,7 +22,7 @@ def detect_unused_variables(source: str, filename: str) -> list[Violation]:
     # Strip block comments before analysis (but keep line numbers)
     lines = source.splitlines()
     # Build a comment-stripped version while tracking line numbers
-    stripped_lines = list(_COMMENT_RE.sub("", source).splitlines())
+    stripped_lines = list(_COMMENT_RE.sub('', source).splitlines())
 
     # Collect declarations: {var_name: lineno}
     declared: dict[str, int] = {}
@@ -47,7 +47,7 @@ def detect_unused_variables(source: str, filename: str) -> list[Violation]:
                 (
                     filename,
                     lineno,
-                    f"CSS custom property --{var_name} declared but never used",
+                    f'CSS custom property --{var_name} declared but never used',
                 ),
             )
     return violations
@@ -56,20 +56,20 @@ def detect_unused_variables(source: str, filename: str) -> list[Violation]:
 def main(argv: Sequence[str] | None = None) -> int:
     """Detect unused CSS custom properties and return 1 if any are found."""
     tools = PreCommitTools()
-    tools.set_params(help_msg="detect unused CSS custom properties")
+    tools.set_params(help_msg='detect unused CSS custom properties')
     args, _ = tools.get_args(argv=argv)
 
     retval = 0
     for filename in args.filenames:
         try:
-            source = Path(filename).read_text(encoding="utf-8")
-        except OSError, UnicodeDecodeError:
+            source = Path(filename).read_text(encoding='utf-8')
+        except (OSError, UnicodeDecodeError):
             continue
         for fname, lineno, msg in detect_unused_variables(source, filename):
-            print(f"{fname}:{lineno}: {msg}")  # print-detection: disable
+            print(f'{fname}:{lineno}: {msg}')  # print-detection: disable
             retval = 1
     return retval
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     raise SystemExit(main())

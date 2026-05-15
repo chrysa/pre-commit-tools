@@ -22,23 +22,23 @@ class PatternDetection:
 
     def as_pattern(self, *, line: str) -> bool:
         """Return True if the line matches the detection pattern."""
-        logger.debug(f"{line} | presence -> {bool(self.pattern.search(line))}")
+        logger.debug(f'{line} | presence -> {bool(self.pattern.search(line))}')
         return bool(self.pattern.search(line))
 
     def is_commented(self, *, line: str) -> bool:
         """Return True if the line is a commented-out occurrence of the pattern."""
-        logger.debug(f"{line} | commented -> {bool(self.commented.search(line))}")
+        logger.debug(f'{line} | commented -> {bool(self.commented.search(line))}')
         return bool(self.commented.search(line))
 
     def is_disabled(self, *, line: str) -> bool:
         """Return True if the line contains an inline disable comment."""
-        logger.debug(f"{line} | disabled -> {bool(self.disable_comment.search(line))}")
+        logger.debug(f'{line} | disabled -> {bool(self.disable_comment.search(line))}')
         return bool(self.disable_comment.search(line))
 
     def detect(self, *, argv: Sequence[str] | None = None) -> int:
         """Run detection across all files and return 1 if a violation is found."""
         tools_instance = PreCommitTools()
-        tools_instance.set_params(help_msg="search print on python code")
+        tools_instance.set_params(help_msg='search print on python code')
         namespace_args, _ = tools_instance.get_args(
             argv=argv if argv is not None else [],
         )
@@ -46,7 +46,7 @@ class PatternDetection:
         for file in namespace_args.filenames:
             file_path = Path(file)
             with open(file_path) as stream:
-                logger.debug(f"process file {file_path}")
+                logger.debug(f'process file {file_path}')
                 for line_number, line_content in enumerate(stream.readlines()):
                     if (
                         self.as_pattern(line=line_content)
@@ -54,7 +54,7 @@ class PatternDetection:
                         and not self.is_commented(line=line_content)
                     ):
                         print(
-                            f"[{file_path}:{line_number}] {line_content.strip()}",
+                            f'[{file_path}:{line_number}] {line_content.strip()}',
                         )  # print-detection: disable
                         ret_val = 1
         return ret_val

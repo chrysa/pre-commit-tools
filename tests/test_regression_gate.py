@@ -250,16 +250,12 @@ class TestCheck:
         b, c, t = self._setup(tmp_path, baseline=_baseline(tests=10, coverage=80.0))
         assert _check(b, c, t) == 0
 
-    def test_missing_coverage_report_warns_but_does_not_fail(
-        self, tmp_path: Path
-    ) -> None:
+    def test_missing_coverage_report_warns_but_does_not_fail(self, tmp_path: Path) -> None:
         b, c, t = self._setup(tmp_path, coverage_xml=None, baseline=_baseline(10, 85.0))
         # Missing report should not block push — just warn
         assert _check(b, c, t) == 0
 
-    def test_missing_test_report_warns_but_does_not_fail(
-        self, tmp_path: Path
-    ) -> None:
+    def test_missing_test_report_warns_but_does_not_fail(self, tmp_path: Path) -> None:
         b, c, t = self._setup(tmp_path, junit_xml=None, baseline=_baseline(10, 85.0))
         assert _check(b, c, t) == 0
 
@@ -281,9 +277,12 @@ class TestMain:
             ret = main(
                 [
                     "--write-baseline",
-                    "--baseline", str(baseline),
-                    "--coverage-report", str(cov),
-                    "--test-report", str(junit),
+                    "--baseline",
+                    str(baseline),
+                    "--coverage-report",
+                    str(cov),
+                    "--test-report",
+                    str(junit),
                 ]
             )
         assert ret == 0
@@ -301,9 +300,12 @@ class TestMain:
 
         ret = main(
             [
-                "--baseline", str(baseline),
-                "--coverage-report", str(cov),
-                "--test-report", str(junit),
+                "--baseline",
+                str(baseline),
+                "--coverage-report",
+                str(cov),
+                "--test-report",
+                str(junit),
             ]
         )
         assert ret == 0
@@ -318,9 +320,12 @@ class TestMain:
 
         ret = main(
             [
-                "--baseline", str(baseline),
-                "--coverage-report", str(cov),
-                "--test-report", str(junit),
+                "--baseline",
+                str(baseline),
+                "--coverage-report",
+                str(cov),
+                "--test-report",
+                str(junit),
             ]
         )
         assert ret == 1
@@ -328,9 +333,12 @@ class TestMain:
     def test_no_baseline_skips_gracefully(self, tmp_path: Path) -> None:
         ret = main(
             [
-                "--baseline", str(tmp_path / "nope.json"),
-                "--coverage-report", str(tmp_path / "nope.xml"),
-                "--test-report", str(tmp_path / "nope2.xml"),
+                "--baseline",
+                str(tmp_path / "nope.json"),
+                "--coverage-report",
+                str(tmp_path / "nope.xml"),
+                "--test-report",
+                str(tmp_path / "nope2.xml"),
             ]
         )
         assert ret == 0

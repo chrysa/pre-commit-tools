@@ -288,3 +288,11 @@
   name: generate changelog
   pass_filenames: false
   stages: [manual]
+- id: regression-gate
+  description: block push when coverage or test-count regresses below the stored baseline in .quality-baseline.json
+  entry: regression-gate
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: regression gate (coverage + tests vs baseline)
+  pass_filenames: false
+  stages: [pre-push]

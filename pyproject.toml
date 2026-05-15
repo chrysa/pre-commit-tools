@@ -53,6 +53,7 @@ fastapi-missing-response-model = "pre_commit_hooks.fastapi_missing_response_mode
 js-syntax-check = "pre_commit_hooks.js_syntax_check:main"
 ts-hardcoded-secret-detection = "pre_commit_hooks.ts_hardcoded_secret:main"  # pragma: allowlist secret
 generate-changelog = "pre_commit_hooks.generate_changelog:main"
+regression-gate = "pre_commit_hooks.regression_gate:main"
 
 [project.optional-dependencies]
 dead_code = ["vulture>=2.0"]
@@ -107,6 +108,9 @@ ignore = [
     "S603", # subprocess call: check=False
     "S607", # starting a process with a partial executable path
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S105", "S106"]  # Test fixtures use names that look like passwords
 
 [tool.ruff.lint.mccabe]
 max-complexity = 15

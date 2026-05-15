@@ -33,14 +33,14 @@ COVERAGE_XML_90 = """\
 </coverage>
 """
 
-JUNIT_XML_10_PASS = """\ # noqa: S105
+JUNIT_XML_10_PASS = """\
 <?xml version="1.0" ?>
 <testsuites>
     <testsuite tests="10" errors="0" failures="0" name="suite"/>
 </testsuites>
 """
 
-JUNIT_XML_8_PASS = """\  # noqa: S105
+JUNIT_XML_8_PASS = """\
 <?xml version="1.0" ?>
 <testsuites>
     <testsuite tests="10" errors="1" failures="1" name="suite"/>

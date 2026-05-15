@@ -26,7 +26,7 @@ import argparse
 import json
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from xml.etree import ElementTree
 
@@ -93,7 +93,7 @@ def _load_baseline(path: Path) -> dict | None:  # type: ignore[type-arg]
 def _git_sha() -> str:
     """Return the short SHA of HEAD, or ``'unknown'``."""
     try:
-        result = subprocess.run(  # noqa: S603, S607
+        result = subprocess.run(
             ["git", "rev-parse", "--short", "HEAD"],
             capture_output=True,
             text=True,
@@ -114,7 +114,7 @@ def _write_baseline(
     """Persist current metrics as the new baseline."""
     data: dict = {  # type: ignore[type-arg]
         "_comment": "Regression baseline — update with: make baseline",
-        "updated_at": datetime.now(tz=timezone.utc).isoformat(),
+        "updated_at": datetime.now(tz=UTC).isoformat(),
         "git_sha": _git_sha(),
         "metrics": {
             "tests_passed": tests_passed if tests_passed is not None else 0,

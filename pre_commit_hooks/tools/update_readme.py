@@ -3,15 +3,15 @@ from pathlib import Path
 
 
 def create_content(*, command: str, content: str) -> str:
-    content_content = "\n```bash\n"
-    content_content += f"$ {command}\n\n"
-    content_content += f"{content}"
-    content_content += "```\n"
+    content_content = '\n```bash\n'
+    content_content += f'$ {command}\n\n'
+    content_content += f'{content}'
+    content_content += '```\n'
     return content_content
 
 
 def define_section(*, name: str, level: int = 1) -> str:
-    return f"{'#' * level} {name.title()}"
+    return f'{"#" * level} {name.title()}'
 
 
 def run_command(*, command: str) -> str:
@@ -22,7 +22,7 @@ def run_command(*, command: str) -> str:
     ) as cmd_process_stream:  # nosec
         output, _ = cmd_process_stream.communicate()
         cmd_process_stream.wait()
-        return bytes.decode(output, "utf-8")
+        return bytes.decode(output, 'utf-8')
 
 
 def update_readme(
@@ -34,8 +34,8 @@ def update_readme(
     readme_file_path: Path | None = None,
 ) -> None:
     if readme_file_path is None:
-        readme_file_path = Path(__file__).resolve().parent.parent / "README.md"
-    with open(readme_file_path, "r+") as file_stream:
+        readme_file_path = Path(__file__).resolve().parent.parent / 'README.md'
+    with open(readme_file_path, 'r+') as file_stream:
         content = file_stream.read()
         pos_start = content.find(start_tag)
         pos_end = content.find(end_tag)

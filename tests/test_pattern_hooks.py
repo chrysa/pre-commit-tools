@@ -16,7 +16,7 @@ from pre_commit_hooks.print_detection import main as print_main
 
 def _write(tmp_path: Path, name: str, content: str) -> str:
     p = tmp_path / name
-    p.write_text(content, encoding="utf-8")
+    p.write_text(content, encoding='utf-8')
     return str(p)
 
 
@@ -25,28 +25,28 @@ def _write(tmp_path: Path, name: str, content: str) -> str:
 
 class TestPrintDetection:
     def test_clean_file_returns_0(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "ok.py", "x = 1\n")
+        f = _write(tmp_path, 'ok.py', 'x = 1\n')
         assert print_main([f]) == 0
 
     def test_print_call_returns_1(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "bad.py", 'print("hello")\n')
+        f = _write(tmp_path, 'bad.py', 'print("hello")\n')
         assert print_main([f]) == 1
 
     def test_commented_print_returns_0(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "commented.py", '# print("hello")\n')
+        f = _write(tmp_path, 'commented.py', '# print("hello")\n')
         assert print_main([f]) == 0
 
     def test_disable_comment_returns_0(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "disabled.py", 'print("x")  # print-detection: disable\n')
+        f = _write(tmp_path, 'disabled.py', 'print("x")  # print-detection: disable\n')
         assert print_main([f]) == 0
 
     def test_multiple_files_any_bad_returns_1(self, tmp_path: Path) -> None:
-        clean = _write(tmp_path, "clean.py", "x = 1\n")
-        bad = _write(tmp_path, "bad.py", 'print("oops")\n')
+        clean = _write(tmp_path, 'clean.py', 'x = 1\n')
+        bad = _write(tmp_path, 'bad.py', 'print("oops")\n')
         assert print_main([clean, bad]) == 1
 
     def test_empty_file_returns_0(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "empty.py", "")
+        f = _write(tmp_path, 'empty.py', '')
         assert print_main([f]) == 0
 
 
@@ -55,19 +55,19 @@ class TestPrintDetection:
 
 class TestPprintDetection:
     def test_clean_returns_0(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "ok.py", "x = 1\n")
+        f = _write(tmp_path, 'ok.py', 'x = 1\n')
         assert pprint_main([f]) == 0
 
     def test_pprint_call_returns_1(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "bad.py", 'pprint({"a": 1})\n')
+        f = _write(tmp_path, 'bad.py', 'pprint({"a": 1})\n')
         assert pprint_main([f]) == 1
 
     def test_commented_pprint_returns_0(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "c.py", "# pprint(x)\n")
+        f = _write(tmp_path, 'c.py', '# pprint(x)\n')
         assert pprint_main([f]) == 0
 
     def test_disable_comment_returns_0(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "d.py", "pprint(x)  # pprint-detection: disable\n")
+        f = _write(tmp_path, 'd.py', 'pprint(x)  # pprint-detection: disable\n')
         assert pprint_main([f]) == 0
 
 
@@ -76,28 +76,28 @@ class TestPprintDetection:
 
 class TestDebuggerDetection:
     @pytest.mark.parametrize(
-        "stmt",
+        'stmt',
         [
-            "breakpoint()\n",
-            "pdb.set_trace()\n",
-            "ipdb.set_trace()\n",
-            "pudb.set_trace()\n",
+            'breakpoint()\n',
+            'pdb.set_trace()\n',
+            'ipdb.set_trace()\n',
+            'pudb.set_trace()\n',
         ],
     )
     def test_debugger_stmt_returns_1(self, tmp_path: Path, stmt: str) -> None:
-        f = _write(tmp_path, "dbg.py", stmt)
+        f = _write(tmp_path, 'dbg.py', stmt)
         assert debugger_main([f]) == 1
 
     def test_clean_file_returns_0(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "ok.py", "x = 1\n")
+        f = _write(tmp_path, 'ok.py', 'x = 1\n')
         assert debugger_main([f]) == 0
 
     def test_commented_breakpoint_returns_0(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "c.py", "# breakpoint()\n")
+        f = _write(tmp_path, 'c.py', '# breakpoint()\n')
         assert debugger_main([f]) == 0
 
     def test_disable_comment_returns_0(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "d.py", "breakpoint()  # debugger-detection: disable\n")
+        f = _write(tmp_path, 'd.py', 'breakpoint()  # debugger-detection: disable\n')
         assert debugger_main([f]) == 0
 
 
@@ -106,17 +106,17 @@ class TestDebuggerDetection:
 
 class TestLoggerDetection:
     @pytest.mark.parametrize(
-        "level",
-        ["debug", "info", "warning", "error", "critical", "exception"],
+        'level',
+        ['debug', 'info', 'warning', 'error', 'critical', 'exception'],
     )
     def test_root_logging_returns_1(self, tmp_path: Path, level: str) -> None:
-        f = _write(tmp_path, "log.py", f'logging.{level}("msg")\n')
+        f = _write(tmp_path, 'log.py', f'logging.{level}("msg")\n')
         assert logger_main([f]) == 1
 
     def test_named_logger_returns_0(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "ok.py", 'log.info("msg")\n')
+        f = _write(tmp_path, 'ok.py', 'log.info("msg")\n')
         assert logger_main([f]) == 0
 
     def test_disable_comment_returns_0(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "d.py", 'logging.info("x")  # logger-detection: disable\n')
+        f = _write(tmp_path, 'd.py', 'logging.info("x")  # logger-detection: disable\n')
         assert logger_main([f]) == 0

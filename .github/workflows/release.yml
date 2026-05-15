@@ -1,75 +1,15 @@
+---
 name: Release
 
 on:
-  push:
-    branches: [main]
-  workflow_dispatch:
-
-permissions:
-  contents: write
-  pull-requests: write
+    push:
+        branches: [main, master]
+        paths-ignore:
+            - '**.md'
+            - .github/**
+    workflow_dispatch:
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Debug context
-        env:
-          REF_NAME: ${{ github.ref_name }}
-          GH_SHA: ${{ github.sha }}
-          GH_ACTOR: ${{ github.actor }}
-        run: |
-          echo "### Debug release context" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Branch: $REF_NAME" >> "$GITHUB_STEP_SUMMARY"
-          echo "- SHA: $GH_SHA" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Actor: $GH_ACTOR" >> "$GITHUB_STEP_SUMMARY"
-          git log -5 --oneline >> "$GITHUB_STEP_SUMMARY" || true
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.14'
-
-      - name: Install GitVersion
-        run: |
-          dotnet tool install --global GitVersion.Tool --version 5.*
-
-      - name: Compute version
-        id: gitversion
-        run: |
-          VERSION=$(dotnet-gitversion /showvariable SemVer)
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Version: $VERSION" >> "$GITHUB_STEP_SUMMARY"
-
-<<<<<<< Updated upstream
-            - name: Create tag
-              run: |
-                  git config user.name 'chrysa'
-                  git config user.email 'greau.anthony+chrysa@gmail.com'
-                  git tag "${{ steps.changelog.outputs.version }}" || echo "Tag already exists"
-                  git push origin "${{ steps.changelog.outputs.version }}" || echo "Tag push skipped"
-||||||| Stash base
-            - name: Create tag
-              run: |
-                  git config user.name 'chrysa'
-                  git config user.email 'greau.anthony@gmail.com'
-                  git tag "${{ steps.changelog.outputs.version }}" || echo "Tag already exists"
-                  git push origin "${{ steps.changelog.outputs.version }}" || echo "Tag push skipped"
-=======
-      # NOTE: conventional commits check removed (caused false negatives on merge commits)
-      # NOTE: paths-ignore removed from trigger (caused legitimate releases to be skipped)
->>>>>>> Stashed changes
-
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ steps.gitversion.outputs.version }}
-          name: Release v${{ steps.gitversion.outputs.version }}
-          generate_release_notes: true
-          draft: false
-          prerelease: false
+    call:
+        uses: chrysa/github-actions/.github/workflows/release.yml@main
+        secrets: inherit

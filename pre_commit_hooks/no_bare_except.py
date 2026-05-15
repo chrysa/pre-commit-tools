@@ -12,12 +12,12 @@ from pre_commit_hooks.tools.pattern_detection import PatternDetection
 def main(argv: Sequence[str] | None = None) -> int:
     """Detect bare except: clauses and return 1 if any are found."""
     pattern_detection = PatternDetection(
-        commented=re.compile(r"^\s*#\s*except\s*:"),
-        disable_comment=re.compile(r"no-bare-except\s*:\s*disable"),
-        pattern=re.compile(r"^\s*except\s*:"),
+        commented=re.compile(r'^\s*#\s*except\s*:'),
+        disable_comment=re.compile(r'no-bare-except\s*:\s*disable'),
+        pattern=re.compile(r'^\s*except\s*:'),
     )
     return pattern_detection.detect(argv=argv)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     raise SystemExit(main())

@@ -9,48 +9,48 @@ from pre_commit_hooks.requirements_sort import main, sort_requirements, sort_set
 
 def _write(tmp_path: Path, name: str, content: str) -> str:
     p = tmp_path / name
-    p.write_text(content, encoding="utf-8")
+    p.write_text(content, encoding='utf-8')
     return str(p)
 
 
 class TestSortRequirements:
     def test_sorted_unchanged(self) -> None:
-        lines = ["requests", "urllib3"]
-        assert sort_requirements(lines) == ["requests", "urllib3"]
+        lines = ['requests', 'urllib3']
+        assert sort_requirements(lines) == ['requests', 'urllib3']
 
     def test_unsorted_sorted(self) -> None:
-        lines = ["urllib3", "requests"]
-        assert sort_requirements(lines) == ["requests", "urllib3"]
+        lines = ['urllib3', 'requests']
+        assert sort_requirements(lines) == ['requests', 'urllib3']
 
     def test_comments_first(self) -> None:
-        lines = ["urllib3", "# comment", "requests"]
+        lines = ['urllib3', '# comment', 'requests']
         result = sort_requirements(lines)
-        assert result[0] == "# comment"
-        assert result[1:] == ["requests", "urllib3"]
+        assert result[0] == '# comment'
+        assert result[1:] == ['requests', 'urllib3']
 
     def test_blank_lines_first(self) -> None:
-        lines = ["urllib3", "", "requests"]
+        lines = ['urllib3', '', 'requests']
         result = sort_requirements(lines)
-        assert result[0] == ""
-        assert result[1:] == ["requests", "urllib3"]
+        assert result[0] == ''
+        assert result[1:] == ['requests', 'urllib3']
 
     def test_case_insensitive(self) -> None:
-        lines = ["Urllib3", "requests"]
+        lines = ['Urllib3', 'requests']
         result = sort_requirements(lines)
-        assert result == ["requests", "Urllib3"]
+        assert result == ['requests', 'Urllib3']
 
 
 class TestRequirementsSortMain:
     def test_already_sorted_returns_0(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "req.txt", "requests\nurllib3\n")
+        f = _write(tmp_path, 'req.txt', 'requests\nurllib3\n')
         assert main([f]) == 0
 
     def test_unsorted_returns_1_and_rewrites(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "req.txt", "urllib3\nrequests\n")
+        f = _write(tmp_path, 'req.txt', 'urllib3\nrequests\n')
         assert main([f]) == 1
         lines = Path(f).read_text().splitlines()
-        assert lines[0] == "requests"
-        assert lines[1] == "urllib3"
+        assert lines[0] == 'requests'
+        assert lines[1] == 'urllib3'
 
     def test_empty_args_returns_0(self) -> None:
         assert main([]) == 0
@@ -108,10 +108,10 @@ class TestSortSetupCfg:
     def test_extras_keys_sorted(self) -> None:
         result = sort_setup_cfg(_SETUP_CFG_UNSORTED_EXTRAS)
         lines = result.splitlines()
-        extra_keys = [ln.split("=")[0].strip() for ln in lines if ln and not ln.startswith((" ", "\t", "[", "#"))]
+        extra_keys = [ln.split('=')[0].strip() for ln in lines if ln and not ln.startswith((' ', '\t', '[', '#'))]
         # Only extras keys (non-metadata keys)
-        extras = [k for k in extra_keys if k in ("alpha", "beta")]
-        assert extras == ["alpha", "beta"]
+        extras = [k for k in extra_keys if k in ('alpha', 'beta')]
+        assert extras == ['alpha', 'beta']
 
     def test_deps_within_extra_sorted(self) -> None:
         result = sort_setup_cfg(_SETUP_CFG_UNSORTED_EXTRAS)
@@ -119,15 +119,15 @@ class TestSortSetupCfg:
         in_alpha = False
         alpha_deps: list[str] = []
         for ln in lines:
-            if ln.strip() == "alpha =":
+            if ln.strip() == 'alpha =':
                 in_alpha = True
                 continue
             if in_alpha:
-                if ln.startswith((" ", "\t")):
+                if ln.startswith((' ', '\t')):
                     alpha_deps.append(ln.strip())
                 else:
                     break
-        assert alpha_deps == ["aaa>=1.0", "bbb>=2.0"]
+        assert alpha_deps == ['aaa>=1.0', 'bbb>=2.0']
 
     def test_install_requires_sorted(self) -> None:
         assert sort_setup_cfg(_SETUP_CFG_WITH_INSTALL) == _SETUP_CFG_WITH_INSTALL_SORTED
@@ -138,13 +138,13 @@ class TestSortSetupCfg:
 
 class TestRequirementsSortMainSetupCfg:
     def test_sorted_setup_cfg_returns_0(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "setup.cfg", _SETUP_CFG_SORTED)
+        f = _write(tmp_path, 'setup.cfg', _SETUP_CFG_SORTED)
         assert main([f]) == 0
 
     def test_unsorted_setup_cfg_returns_1_and_rewrites(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, "setup.cfg", _SETUP_CFG_UNSORTED_EXTRAS)
+        f = _write(tmp_path, 'setup.cfg', _SETUP_CFG_UNSORTED_EXTRAS)
         assert main([f]) == 1
-        result = Path(f).read_text(encoding="utf-8")
+        result = Path(f).read_text(encoding='utf-8')
         lines = result.splitlines()
-        extras = [ln.split("=")[0].strip() for ln in lines if ln.strip() in ("alpha =", "beta =")]
-        assert extras.index("alpha") < extras.index("beta")
+        extras = [ln.split('=')[0].strip() for ln in lines if ln.strip() in ('alpha =', 'beta =')]
+        assert extras.index('alpha') < extras.index('beta')

@@ -9,5 +9,16 @@ on:
 
 jobs:
     call:
-        uses: chrysa/github-actions/.github/workflows/pre-commit.yml@main
-        secrets: inherit
+        name: Run pre-commit hooks
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        steps:
+            - uses: actions/checkout@v6
+            - uses: actions/setup-python@v6
+              with:
+                  python-version: '3.14'
+            - name: Install package for system hooks
+              run: pip install -e '.[yaml,format_dockerfile,ts_unreachable_code]'
+            - uses: pre-commit/action@v3.0.1
+              env:
+                  SKIP: no-commit-to-branch

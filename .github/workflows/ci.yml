@@ -55,6 +55,8 @@ jobs:
             - name: Install package for system hooks
               run: pip install -e '.[yaml,format_dockerfile,ts_unreachable_code]'
             - uses: pre-commit/action@v3.0.1
+              env:
+                  SKIP: no-commit-to-branch
 
     ruff:
         name: Ruff (${{ matrix.python-version }})

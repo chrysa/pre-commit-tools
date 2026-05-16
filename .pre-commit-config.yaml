@@ -144,59 +144,50 @@ repos:
       - id: python-print-detection
         name: detect print on python code
         entry: print-detection
-        language: python
+        language: system
         types: [python]
-        additional_dependencies: ["."]
       - id: python-pprint-detection
         name: detect pprint on python code
         entry: pprint-detection
-        language: python
+        language: system
         types: [python]
-        additional_dependencies: ["."]
       - id: debugger-detection
         name: detect debugger statements
         entry: debugger-detection
-        language: python
-        additional_dependencies: ["."]
+        language: system
       - id: yaml-sorter
         exclude: '^(\.github/|GitVersion\.yml)'
         name: sort yaml files
         entry: yaml-sorter
-        language: python
+        language: system
         types: [yaml]
-        additional_dependencies: [".[yaml]"]
       - id: json-sorter
         name: sort json files
         entry: json-sorter
-        language: python
+        language: system
         types: [json]
-        additional_dependencies: ["."]
       - id: requirements-sort
         name: sort requirements files
         entry: requirements-sort
-        language: python
+        language: system
         types: [text]
         files: requirements.*\.txt$
-        additional_dependencies: ["."]
       - id: env-file-check
         name: check env files for secrets
         entry: env-file-check
-        language: python
+        language: system
         types: [text]
         files: \.env
-        additional_dependencies: ["."]
       - id: python-logger-detection
         name: detect root logger usage
         entry: logger-detection
-        language: python
+        language: system
         types: [python]
-        additional_dependencies: ["."]
       - id: python-unreachable-code
         name: detect unreachable code
         entry: unreachable-code-detection
-        language: python
+        language: system
         types: [python]
-        additional_dependencies: ["."]
       - id: python-dead-code
         name: detect dead/unused code
         entry: dead-code-detection

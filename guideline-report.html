@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guideline Compliance Report</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; padding: 0; background: #f8f9fa; color: #212529; }
+  header { background: #343a40; color: white; padding: 1.5rem 2rem; }
+  header h1 { margin: 0; font-size: 1.5rem; }
+  header p { margin: 0.25rem 0 0; opacity: 0.75; font-size: 0.9rem; }
+  .summary { display: flex; gap: 1rem; padding: 1.5rem 2rem; flex-wrap: wrap; }
+  .stat { background: white; border: 1px solid #dee2e6; border-radius: 8px;
+    padding: 1rem 1.5rem; min-width: 120px; text-align: center; }
+  .stat .value { font-size: 2rem; font-weight: bold; }
+  .stat .label { font-size: 0.8rem; color: #6c757d; text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat.error .value { color: #dc3545; }
+  .stat.warning .value { color: #fd7e14; }
+  .stat.info .value { color: #0d6efd; }
+  .stat.ok .value { color: #198754; }
+  .section { margin: 1rem 2rem; background: white; border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden; }
+  .section-header { padding: 0.75rem 1.25rem; background: #e9ecef;
+    display: flex; justify-content: space-between; align-items: center; }
+  .section-header h2 { margin: 0; font-size: 1rem; }
+  .section-meta { font-size: 0.8rem; color: #6c757d; }
+  .badge { display: inline-block; padding: 0.2em 0.6em; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+  .badge-error { background: #f8d7da; color: #842029; }
+  .badge-warning { background: #fff3cd; color: #664d03; }
+  .badge-info { background: #cfe2ff; color: #084298; }
+  .badge-ok { background: #d1e7dd; color: #0a3622; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  th { background: #f8f9fa; padding: 0.5rem 1rem; text-align: left; border-bottom: 2px solid #dee2e6; }
+  td { padding: 0.5rem 1rem; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+  tr:hover td { background: #f8f9fa; }
+  .file-path { font-family: monospace; font-size: 0.8rem; color: #6c757d; }
+  .line-content { font-family: monospace; background: #f8f9fa; padding: 0.1em 0.4em; border-radius: 3px; }
+  .rule-text { max-width: 400px; }
+  .no-violations { padding: 1rem 1.25rem; color: #198754; font-size: 0.9rem; }
+  footer { text-align: center; color: #6c757d; font-size: 0.8rem; padding: 2rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Guideline Compliance Report</h1>
+  <p>Project: /home/anthony/Documents/perso/projects/chrysa/pre-commit-tools &mdash; Generated: 2026-05-16 20:16 UTC</p>
+</header>
+<div class="summary">
+  <div class="stat ok"><div class="value">150</div><div class="label">Files checked</div></div>
+  <div class="stat error"><div class="value">0</div><div class="label">Errors</div></div>
+  <div class="stat warning"><div class="value">0</div><div class="label">Warnings</div></div>
+  <div class="stat info"><div class="value">0</div><div class="label">Info</div></div>
+  <div class="stat"><div class="value">6</div><div class="label">Rule files</div></div>
+</div>
+<div class="section">
+  <div class="section-header">
+    <div>
+      <h2>frontend_guidelines.instructions</h2>
+      <div class="section-meta">applyTo: <code>**/*.{ts,tsx,js,jsx,css}</code> &mdash; 0 file(s) checked</div>
+    </div>
+    <span class="badge badge-ok">PASS</span>
+  </div>
+  <div class="no-violations">No violations found.</div>
+</div>
+<div class="section">
+  <div class="section-header">
+    <div>
+      <h2>hooks.instructions</h2>
+      <div class="section-meta">applyTo: <code>pre_commit_hooks/**/*.py</code> &mdash; 5 file(s) checked</div>
+    </div>
+    <span class="badge badge-ok">PASS</span>
+  </div>
+  <div class="no-violations">No violations found.</div>
+</div>
+<div class="section">
+  <div class="section-header">
+    <div>
+      <h2>python_guidelines.instructions</h2>
+      <div class="section-meta">applyTo: <code>pre_commit_hooks/**/*.py</code> &mdash; 5 file(s) checked</div>
+    </div>
+    <span class="badge badge-ok">PASS</span>
+  </div>
+  <div class="no-violations">No violations found.</div>
+</div>
+<div class="section">
+  <div class="section-header">
+    <div>
+      <h2>ruff_compliance.instructions</h2>
+      <div class="section-meta">applyTo: <code>**/*.py</code> &mdash; 70 file(s) checked</div>
+    </div>
+    <span class="badge badge-ok">PASS</span>
+  </div>
+  <div class="no-violations">No violations found.</div>
+</div>
+<div class="section">
+  <div class="section-header">
+    <div>
+      <h2>testing.instructions</h2>
+      <div class="section-meta">applyTo: <code>tests/**/*.py</code> &mdash; 0 file(s) checked</div>
+    </div>
+    <span class="badge badge-ok">PASS</span>
+  </div>
+  <div class="no-violations">No violations found.</div>
+</div>
+<div class="section">
+  <div class="section-header">
+    <div>
+      <h2>typing.instructions</h2>
+      <div class="section-meta">applyTo: <code>**/*.py</code> &mdash; 70 file(s) checked</div>
+    </div>
+    <span class="badge badge-ok">PASS</span>
+  </div>
+  <div class="no-violations">No violations found.</div>
+</div>
+
+<footer>Generated by <a href="https://github.com/chrysa/guideline-checker">guideline-checker</a></footer>
+</body>
+</html>

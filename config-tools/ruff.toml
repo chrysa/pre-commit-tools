@@ -33,7 +33,7 @@ ban-relative-imports = "all"
 split-on-trailing-comma = true
 
 [lint.per-file-ignores]
-"tests/**" = ["S101", "N802", "S603", "S607"]
+"tests/**" = ["S101", "N802", "S603", "S607", "S105", "S106"]
 "pre_commit_hooks/pylint_report_html.py" = ["S101"]
 
 [format]

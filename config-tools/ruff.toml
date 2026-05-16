@@ -17,10 +17,10 @@ select = [
     "RUF",  # ruff-specific rules
 ]
 ignore = [
-    "E203",   # whitespace before ':' (conflicts with black-style formatting)
-    "S101",   # assert used (fine in tests)
-    "S603",   # subprocess call: check=False (too noisy for hook scripts)
-    "S607",   # starting a process with a partial executable path
+    "E203", # whitespace before ':' (conflicts with black-style formatting)
+    "S101", # assert used (fine in tests)
+    "S603", # subprocess call: check=False (too noisy for hook scripts)
+    "S607", # starting a process with a partial executable path
 ]
 
 [lint.mccabe]

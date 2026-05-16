@@ -42,7 +42,7 @@ def _parse_coverage(report_path: Path) -> float | None:
         line_rate = tree.getroot().get('line-rate')
         if line_rate is not None:
             return round(float(line_rate) * 100, 2)
-    except (ElementTree.ParseError, ValueError, OSError):
+    except ElementTree.ParseError, ValueError, OSError:
         pass
     return None
 
@@ -73,7 +73,7 @@ def _parse_test_count(report_path: Path) -> int | None:
             1 for tc in root.iter('testcase') if not (tc.find('failure') is not None or tc.find('error') is not None)
         )
         return passed
-    except (ElementTree.ParseError, ValueError, OSError):
+    except ElementTree.ParseError, ValueError, OSError:
         pass
     return None
 
@@ -84,7 +84,7 @@ def _load_baseline(path: Path) -> dict | None:
         return None
     try:
         return json.loads(path.read_text(encoding='utf-8'))
-    except (json.JSONDecodeError, OSError):
+    except json.JSONDecodeError, OSError:
         return None
 
 

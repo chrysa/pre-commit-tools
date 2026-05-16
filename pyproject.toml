@@ -119,7 +119,7 @@ max-complexity = 15
 ban-relative-imports = "all"
 
 [tool.ruff.format]
-quote-style = "double"
+quote-style = "single"
 indent-style = "space"
 line-ending = "lf"
 docstring-code-format = true

@@ -22,7 +22,7 @@ def _check_node_available() -> bool:
             capture_output=True,
             timeout=5,
         )
-    except (FileNotFoundError, subprocess.TimeoutExpired):
+    except FileNotFoundError, subprocess.TimeoutExpired:
         return False
     else:
         return True

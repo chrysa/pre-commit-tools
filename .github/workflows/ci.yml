@@ -72,7 +72,7 @@ jobs:
               uses: chrysa/github-actions/tool-setup@v1
               with:
                   python-version: ${{ matrix.python-version }}
-                  extras: 'lint,format_dockerfile,yaml,dead_code'
+                  extras: "lint,format_dockerfile,yaml,dead_code"
 
             - name: Ruff checks
               uses: chrysa/github-actions/ruff-check@v1
@@ -80,7 +80,7 @@ jobs:
                   python-version: ${{ matrix.python-version }}
                   latest-python: ${{ needs.config.outputs.latest-python }}
                   config: config-tools/ruff.toml
-                  sources: 'pre_commit_hooks tests'
+                  sources: "pre_commit_hooks tests"
 
     mypy:
         name: Mypy (${{ matrix.python-version }})
@@ -99,7 +99,7 @@ jobs:
               uses: chrysa/github-actions/tool-setup@v1
               with:
                   python-version: ${{ matrix.python-version }}
-                  extras: 'typecheck,format_dockerfile,yaml,dead_code'
+                  extras: "typecheck,format_dockerfile,yaml,dead_code"
 
             - name: Mypy checks
               uses: chrysa/github-actions/mypy-check@v1
@@ -129,7 +129,7 @@ jobs:
               uses: chrysa/github-actions/tool-setup@v1
               with:
                   python-version: ${{ matrix.python-version }}
-                  extras: 'test,format_dockerfile,yaml,ts_unreachable_code,dead_code'
+                  extras: "test,format_dockerfile,yaml,ts_unreachable_code,dead_code"
 
             - name: Run tests
               uses: chrysa/github-actions/run-tests@v1

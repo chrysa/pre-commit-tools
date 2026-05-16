@@ -16,7 +16,7 @@ jobs:
             - uses: actions/checkout@v6
             - uses: actions/setup-python@v6
               with:
-                  python-version: '3.14'
+                  python-version: "3.14"
             - name: Install package for system hooks
               run: pip install -e '.[yaml,format_dockerfile,ts_unreachable_code]'
             - uses: pre-commit/action@v3.0.1

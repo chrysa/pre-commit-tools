@@ -79,6 +79,10 @@ pre-commit-manual: ## Run manual-stage pre-commit hooks on every file
 test: ## Run test suite
 	pytest
 
+docker-test: ## Run test suite inside Docker (CI-compatible)
+	docker build -f Dockerfile.test -t pre-commit-tools-test .
+	docker run --rm pre-commit-tools-test
+
 test-cov: ## Run test suite with coverage report
 	pytest --cov=$(PACKAGE_DIR) --cov-branch \
 		--cov-report=xml:reports/coverage.xml \

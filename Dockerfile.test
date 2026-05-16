@@ -1,0 +1,16 @@
+FROM python:3.14-slim AS deps
+
+WORKDIR /app
+
+RUN pip install --upgrade pip setuptools wheel
+
+COPY pyproject.toml ./
+RUN pip install ".[test,yaml,ts_unreachable_code]"
+
+FROM deps AS test
+
+COPY . .
+
+CMD ["pytest", "--cov=pre_commit_hooks", "--cov-branch", \
+     "--cov-report=xml:reports/coverage.xml", \
+     "--cov-report=term-missing"]

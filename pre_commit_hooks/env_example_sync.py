@@ -25,7 +25,7 @@ def _parse_keys(path: Path) -> set[str]:
                 m = _KEY_RE.match(line)
                 if m:
                     keys.add(m.group(1))
-    except (OSError, UnicodeDecodeError):
+    except OSError, UnicodeDecodeError:
         pass
     return keys
 

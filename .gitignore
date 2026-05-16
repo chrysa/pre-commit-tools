@@ -12,3 +12,4 @@ dist/
 .offline-markdown-preview/
 .ci-backup-*/
 .gitnexus
+guideline-report.html

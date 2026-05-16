@@ -52,6 +52,8 @@ jobs:
             - uses: actions/setup-python@v6
               with:
                   python-version: ${{ needs.config.outputs.latest-python }}
+            - name: Install package for system hooks
+              run: pip install -e '.[yaml,format_dockerfile,ts_unreachable_code]'
             - uses: pre-commit/action@v3.0.1
 
     ruff:

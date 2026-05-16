@@ -36,7 +36,7 @@ def _load_config(config_path: Path) -> dict[str, bool]:
     try:
         data = tomllib.loads(config_path.read_text(encoding='utf-8'))
         return data.get('format-dockerfiles', {})
-    except (OSError, tomllib.TOMLDecodeError):
+    except OSError, tomllib.TOMLDecodeError:
         return {}
 
 

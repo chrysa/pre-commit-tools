@@ -146,55 +146,63 @@ repos:
         entry: print-detection
         language: python
         types: [python]
+        additional_dependencies: ["."]
       - id: python-pprint-detection
         name: detect pprint on python code
         entry: pprint-detection
         language: python
         types: [python]
+        additional_dependencies: ["."]
       - id: debugger-detection
         name: detect debugger statements
         entry: debugger-detection
         language: python
+        additional_dependencies: ["."]
       - id: yaml-sorter
         exclude: '^(\.github/|GitVersion\.yml)'
         name: sort yaml files
         entry: yaml-sorter
         language: python
         types: [yaml]
-        additional_dependencies: [PyYAML]
+        additional_dependencies: [".[yaml]"]
       - id: json-sorter
         name: sort json files
         entry: json-sorter
         language: python
         types: [json]
+        additional_dependencies: ["."]
       - id: requirements-sort
         name: sort requirements files
         entry: requirements-sort
         language: python
         types: [text]
         files: requirements.*\.txt$
+        additional_dependencies: ["."]
       - id: env-file-check
         name: check env files for secrets
         entry: env-file-check
         language: python
         types: [text]
         files: \.env
+        additional_dependencies: ["."]
       - id: python-logger-detection
         name: detect root logger usage
         entry: logger-detection
         language: python
         types: [python]
+        additional_dependencies: ["."]
       - id: python-unreachable-code
         name: detect unreachable code
         entry: unreachable-code-detection
         language: python
         types: [python]
+        additional_dependencies: ["."]
       - id: python-dead-code
         name: detect dead/unused code
         entry: dead-code-detection
         language: python
         types: [python]
-        additional_dependencies: [vulture>=2.0]
+        additional_dependencies: [".[dead_code]"]
         stages: [manual]
 
   - repo: https://github.com/gitleaks/gitleaks

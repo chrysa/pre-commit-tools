@@ -12,5 +12,5 @@ FROM deps AS test
 COPY . .
 
 CMD ["pytest", "--cov=pre_commit_hooks", "--cov-branch", \
-     "--cov-report=xml:reports/coverage.xml", \
-     "--cov-report=term-missing"]
+    "--cov-report=xml:reports/coverage.xml", \
+    "--cov-report=term-missing"]

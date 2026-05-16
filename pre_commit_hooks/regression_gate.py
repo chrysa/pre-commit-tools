@@ -78,7 +78,7 @@ def _parse_test_count(report_path: Path) -> int | None:
     return None
 
 
-def _load_baseline(path: Path) -> dict | None:  # type: ignore[type-arg]
+def _load_baseline(path: Path) -> dict | None:
     """Return the baseline dict, or ``None`` if the file does not exist."""
     if not path.exists():
         return None
@@ -110,7 +110,7 @@ def _write_baseline(
     tests_passed: int | None,
 ) -> None:
     """Persist current metrics as the new baseline."""
-    data: dict = {  # type: ignore[type-arg]
+    data: dict = {
         '_comment': 'Regression baseline — update with: make baseline',
         'updated_at': datetime.now(tz=UTC).isoformat(),
         'git_sha': _git_sha(),

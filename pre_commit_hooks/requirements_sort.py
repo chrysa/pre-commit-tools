@@ -9,6 +9,8 @@ from pathlib import Path
 
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 
+_SECTION_HEADER_RE = re.compile(r'^\[([^\]]+)\]')
+
 
 def sort_requirements(lines: list[str]) -> list[str]:
     """Sort requirements lines: comments/blanks first, packages sorted case-insensitively."""
@@ -50,6 +52,53 @@ def _sort_dep_block(dep_lines: list[str]) -> list[str]:
     return pkgs + blanks
 
 
+def _sort_extras_require_section(
+    lines: list[str], start: int, result: list[str]
+) -> tuple[list[str], int]:
+    """Process ``[options.extras_require]`` block; return (result, new_index)."""
+    i = start
+    line = lines[i]
+    stripped = line.strip()
+
+    # Pass through blank/comment lines before any key block
+    if not stripped or stripped.startswith('#'):
+        result.append(line)
+        return result, i + 1
+
+    # Collect all key=value blocks until the next section header
+    blocks: list[tuple[str, list[str]]] = []
+    while i < len(lines):
+        ln = lines[i]
+        s = ln.strip()
+        if _SECTION_HEADER_RE.match(s):
+            break
+        # Skip blank/comment separators between key blocks
+        if not s or s.startswith('#'):
+            i += 1
+            continue
+        # Key line (non-indented)
+        if not ln.startswith((' ', '\t')):
+            key_line = ln
+            i += 1
+            dep_lines, i = _collect_continuation(lines, i)
+            blocks.append((key_line, dep_lines))
+        else:
+            # Orphan continuation — pass through unchanged
+            result.append(ln)
+            i += 1
+
+    # Emit blocks sorted by key name
+    blocks.sort(key=lambda b: b[0].split('=')[0].strip().lower())
+    for key_line, dep_lines in blocks:
+        result.append(key_line)
+        result.extend(_sort_dep_block(dep_lines))
+    # Preserve blank line separator before next section header
+    if i < len(lines) and _SECTION_HEADER_RE.match(lines[i].strip()):
+        result.append('\n')
+
+    return result, i
+
+
 def sort_setup_cfg(content: str) -> str:
     """Sort ``install_requires`` and every ``extras_require`` block in a setup.cfg file.
 
@@ -66,7 +115,7 @@ def sort_setup_cfg(content: str) -> str:
         stripped = line.strip()
 
         # Detect section header -----------------------------------------------
-        m = re.match(r'^\[([^\]]+)\]', stripped)
+        m = _SECTION_HEADER_RE.match(stripped)
         if m:
             section = m.group(1)
             result.append(line)
@@ -83,42 +132,7 @@ def sort_setup_cfg(content: str) -> str:
 
         # [options.extras_require] -------------------------------------------
         if section == 'options.extras_require':
-            # Pass through blank/comment lines before any key block
-            if not stripped or stripped.startswith('#'):
-                result.append(line)
-                i += 1
-                continue
-
-            # Collect all key=value blocks until the next section header
-            blocks: list[tuple[str, list[str]]] = []
-            while i < len(lines):
-                ln = lines[i]
-                s = ln.strip()
-                if re.match(r'^\[([^\]]+)\]', s):
-                    break
-                # Skip blank/comment separators between key blocks
-                if not s or s.startswith('#'):
-                    i += 1
-                    continue
-                # Key line (non-indented)
-                if not ln.startswith((' ', '\t')):
-                    key_line = ln
-                    i += 1
-                    dep_lines, i = _collect_continuation(lines, i)
-                    blocks.append((key_line, dep_lines))
-                else:
-                    # Orphan continuation — pass through unchanged
-                    result.append(ln)
-                    i += 1
-
-            # Emit blocks sorted by key name
-            blocks.sort(key=lambda b: b[0].split('=')[0].strip().lower())
-            for key_line, dep_lines in blocks:
-                result.append(key_line)
-                result.extend(_sort_dep_block(dep_lines))
-            # Preserve blank line separator before next section header
-            if i < len(lines) and re.match(r'^\[([^\]]+)\]', lines[i].strip()):
-                result.append('\n')
+            result, i = _sort_extras_require_section(lines, i, result)
             continue
 
         result.append(line)

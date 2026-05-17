@@ -36,6 +36,29 @@ def _has_keyword(node: ast.Call, keyword: str) -> bool:
     return any(kw.arg == keyword for kw in node.keywords)
 
 
+def _check_decorator_violation(
+    dec: ast.Call,
+    node: ast.FunctionDef | ast.AsyncFunctionDef,
+    lines: list[str],
+    filename: str,
+) -> Violation | None:
+    """Return a violation if the decorator is a FastAPI route missing response_model."""
+    if not isinstance(dec, ast.Call):
+        return None
+    _obj, method = _get_decorator_call_name(dec)
+    if method not in _ROUTE_METHODS:
+        return None
+    if _has_keyword(dec, 'response_model'):
+        return None
+    if _is_disable_comment(lines, dec.lineno):
+        return None
+    return (
+        filename,
+        node.lineno,
+        f'FastAPI route {node.name!r} missing response_model= parameter',
+    )
+
+
 def detect_missing_response_model(source: str, filename: str) -> list[Violation]:
     """Return violations for FastAPI routes without response_model."""
     try:
@@ -48,22 +71,9 @@ def detect_missing_response_model(source: str, filename: str) -> list[Violation]
         if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             continue
         for dec in node.decorator_list:
-            if not isinstance(dec, ast.Call):
-                continue
-            _obj, method = _get_decorator_call_name(dec)
-            if method not in _ROUTE_METHODS:
-                continue
-            # Found a route decorator — check for response_model keyword
-            if not _has_keyword(dec, 'response_model'):
-                lineno = dec.lineno
-                if not _is_disable_comment(lines, lineno):
-                    violations.append(
-                        (
-                            filename,
-                            node.lineno,
-                            f'FastAPI route {node.name!r} missing response_model= parameter',
-                        ),
-                    )
+            violation = _check_decorator_violation(dec, node, lines, filename)
+            if violation:
+                violations.append(violation)
     return violations
 
 

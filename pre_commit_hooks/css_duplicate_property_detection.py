@@ -35,6 +35,36 @@ def _strip_block_comments(content: str) -> str:
     return _BLOCK_COMMENT.sub(_sub, content)
 
 
+def _check_property_line(
+    stripped: str,
+    original_line: str,
+    lineno: int,
+    scope_stack: list[dict[str, int]],
+    violations: list[Violation],
+    filename: str,
+) -> None:
+    """Check one line for a duplicate CSS property and update scope_stack in-place."""
+    if not (
+        scope_stack
+        and ':' in stripped
+        and not _NOT_PROPERTY_RE.match(stripped)
+        and not stripped.endswith('{')
+        and not stripped.endswith(',')
+    ):
+        return
+    m = _PROPERTY_RE.match(stripped)
+    if not m:
+        return
+    prop = m.group(1).lower()
+    if _DISABLE_PROPERTY_COMMENT in original_line:
+        return
+    current_scope = scope_stack[-1]
+    if prop in current_scope:
+        violations.append((filename, lineno, current_scope[prop], prop))
+    else:
+        current_scope[prop] = lineno
+
+
 def detect_duplicate_properties(content: str, filename: str) -> list[Violation]:
     """Return violations for duplicate CSS property declarations within the same rule block."""
     original_lines = content.splitlines()  # keep for disable-comment lookup
@@ -58,20 +88,9 @@ def detect_duplicate_properties(content: str, filename: str) -> list[Violation]:
         for _ in range(open_count):
             scope_stack.append({})
 
-        # Detect property: value pattern (before processing closing braces)
-        if scope_stack and ':' in stripped:
-            if not _NOT_PROPERTY_RE.match(stripped) and not stripped.endswith('{') and not stripped.endswith(','):
-                m = _PROPERTY_RE.match(stripped)
-                if m:
-                    prop = m.group(1).lower()
-                    if _DISABLE_PROPERTY_COMMENT not in original_lines[lineno - 1]:
-                        current_scope = scope_stack[-1]
-                        if prop in current_scope:
-                            violations.append(
-                                (filename, lineno, current_scope[prop], prop),
-                            )
-                        else:
-                            current_scope[prop] = lineno
+        _check_property_line(
+            stripped, original_lines[lineno - 1], lineno, scope_stack, violations, filename
+        )
 
         # Update nesting for closing braces
         for _ in range(close_count):
@@ -83,6 +102,29 @@ def detect_duplicate_properties(content: str, filename: str) -> list[Violation]:
 
 # (filename, duplicate_lineno, first_lineno, id_name)
 IdViolation = tuple[str, int, int, str]
+
+
+def _check_id_line(
+    stripped: str,
+    original_line: str,
+    lineno: int,
+    depth: int,
+    seen_ids: dict[str, int],
+    violations: list[IdViolation],
+    filename: str,
+) -> None:
+    """Check a selector line for duplicate ID usage and update seen_ids in-place."""
+    open_count = stripped.count('{')
+    if not open_count or depth != 0:
+        return
+    if _DISABLE_ID_COMMENT in original_line:
+        return
+    for id_name in _ID_SELECTOR_RE.findall(stripped):
+        id_lower = id_name.lower()
+        if id_lower in seen_ids:
+            violations.append((filename, lineno, seen_ids[id_lower], id_name))
+        else:
+            seen_ids[id_lower] = lineno
 
 
 def detect_duplicate_ids(content: str, filename: str) -> list[IdViolation]:
@@ -109,17 +151,9 @@ def detect_duplicate_ids(content: str, filename: str) -> list[IdViolation]:
         open_count = stripped.count('{')
         close_count = stripped.count('}')
 
-        # Selector lines: depth == 0 before the opening brace and contain '{'
-        if open_count and depth == 0:
-            if _DISABLE_ID_COMMENT not in original_lines[lineno - 1]:
-                for id_name in _ID_SELECTOR_RE.findall(stripped):
-                    id_lower = id_name.lower()
-                    if id_lower in seen_ids:
-                        violations.append(
-                            (filename, lineno, seen_ids[id_lower], id_name),
-                        )
-                    else:
-                        seen_ids[id_lower] = lineno
+        _check_id_line(
+            stripped, original_lines[lineno - 1], lineno, depth, seen_ids, violations, filename
+        )
 
         depth += open_count - close_count
 

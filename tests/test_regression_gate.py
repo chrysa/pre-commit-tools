@@ -33,14 +33,14 @@ COVERAGE_XML_90 = """\
 </coverage>
 """
 
-JUNIT_XML_10_PASS = """\
+JUNIT_XML_10_OK = """\
 <?xml version="1.0" ?>
 <testsuites>
     <testsuite tests="10" errors="0" failures="0" name="suite"/>
 </testsuites>
 """
 
-JUNIT_XML_8_PASS = """\
+JUNIT_XML_8_OK = """\
 <?xml version="1.0" ?>
 <testsuites>
     <testsuite tests="10" errors="1" failures="1" name="suite"/>
@@ -100,12 +100,12 @@ class TestParseCoverage:
 class TestParseTestCount:
     def test_counts_passing_tests_in_testsuites(self, tmp_path: Path) -> None:
         f = tmp_path / 'results.xml'
-        f.write_text(JUNIT_XML_10_PASS)
+        f.write_text(JUNIT_XML_10_OK)
         assert _parse_test_count(f) == 10
 
     def test_subtracts_errors_and_failures(self, tmp_path: Path) -> None:
         f = tmp_path / 'results.xml'
-        f.write_text(JUNIT_XML_8_PASS)
+        f.write_text(JUNIT_XML_8_OK)
         assert _parse_test_count(f) == 8
 
     def test_single_testsuite_root(self, tmp_path: Path) -> None:
@@ -196,7 +196,7 @@ class TestCheck:
         self,
         tmp_path: Path,
         coverage_xml: str | None = COVERAGE_XML_85,
-        junit_xml: str | None = JUNIT_XML_10_PASS,
+        junit_xml: str | None = JUNIT_XML_10_OK,
         baseline: dict | None = None,  # type: ignore[type-arg]
     ) -> tuple[Path, Path, Path]:
         b = tmp_path / '.quality-baseline.json'
@@ -231,7 +231,7 @@ class TestCheck:
         # Baseline 10 tests, current 8 → regression
         b, c, t = self._setup(
             tmp_path,
-            junit_xml=JUNIT_XML_8_PASS,
+            junit_xml=JUNIT_XML_8_OK,
             baseline=_baseline(tests=10, coverage=85.0),
         )
         assert _check(b, c, t) == 1
@@ -240,7 +240,7 @@ class TestCheck:
         b, c, t = self._setup(
             tmp_path,
             coverage_xml=COVERAGE_XML_85,
-            junit_xml=JUNIT_XML_8_PASS,
+            junit_xml=JUNIT_XML_8_OK,
             baseline=_baseline(tests=10, coverage=90.0),
         )
         assert _check(b, c, t) == 1
@@ -270,7 +270,7 @@ class TestMain:
         cov = tmp_path / 'coverage.xml'
         cov.write_text(COVERAGE_XML_85)
         junit = tmp_path / 'results.xml'
-        junit.write_text(JUNIT_XML_10_PASS)
+        junit.write_text(JUNIT_XML_10_OK)
         baseline = tmp_path / '.quality-baseline.json'
 
         with patch('pre_commit_hooks.regression_gate._git_sha', return_value='abc'):
@@ -294,7 +294,7 @@ class TestMain:
         cov = tmp_path / 'coverage.xml'
         cov.write_text(COVERAGE_XML_85)
         junit = tmp_path / 'results.xml'
-        junit.write_text(JUNIT_XML_10_PASS)
+        junit.write_text(JUNIT_XML_10_OK)
         baseline = tmp_path / '.quality-baseline.json'
         baseline.write_text(json.dumps(_baseline(10, 80.0)))
 
@@ -314,7 +314,7 @@ class TestMain:
         cov = tmp_path / 'coverage.xml'
         cov.write_text(COVERAGE_XML_85)
         junit = tmp_path / 'results.xml'
-        junit.write_text(JUNIT_XML_8_PASS)
+        junit.write_text(JUNIT_XML_8_OK)
         baseline = tmp_path / '.quality-baseline.json'
         baseline.write_text(json.dumps(_baseline(10, 90.0)))
 

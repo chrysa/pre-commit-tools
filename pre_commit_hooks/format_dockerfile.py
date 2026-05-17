@@ -198,10 +198,20 @@ class FormatDockerfile:
             index=index,
         )
 
-    _SIMPLE_INSTRUCTIONS = frozenset({
-        'ADD', 'ARG', 'CMD', 'COMMENT', 'COPY',
-        'ENTRYPOINT', 'EXPOSE', 'SHELL', 'USER', 'WORKDIR',
-    })
+    _SIMPLE_INSTRUCTIONS = frozenset(
+        {
+            'ADD',
+            'ARG',
+            'CMD',
+            'COMMENT',
+            'COPY',
+            'ENTRYPOINT',
+            'EXPOSE',
+            'SHELL',
+            'USER',
+            'WORKDIR',
+        },
+    )
 
     def _format_line(self, *, index: int, line: Line) -> None:
         line_content = self._get_line_content(line=line)

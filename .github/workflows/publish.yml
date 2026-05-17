@@ -50,7 +50,7 @@ jobs:
                   fetch-depth: 0
             - uses: actions/setup-python@v6
               with:
-                  python-version: '3.14'  # keep in sync with config job in ci.yml
+                  python-version: "3.14" # keep in sync with config job in ci.yml
             - name: Update version in pyproject.toml
               shell: bash
               run: |

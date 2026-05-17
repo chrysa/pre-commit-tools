@@ -15,7 +15,7 @@ from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 def sort_yaml_file(
     changed_file_state: bool,
     data: dict[Any, Any],
-    sorted_data: dict[Any, Any],
+    _initial_sorted: dict[Any, Any] | None = None,
 ) -> tuple[bool, dict[Any, Any]]:
     """Sort a YAML dict recursively; return updated change flag and sorted dict."""
     sorted_data = dict(sorted(data.items(), key=lambda item: str(item[0])))
@@ -26,7 +26,6 @@ def sort_yaml_file(
             changed_file_state, sorted_data[key] = sort_yaml_file(
                 changed_file_state,
                 value,
-                sorted_data[key],
             )
         elif isinstance(value, list):
             if all(not isinstance(item, (dict, list)) for item in value):
@@ -46,7 +45,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     args, _ = tools_instance.get_args(argv=argv)
     changed_file_state = False
     for file in args.filenames:
-        sorted_data: dict[Any, Any] = {}
         with open(file) as file_stream:
             raw = yaml.safe_load(file_stream)
         if not isinstance(raw, dict):
@@ -55,7 +53,6 @@ def main(argv: Sequence[str] | None = None) -> int:
         changed_file_state, sorted_data = sort_yaml_file(
             changed_file_state,
             data,
-            sorted_data,
         )
         if changed_file_state:
             with open(file, mode='w') as file_stream:

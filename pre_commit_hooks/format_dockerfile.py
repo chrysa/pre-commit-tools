@@ -24,6 +24,7 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 SHEBANG = '# syntax=docker/dockerfile:1.4'
+_RUN_JOIN = ' \\\n    && '
 
 # Matches ARG lines that reference another variable: ARG FOO=${BAR} or ARG FOO=${BAR}-extra
 _ARG_VAR_PATTERN = re.compile(r'ARG\s+\w+\s*=\s*.*\$\{')
@@ -153,18 +154,18 @@ class FormatDockerfile:
             self.content += data
         else:
             self.content += '\n'
-            if data.startswith(' \\\n    && '):
-                data = data.replace(' \\\n    && ', '', 1)
+            if data.startswith(_RUN_JOIN):
+                data = data.replace(_RUN_JOIN, '', 1)
             self.content += '\n' + 'RUN ' + data
 
     def _split_run_content(self, line_content: str) -> str:
         if line_content.startswith('--'):
             split_list = list(map(str.strip, line_content.split('&&')))
-            return ' \\\n    && '.join(split_list)
+            return _RUN_JOIN.join(split_list)
         elif '&&' in line_content:
-            return ' \\\n    && '.join(list(map(str.strip, line_content.split('&&'))))
+            return _RUN_JOIN.join(list(map(str.strip, line_content.split('&&'))))
         else:
-            return ' \\\n    && ' + line_content
+            return _RUN_JOIN + line_content
 
     def _format_simple_line(self, *, line_content: str, line_instruction: str) -> None:
         logger.debug(f'format {line_instruction} ..........')
@@ -197,21 +198,15 @@ class FormatDockerfile:
             index=index,
         )
 
+    _SIMPLE_INSTRUCTIONS = frozenset({
+        'ADD', 'ARG', 'CMD', 'COMMENT', 'COPY',
+        'ENTRYPOINT', 'EXPOSE', 'SHELL', 'USER', 'WORKDIR',
+    })
+
     def _format_line(self, *, index: int, line: Line) -> None:
         line_content = self._get_line_content(line=line)
         line_instruction = self._get_line_instruction(line=self.origin_content[index])
-        if line_instruction in [
-            'ADD',
-            'ARG',
-            'CMD',
-            'COMMENT',
-            'COPY',
-            'ENTRYPOINT',
-            'EXPOSE',
-            'SHELL',
-            'USER',
-            'WORKDIR',
-        ]:
+        if line_instruction in self._SIMPLE_INSTRUCTIONS:
             self._add_newline_if_needed(index=index)
             self._format_simple_line(
                 line_content=line_content,

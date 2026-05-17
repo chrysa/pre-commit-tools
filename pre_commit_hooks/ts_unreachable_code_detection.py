@@ -55,26 +55,33 @@ def _statements_of(node: object) -> list[object]:
     return []
 
 
+def _first_unreachable(
+    stmts: list[object],
+    filename: str,
+    lines: list[str],
+) -> Violation | None:
+    """Return the first unreachable-code violation in *stmts*, or None."""
+    for i, stmt in enumerate(stmts):
+        if stmt.type not in _TERMINAL_TYPES or i + 1 >= len(stmts):  # type: ignore[attr-defined]
+            continue
+        next_stmt = stmts[i + 1]
+        line_idx: int = next_stmt.start_point[0]  # type: ignore[attr-defined]
+        src_line = lines[line_idx] if line_idx < len(lines) else ''
+        if _DISABLE_COMMENT in src_line:
+            return None
+        stmt_label = stmt.type.replace('_statement', '')  # type: ignore[attr-defined]
+        return (filename, line_idx + 1, f'unreachable code after {stmt_label}')
+    return None
+
+
 def _check_statements(
     stmts: list[object],
     filename: str,
     lines: list[str],
 ) -> list[Violation]:
     """Return violations for unreachable statements following a terminal node."""
-    violations: list[Violation] = []
-    for i, stmt in enumerate(stmts):
-        if stmt.type in _TERMINAL_TYPES and i + 1 < len(stmts):  # type: ignore[attr-defined]
-            next_stmt = stmts[i + 1]
-            line_idx: int = next_stmt.start_point[0]  # type: ignore[attr-defined]
-            src_line = lines[line_idx] if line_idx < len(lines) else ''
-            if _DISABLE_COMMENT in src_line:
-                break
-            stmt_label = stmt.type.replace('_statement', '')  # type: ignore[attr-defined]
-            violations.append(
-                (filename, line_idx + 1, f'unreachable code after {stmt_label}'),
-            )
-            break  # report only the first dead statement per block
-    return violations
+    violation = _first_unreachable(stmts, filename, lines)
+    return [violation] if violation else []
 
 
 def _walk(node: object, filename: str, lines: list[str]) -> list[Violation]:

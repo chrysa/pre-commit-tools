@@ -49,25 +49,25 @@ class _UnreachableVisitor(ast.NodeVisitor):
     def _visit_body(self, body: list[ast.stmt]) -> None:
         self.violations.extend(_check_body(body, self._filename, self._source_lines))
 
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        self._visit_body(node.body)
+    def _visit_simple_body(self, node: ast.AST) -> None:
+        """Visit a node whose only relevant child is ``node.body``."""
+        self._visit_body(getattr(node, 'body', []))
         self.generic_visit(node)
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        self._visit_simple_body(node)
 
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
-        self._visit_body(node.body)
-        self.generic_visit(node)
+        self._visit_simple_body(node)
 
     def visit_For(self, node: ast.For) -> None:
-        self._visit_body(node.body)
-        self.generic_visit(node)
+        self._visit_simple_body(node)
 
     def visit_AsyncFor(self, node: ast.AsyncFor) -> None:
-        self._visit_body(node.body)
-        self.generic_visit(node)
+        self._visit_simple_body(node)
 
     def visit_While(self, node: ast.While) -> None:
-        self._visit_body(node.body)
-        self.generic_visit(node)
+        self._visit_simple_body(node)
 
     def visit_If(self, node: ast.If) -> None:
         self._visit_body(node.body)
@@ -76,12 +76,10 @@ class _UnreachableVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_With(self, node: ast.With) -> None:
-        self._visit_body(node.body)
-        self.generic_visit(node)
+        self._visit_simple_body(node)
 
     def visit_AsyncWith(self, node: ast.AsyncWith) -> None:
-        self._visit_body(node.body)
-        self.generic_visit(node)
+        self._visit_simple_body(node)
 
     def visit_Try(self, node: ast.Try) -> None:
         self._visit_body(node.body)

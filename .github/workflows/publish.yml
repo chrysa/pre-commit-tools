@@ -51,10 +51,10 @@ jobs:
             - uses: actions/setup-python@v6
               with:
                   python-version: '3.14'  # keep in sync with config job in ci.yml
-            - name: Update version in setup.cfg
+            - name: Update version in pyproject.toml
               shell: bash
               run: |
-                  sed -i "s/^version = .*/version = ${{ needs.version.outputs.majorMinorPatch }}/" setup.cfg
+                  sed -i "s/^version = .*/version = \"${{ needs.version.outputs.majorMinorPatch }}\"/" pyproject.toml
             - name: Install build
               shell: bash
               run: pip install build

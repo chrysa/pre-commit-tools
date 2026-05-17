@@ -75,8 +75,6 @@ exclude = ["tests*", "testing*"]
 omit = [
     "pre_commit_hooks/pylint_report_html.py",
     "pre_commit_hooks/tools/update_readme.py",
-    "pre_commit_hooks/format_dockerfile.py",
-    "pre_commit_hooks/tools/pre_commit_tools.py",
 ]
 
 [tool.pytest.ini_options]

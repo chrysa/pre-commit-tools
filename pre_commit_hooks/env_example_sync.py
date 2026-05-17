@@ -9,7 +9,7 @@ import re
 from collections.abc import Sequence
 from pathlib import Path
 
-_KEY_RE = re.compile(r'^([A-Za-z_][A-Za-z0-9_]*)\s*=', re.MULTILINE)
+_KEY_RE = re.compile(r'^([A-Za-z_]\w*)\s*=', re.MULTILINE)
 _COMMENT_RE = re.compile(r'^\s*#')
 
 

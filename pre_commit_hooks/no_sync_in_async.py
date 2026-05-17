@@ -12,19 +12,23 @@ from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 
 Violation = tuple[str, int, str]
 
+# Reuse messages to avoid duplication (S1192)
+_MSG_USE_HTTPX = 'use httpx.AsyncClient or aiohttp'
+_MSG_USE_ASYNCIO_SUBPROCESS = 'use asyncio.create_subprocess_exec'
+
 # Blocking calls that should not appear inside async functions
 _BLOCKING_CALLS: dict[str, str] = {
     'time.sleep': 'use asyncio.sleep instead',
-    'requests.get': 'use httpx.AsyncClient or aiohttp',
-    'requests.post': 'use httpx.AsyncClient or aiohttp',
-    'requests.put': 'use httpx.AsyncClient or aiohttp',
-    'requests.delete': 'use httpx.AsyncClient or aiohttp',
-    'requests.patch': 'use httpx.AsyncClient or aiohttp',
-    'requests.request': 'use httpx.AsyncClient or aiohttp',
-    'urllib.request.urlopen': 'use httpx.AsyncClient or aiohttp',
-    'subprocess.run': 'use asyncio.create_subprocess_exec',
-    'subprocess.call': 'use asyncio.create_subprocess_exec',
-    'subprocess.check_output': 'use asyncio.create_subprocess_exec',
+    'requests.get': _MSG_USE_HTTPX,
+    'requests.post': _MSG_USE_HTTPX,
+    'requests.put': _MSG_USE_HTTPX,
+    'requests.delete': _MSG_USE_HTTPX,
+    'requests.patch': _MSG_USE_HTTPX,
+    'requests.request': _MSG_USE_HTTPX,
+    'urllib.request.urlopen': _MSG_USE_HTTPX,
+    'subprocess.run': _MSG_USE_ASYNCIO_SUBPROCESS,
+    'subprocess.call': _MSG_USE_ASYNCIO_SUBPROCESS,
+    'subprocess.check_output': _MSG_USE_ASYNCIO_SUBPROCESS,
     'input': 'use aioconsole or run_in_executor',
 }
 

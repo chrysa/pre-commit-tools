@@ -251,4 +251,3 @@ class TestFormatDockerfileClass:
         fd.load_dockerfile(dockerfile_path=Path(f))
         fd.format_file()
         assert 'HEALTHCHECK' in fd.content
-

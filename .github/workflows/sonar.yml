@@ -27,13 +27,13 @@ jobs:
           fetch-depth: 0
 
       - name: SonarCloud scan
-        uses: chrysa/github-actions/sonar-scan@v1
+        uses: chrysa/github-actions/sonar-scan-python@v1
         with:
-          latest-python: "3.14"
+          python-version: "3.14"
           sonar-token: ${{ secrets.SONAR_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           project-key: chrysa_pre-commit-tools
           organization: chrysa
           project-name: pre-commit-tools
-          sources: .
+          sources: pre_commit_hooks
           tests: tests

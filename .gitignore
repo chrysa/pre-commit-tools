@@ -13,3 +13,6 @@ dist/
 .ci-backup-*/
 .gitnexus
 guideline-report.html
+
+# CodeGraph (local index — never commit)
+.codegraph/

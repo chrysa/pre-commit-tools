@@ -184,3 +184,11 @@ except:
 4. Write tests in `tests/test_my_hook.py`
 5. Run `ruff check` + `pytest` — both must pass
 6. Add documentation in `README.md`
+
+---
+
+## Structure Rules (from Notion Engineering Standards 2026-05-21)
+
+- **One class per file.** Each class lives in its own module (e.g. `models/user.py` contains only `User`).
+- **Domain-driven structure.** Organise by domain (`connectors/`, `services/`, `schemas/`) — not by layer.
+- **No `print()` in production.** Use `structlog` or `logging` with JSON formatter.

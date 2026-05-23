@@ -35,17 +35,17 @@ class PatternDetection:
         logger.debug(f'{line} | disabled -> {bool(self.disable_comment.search(line))}')
         return bool(self.disable_comment.search(line))
 
-    def detect(self, *, argv: Sequence[str] | None = None) -> int:
+    def detect(self, *, argv: Sequence[str] | None = None, help_msg: str = 'detect pattern in files') -> int:
         """Run detection across all files and return 1 if a violation is found."""
         tools_instance = PreCommitTools()
-        tools_instance.set_params(help_msg='search print on python code')
+        tools_instance.set_params(help_msg=help_msg)
         namespace_args, _ = tools_instance.get_args(
             argv=argv if argv is not None else [],
         )
         ret_val: int = 0
         for file in namespace_args.filenames:
             file_path = Path(file)
-            with open(file_path) as stream:
+            with open(file_path, encoding='utf-8') as stream:
                 logger.debug(f'process file {file_path}')
                 for line_number, line_content in enumerate(stream.readlines()):
                     if (

@@ -75,6 +75,14 @@ class TestDetectHardcodedSecrets:
         assert len(result) == 1
         assert label in result[0][2]
 
+    def test_js_comment_line_not_flagged(self) -> None:
+        src = '// const apiKey = "abc1234567890";\n'  # gitleaks:allow
+        assert detect_hardcoded_secrets(src, 'f.ts') == []
+
+    def test_jsdoc_line_not_flagged(self) -> None:
+        src = ' * @example apiKey = "abc1234567890"\n'  # gitleaks:allow
+        assert detect_hardcoded_secrets(src, 'f.ts') == []
+
 
 class TestTsHardcodedSecretMain:
     def test_clean_file_returns_0(self, tmp_path: Path) -> None:

@@ -19,19 +19,6 @@
 - Prefer make targets when available instead of invoking tooling ad hoc.
 - Never commit secrets, credentials or environment-specific values.
 
-## Automation & Industrialization (NON-NEGOTIABLE)
-
-- Projects must be **maximally automated and industrialized**.
-- Every repetitive task must be covered by one of: CI/CD pipeline, Makefile target, pre-commit hook, GitHub Actions workflow, or a bot/script.
-- Required automation baseline for any project:
-  - **CI/CD**: automated lint, type-check, tests, build on every push/PR.
-  - **Formatting**: auto-applied via pre-commit or CI (no manual `ruff`/`prettier` runs).
-  - **Releases**: automated versioning and changelog generation (e.g. `cliff`, `semantic-release`).
-  - **Dependency updates**: automated via Dependabot or Renovate.
-  - **Secret scanning**: automated on every commit (pre-commit hook + CI step).
-- When proposing or implementing a feature, always include the automation layer (tests, CI step, Makefile target) — not just the code.
-- Any manual step that could be automated is considered **technical debt** and must be tracked.
-
 ## Canonical Templates & Shared Tooling
 
 ### React applications
@@ -52,46 +39,3 @@
   1. Analyse the issue and propose a solution on the upstream repo.
   2. Once the solution is validated (human approval), automatically unblock the dependent issue/PR in the requesting repo.
 - This workflow is aspirational — track automation gaps as issues on the relevant repos.
-
-## Claude Interoperability
-
-- This repository is also prepared for Claude Code via `.claude/` and `CLAUDE.md`.
-- Claude skills are available under `.claude/skills/` for relevant tasks.
-- If a task has repository instructions, those instructions override generic defaults.
-
-## Quality Thresholds
-
-- Max function length: 50 lines when practical.
-- Max file length: 500 lines when practical.
-- Max cyclomatic complexity: 10.
-- Lint warnings target: 0.
-
-## Regression Prevention (NON-NEGOTIABLE)
-
-Before marking **any** task or sub-task as done, the agent MUST verify that no regression has been introduced.
-
-### Required checks — run in order
-
-1. **Tests** — `make test` (or equivalent): number of passing tests must be **≥ baseline** (count before the change). Zero new failures allowed.
-2. **Coverage** — coverage percentage must be **≥ baseline**. Never decrease. If no baseline exists, record the current value as baseline.
-3. **Lint** — `make lint` (or `ruff check` / `eslint`): warning count must be **= 0**. No increase tolerated.
-4. **Types** — `mypy` / `tsc --noEmit`: error count must be **≤ baseline**. No new type errors allowed.
-5. **Build** — `make build` must exit 0 when applicable.
-
-### Procedure
-
-- Record baseline metrics **before** starting the task (tests passing, coverage %, lint count, type errors).
-- After each implementation step, re-run the relevant checks.
-- **If any check regresses**: stop, fix the regression, re-run all checks before continuing.
-- Do NOT proceed to the next task if any gate is red.
-
-### Reporting
-
-After completing a task, always report:
-```
-Tests : <N> passed (baseline <N>) ✓/✗
-Coverage: <X>% (baseline <X>%) ✓/✗
-Lint    : 0 warnings ✓/✗
-Types   : 0 errors ✓/✗
-Build   : ok ✓/✗
-```

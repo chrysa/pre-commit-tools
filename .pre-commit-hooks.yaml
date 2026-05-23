@@ -6,6 +6,15 @@
   name: ADR gate -- require DECISIONS.md on architecture changes
   pass_filenames: true
   types: ["text"]
+- id: detect-duplicated-copilot-instructions
+  description: detect sections in per-repo copilot-instructions.md already present in workspace-level instructions
+  entry: detect-duplicated-copilot-instructions
+  files: '\.github/copilot-instructions\.md$'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect duplicated copilot-instructions sections
+  pass_filenames: true
+  types: [markdown]
 - id: format-dockerfiles
   additional_dependencies:
     - dockerfile-parse

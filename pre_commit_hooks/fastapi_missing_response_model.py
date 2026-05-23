@@ -36,6 +36,18 @@ def _has_keyword(node: ast.Call, keyword: str) -> bool:
     return any(kw.arg == keyword for kw in node.keywords)
 
 
+# HTTP status codes that legitimately have no response body
+_NO_BODY_STATUS_CODES: frozenset[int] = frozenset({204, 301, 302, 303, 304})
+
+
+def _status_code_has_no_body(dec: ast.Call) -> bool:
+    """Return True if the route declares a status code that carries no body."""
+    for kw in dec.keywords:
+        if kw.arg == 'status_code' and isinstance(kw.value, ast.Constant):
+            return int(kw.value.value) in _NO_BODY_STATUS_CODES
+    return False
+
+
 def _check_decorator_violation(
     dec: ast.Call,
     node: ast.FunctionDef | ast.AsyncFunctionDef,
@@ -49,6 +61,8 @@ def _check_decorator_violation(
     if method not in _ROUTE_METHODS:
         return None
     if _has_keyword(dec, 'response_model'):
+        return None
+    if _status_code_has_no_body(dec):
         return None
     if _is_disable_comment(lines, dec.lineno):
         return None

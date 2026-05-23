@@ -15,6 +15,8 @@ Violation = tuple[str, int, str]
 # Reuse messages to avoid duplication (S1192)
 _MSG_USE_HTTPX = 'use httpx.AsyncClient or aiohttp'
 _MSG_USE_ASYNCIO_SUBPROCESS = 'use asyncio.create_subprocess_exec'
+_MSG_USE_AIOFILES = 'use aiofiles or run_in_executor'
+_MSG_USE_ASYNC_HTTPX = 'use httpx.AsyncClient instead (sync httpx used)'
 
 # Blocking calls that should not appear inside async functions
 _BLOCKING_CALLS: dict[str, str] = {
@@ -30,6 +32,15 @@ _BLOCKING_CALLS: dict[str, str] = {
     'subprocess.call': _MSG_USE_ASYNCIO_SUBPROCESS,
     'subprocess.check_output': _MSG_USE_ASYNCIO_SUBPROCESS,
     'input': 'use aioconsole or run_in_executor',
+    'open': _MSG_USE_AIOFILES,
+    'os.system': _MSG_USE_ASYNCIO_SUBPROCESS,
+    'os.popen': _MSG_USE_ASYNCIO_SUBPROCESS,
+    'httpx.get': _MSG_USE_ASYNC_HTTPX,
+    'httpx.post': _MSG_USE_ASYNC_HTTPX,
+    'httpx.put': _MSG_USE_ASYNC_HTTPX,
+    'httpx.delete': _MSG_USE_ASYNC_HTTPX,
+    'httpx.patch': _MSG_USE_ASYNC_HTTPX,
+    'httpx.request': _MSG_USE_ASYNC_HTTPX,
 }
 
 

@@ -93,6 +93,19 @@ class TestDetectMissingResponseModel:
     def test_syntax_error_returns_empty(self) -> None:
         assert detect_missing_response_model('def (:', 'bad.py') == []
 
+    def test_204_status_code_not_flagged(self) -> None:
+        src = '@app.delete("/items/{id}", status_code=204)\nasync def delete_item():\n    return None\n'
+        assert detect_missing_response_model(src, 'f.py') == []
+
+    def test_301_redirect_not_flagged(self) -> None:
+        src = '@app.get("/old", status_code=301)\nasync def redirect():\n    pass\n'
+        assert detect_missing_response_model(src, 'f.py') == []
+
+    def test_200_status_code_still_flagged(self) -> None:
+        src = '@app.get("/items", status_code=200)\nasync def get_items():\n    return []\n'
+        violations = detect_missing_response_model(src, 'f.py')
+        assert len(violations) == 1
+
 
 class TestFastapiMissingResponseModelMain:
     def test_violation_returns_1(self, tmp_path: Path) -> None:

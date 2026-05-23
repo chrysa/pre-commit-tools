@@ -207,3 +207,9 @@ repos:
       - id: conventional-pre-commit
         stages: [commit-msg]
         args: [feat, fix, docs, style, refactor, test, chore, perf, revert, ci]
+
+  - repo: https://github.com/chrysa/pre-commit-tools
+    rev: v0.1.1-76
+    hooks:
+      - id: regression-gate
+        stages: [pre-push]

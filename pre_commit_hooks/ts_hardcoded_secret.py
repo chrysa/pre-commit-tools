@@ -46,12 +46,14 @@ _SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ),
 ]
 
-# Lines where the value is clearly env-based — skip these
+# Lines where the value is clearly env-based or commented-out — skip these
 _SAFE_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r'process\.env'),
     re.compile(r'import\.meta\.env'),
     re.compile(r'getenv|getEnv'),
     re.compile(r'process\.env\['),
+    re.compile(r'^\s*//'),  # JS/TS single-line comment
+    re.compile(r'^\s*\*'),  # JSDoc block comment line
 ]
 
 Violation = tuple[str, int, str]

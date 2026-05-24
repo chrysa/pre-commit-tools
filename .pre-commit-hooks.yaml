@@ -6,6 +6,15 @@
   name: ADR gate -- require DECISIONS.md on architecture changes
   pass_filenames: true
   types: ["text"]
+- id: detect-duplicated-copilot-instructions
+  description: detect sections in per-repo copilot-instructions.md already present in workspace-level instructions
+  entry: detect-duplicated-copilot-instructions
+  files: '\.github/copilot-instructions\.md$'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect duplicated copilot-instructions sections
+  pass_filenames: true
+  types: [markdown]
 - id: format-dockerfiles
   additional_dependencies:
     - dockerfile-parse
@@ -43,6 +52,7 @@
 - id: python-print-detection
   description: detect print() calls in Python files
   entry: print-detection
+  exclude: 'tests?/'
   files: .py$
   language: python
   minimum_pre_commit_version: '4.1.0'
@@ -51,6 +61,7 @@
 - id: python-pprint-detection
   description: detect pprint() calls in Python files
   entry: pprint-detection
+  exclude: 'tests?/'
   files: .py$
   language: python
   minimum_pre_commit_version: '4.1.0'
@@ -273,10 +284,10 @@
   name: detect hardcoded secrets in TypeScript/JavaScript
   types_or: ["javascript", "ts", "tsx", "file"]
 - id: helm-lint
-  description: run helm lint --strict on all charts in charts/<namespace>/<service>/ (requires helm in PATH)
-  entry: bash -c 'find charts -mindepth 2 -maxdepth 2 -type d | while read d; do helm lint "$d" --strict || exit 1; done'
+  description: run helm lint --strict on charts/<namespace>/<service>/ directories (gracefully skips if helm not in PATH)
+  entry: helm-lint
   files: ^charts/
-  language: system
+  language: python
   minimum_pre_commit_version: '4.1.0'
   name: helm lint (charts/)
   pass_filenames: false
@@ -296,3 +307,27 @@
   name: regression gate (coverage + tests vs baseline)
   pass_filenames: false
   stages: [pre-push]
+- id: no-hardcoded-localhost
+  description: detect hardcoded localhost/127.0.0.1 URLs in source files
+  entry: no-hardcoded-localhost
+  exclude: 'tests?/|\.test\.|\.spec\.'
+  files: \.(py|ts|tsx|js|jsx)$
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect hardcoded localhost URLs
+  types_or: ["python", "ts", "tsx", "javascript", "file"]
+- id: fastapi-missing-links
+  description: detect FastAPI routes whose response model lacks a 'links' field (HATEOAS)
+  entry: fastapi-missing-links
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect FastAPI response models missing links field (HATEOAS)
+  types: ["python"]
+- id: react-no-async-in-useeffect
+  description: detect async function passed directly to useEffect() in React files
+  entry: react-no-async-in-useeffect
+  files: \.(tsx|jsx)$
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect async useEffect (use useCallback + useEffect instead)
+  types_or: ["tsx", "jsx", "file"]

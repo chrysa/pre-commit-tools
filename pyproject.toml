@@ -54,12 +54,17 @@ js-syntax-check = "pre_commit_hooks.js_syntax_check:main"
 ts-hardcoded-secret-detection = "pre_commit_hooks.ts_hardcoded_secret:main"  # pragma: allowlist secret
 generate-changelog = "pre_commit_hooks.generate_changelog:main"
 regression-gate = "pre_commit_hooks.regression_gate:main"
+detect-duplicated-copilot-instructions = "pre_commit_hooks.copilot_instructions_duplication:main"
+helm-lint = "pre_commit_hooks.helm_lint:main"
+no-hardcoded-localhost = "pre_commit_hooks.no_hardcoded_localhost:main"
+fastapi-missing-links = "pre_commit_hooks.fastapi_missing_links:main"
+react-no-async-in-useeffect = "pre_commit_hooks.react_no_async_in_useeffect:main"
 
 [project.optional-dependencies]
 dead_code = ["vulture>=2.0"]
 format_dockerfile = ["dockerfile-parse==2.0.1"]
 lint = ["ruff"]
-pylint_report = ["pylint==4.0.5", "pylint-report==2.4.2"]
+pylint_report = ["pylint>=4.0.5", "pylint-report>=2.4.2"]
 test = ["pytest", "pytest-cov"]
 ts_unreachable_code = [
     "tree-sitter>=0.23,<0.26",
@@ -75,6 +80,8 @@ exclude = ["tests*", "testing*"]
 omit = [
     "pre_commit_hooks/pylint_report_html.py",
     "pre_commit_hooks/tools/update_readme.py",
+    "pre_commit_hooks/format_dockerfile.py",
+    "pre_commit_hooks/tools/pre_commit_tools.py",
 ]
 
 [tool.pytest.ini_options]

@@ -49,11 +49,12 @@ jobs:
         timeout-minutes: 15
         steps:
             - uses: actions/checkout@v6
-            - uses: actions/setup-python@v6
+            - uses: chrysa/github-actions/python-setup@v1
               with:
                   python-version: ${{ needs.config.outputs.latest-python }}
-            - name: Install package for system hooks
-              run: pip install -e '.[yaml,format_dockerfile,ts_unreachable_code]'
+            - uses: chrysa/github-actions/install-project@v1
+              with:
+                  extras: yaml,format_dockerfile,ts_unreachable_code
             - uses: pre-commit/action@v3.0.1
               env:
                   SKIP: no-commit-to-branch

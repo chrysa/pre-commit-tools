@@ -211,5 +211,8 @@ repos:
   - repo: https://github.com/chrysa/pre-commit-tools
     rev: v0.1.1-76
     hooks:
+      - id: adr-gate
+      - id: no-bare-except
+      - id: no-sync-in-async
       - id: regression-gate
         stages: [pre-push]

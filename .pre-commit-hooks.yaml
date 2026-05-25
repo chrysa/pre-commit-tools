@@ -331,3 +331,52 @@
   minimum_pre_commit_version: '4.1.0'
   name: detect async useEffect (use useCallback + useEffect instead)
   types_or: ["tsx", "jsx", "file"]
+- id: dockerfile-multi-stage-check
+  description: detect Dockerfiles that do not use a multi-stage build (fewer than 2 FROM stages)
+  entry: dockerfile-multi-stage-check
+  files: '(^|/)Dockerfile[^/]*$'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect missing multi-stage build in Dockerfiles
+  types_or: ["dockerfile", "file"]
+- id: dockerfile-healthcheck
+  description: detect Dockerfiles missing a HEALTHCHECK instruction in the final stage
+  entry: dockerfile-healthcheck
+  files: '(^|/)Dockerfile[^/]*$'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect missing HEALTHCHECK in Dockerfiles
+  types_or: ["dockerfile", "file"]
+- id: dockerfile-non-root-user
+  description: detect Dockerfiles where the final stage runs as root (no USER or USER root)
+  entry: dockerfile-non-root-user
+  files: '(^|/)Dockerfile[^/]*$'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect root user in Dockerfile final stage
+  types_or: ["dockerfile", "file"]
+- id: ts-no-any
+  description: 'detect explicit `any` type usage (`: any`, `as any`, `<any>`) in TypeScript files'
+  entry: ts-no-any
+  exclude: 'tests?/|\.test\.|\.spec\.'
+  files: \.(ts|tsx)$
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect `any` type in TypeScript
+  types_or: ["ts", "tsx", "file"]
+- id: react-no-inline-styles
+  description: detect `style={{...}}` inline styles in React/JSX/TSX files
+  entry: react-no-inline-styles
+  files: \.(tsx|jsx)$
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect inline styles in React components
+  types_or: ["tsx", "jsx", "file"]
+- id: python-no-type-ignore
+  description: 'detect `# type: ignore` without a justification comment in Python files'
+  entry: python-no-type-ignore
+  files: \.py$
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: 'detect bare # type: ignore without justification'
+  types: ["python"]

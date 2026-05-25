@@ -58,6 +58,12 @@ helm-lint = "pre_commit_hooks.helm_lint:main"
 no-hardcoded-localhost = "pre_commit_hooks.no_hardcoded_localhost:main"
 fastapi-missing-links = "pre_commit_hooks.fastapi_missing_links:main"
 react-no-async-in-useeffect = "pre_commit_hooks.react_no_async_in_useeffect:main"
+dockerfile-multi-stage-check = "pre_commit_hooks.dockerfile_multi_stage_check:main"
+dockerfile-healthcheck = "pre_commit_hooks.dockerfile_healthcheck:main"
+dockerfile-non-root-user = "pre_commit_hooks.dockerfile_non_root_user:main"
+ts-no-any = "pre_commit_hooks.ts_no_any:main"
+react-no-inline-styles = "pre_commit_hooks.react_no_inline_styles:main"
+python-no-type-ignore = "pre_commit_hooks.python_no_type_ignore:main"
 
 [project.optional-dependencies]
 dead_code = ["vulture>=2.0"]

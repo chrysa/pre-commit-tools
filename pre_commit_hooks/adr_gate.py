@@ -33,6 +33,22 @@ def get_added_files() -> list[str]:
     return [f for f in result.stdout.splitlines() if f]
 
 
+def get_all_staged_files() -> list[str]:
+    """Return all filenames currently staged in the index (any diff-filter).
+
+    Used to check for DECISIONS.md directly in the git index, bypassing
+    pre-commit's argv filtering which can exclude files when earlier hooks
+    (e.g. ruff-format) modify the working tree before adr-gate runs.
+    """
+    result = subprocess.run(
+        ['git', 'diff', '--cached', '--name-only'],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return [f for f in result.stdout.splitlines() if f]
+
+
 def matches_any_pattern(filepath: str, patterns: list[str]) -> bool:
     """Return True if filepath matches any fnmatch pattern (full path or basename)."""
     name = Path(filepath).name
@@ -50,13 +66,14 @@ def check_adr_gate(
     trigger_patterns: list[str],
     decisions_file: str = 'DECISIONS.md',
     warn_only: bool = False,
+    all_staged_files: list[str] | None = None,
 ) -> int:
     """Run the ADR gate check.
 
     Parameters
     ----------
     staged_files:
-        All files currently staged (from pre-commit argv).
+        Files passed by pre-commit (filtered by the hook's types/files config).
     added_files:
         Files staged as newly added (git diff-filter A).
     trigger_patterns:
@@ -65,6 +82,10 @@ def check_adr_gate(
         Path to the decisions file to check (default: DECISIONS.md).
     warn_only:
         When True, print the warning but return 0 instead of 1.
+    all_staged_files:
+        All files staged in the git index (from git diff --cached --name-only).
+        When provided, used as a fallback to detect decisions_file even if
+        pre-commit's argv filtering excluded it (e.g. after ruff-format runs).
 
     Returns
     -------
@@ -75,7 +96,14 @@ def check_adr_gate(
     if not triggered:
         return 0
 
-    if decisions_file in staged_files:
+    # Check pre-commit argv first, then fall back to the full git index.
+    # This fixes a false negative where ruff-format (or any hook that modifies
+    # the working tree) runs before adr-gate and causes pre-commit to rebuild
+    # the staged-file list, potentially dropping DECISIONS.md from argv.
+    decisions_is_staged = decisions_file in staged_files or (
+        all_staged_files is not None and decisions_file in all_staged_files
+    )
+    if decisions_is_staged:
         return 0
 
     print('[adr-gate] Architecture-sensitive files detected:')  # print-detection: disable
@@ -115,6 +143,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     trigger_patterns = [p.strip() for p in args.trigger_patterns.split(',') if p.strip()]
     added = get_added_files()
+    all_staged = get_all_staged_files()
 
     return check_adr_gate(
         staged_files=args.filenames,
@@ -122,6 +151,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         trigger_patterns=trigger_patterns,
         decisions_file=args.decisions_file,
         warn_only=args.warn_only,
+        all_staged_files=all_staged,
     )
 
 

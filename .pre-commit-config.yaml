@@ -4,11 +4,6 @@ default_language_version:
 fail_fast: false
 minimum_pre_commit_version: 4.1.0
 repos:
-  - repo: https://github.com/asottile/setup-cfg-fmt
-    rev: v3.2.0
-    hooks:
-      - id: setup-cfg-fmt
-
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
@@ -74,25 +69,6 @@ repos:
         args: [--config=config-tools/ruff.toml, --fix]
       - id: ruff-format
         args: [--config=config-tools/ruff.toml]
-
-  - repo: https://github.com/pre-commit/mirrors-pylint
-    rev: v3.0.0a5
-    hooks:
-      - id: pylint
-        args:
-          - --rcfile=setup.cfg
-          - --reports=no
-          - --persistent=no
-          - --score=no
-          - --disable=E0401
-        stages: [manual]
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.1.0
-    hooks:
-      - id: mypy
-        args: [--config-file=setup.cfg]
-        stages: [manual]
 
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0

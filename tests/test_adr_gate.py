@@ -212,3 +212,73 @@ class TestGetAllStagedFiles:
         """get_all_staged_files() always returns a list (even outside a git repo)."""
         result = get_all_staged_files()
         assert isinstance(result, list)
+
+
+class TestMain:
+    """Tests for main() — argparse wiring and subprocess delegation."""
+
+    def _run(self, argv: list[str], added: list[str], all_staged: list[str]) -> int:
+        from unittest.mock import patch
+
+        from pre_commit_hooks.adr_gate import main
+
+        with (
+            patch('pre_commit_hooks.adr_gate.get_added_files', return_value=added),
+            patch('pre_commit_hooks.adr_gate.get_all_staged_files', return_value=all_staged),
+        ):
+            return main(argv)
+
+    def test_no_trigger_returns_0(self) -> None:
+        """main() returns 0 when no architecture-sensitive files are added."""
+        qg = self._run(['some_file.txt'], added=['some_file.txt'], all_staged=['some_file.txt'])
+        assert qg == 0
+
+    def test_trigger_without_decisions_returns_1(self) -> None:
+        """main() returns 1 when a trigger file is added without DECISIONS.md."""
+        qg = self._run(
+            ['pyproject.toml'],
+            added=['pyproject.toml'],
+            all_staged=['pyproject.toml'],
+        )
+        assert qg == 1
+
+    def test_trigger_with_decisions_returns_0(self) -> None:
+        """main() returns 0 when a trigger file is added with DECISIONS.md staged."""
+        qg = self._run(
+            ['pyproject.toml', 'DECISIONS.md'],
+            added=['pyproject.toml'],
+            all_staged=['pyproject.toml', 'DECISIONS.md'],
+        )
+        assert qg == 0
+
+    def test_warn_only_flag_returns_0(self) -> None:
+        """main() with --warn-only returns 0 even if DECISIONS.md is missing."""
+        qg = self._run(
+            ['pyproject.toml', '--warn-only'],
+            added=['pyproject.toml'],
+            all_staged=['pyproject.toml'],
+        )
+        assert qg == 0
+
+    def test_custom_decisions_file(self) -> None:
+        """main() respects --decisions-file argument."""
+        qg = self._run(
+            ['pyproject.toml', '--decisions-file', 'CHANGELOG.md'],
+            added=['pyproject.toml'],
+            all_staged=['pyproject.toml', 'CHANGELOG.md'],
+        )
+        assert qg == 0
+
+    def test_custom_trigger_patterns(self) -> None:
+        """main() respects --trigger-patterns argument."""
+        qg = self._run(
+            ['custom_arch.py', '--trigger-patterns', 'custom_arch.py'],
+            added=['custom_arch.py'],
+            all_staged=['custom_arch.py'],
+        )
+        assert qg == 1
+
+    def test_no_filenames_returns_0(self) -> None:
+        """main() with no filenames (empty argv) returns 0 — nothing staged."""
+        qg = self._run([], added=[], all_staged=[])
+        assert qg == 0

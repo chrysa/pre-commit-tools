@@ -42,7 +42,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         try:
             with open(filename, encoding='utf-8') as f:
                 source = f.read()
-        except OSError, UnicodeDecodeError:
+        except (OSError, UnicodeDecodeError):
             continue
         for fname, lineno, msg in detect_from_latest(source, filename):
             print(f'{fname}:{lineno}: {msg}')

@@ -108,7 +108,7 @@ class QualityGate:
         try:
             d = json.loads(output)
             return sum(len(v) for v in d.get('results', {}).values())
-        except json.JSONDecodeError, AttributeError, ValueError:
+        except (json.JSONDecodeError, AttributeError, ValueError):
             pass
         match = re.search(r'secrets?\s+found[:\s]+(\d+)', output, re.IGNORECASE)
         if match:

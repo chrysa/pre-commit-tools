@@ -84,7 +84,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     for filename in args.filenames:
         try:
             source = Path(filename).read_text(encoding='utf-8')
-        except OSError, UnicodeDecodeError:
+        except (OSError, UnicodeDecodeError):
             continue
         for fname, lineno, msg in detect_hardcoded_secrets(source, filename):
             print(f'{fname}:{lineno}: {msg}')  # print-detection: disable

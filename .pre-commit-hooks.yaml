@@ -380,3 +380,11 @@
   minimum_pre_commit_version: '4.1.0'
   name: 'detect bare # type: ignore without justification'
   types: ["python"]
+- id: docs-drift-gate
+  description: regenerate code-derived docs via a make target and block push when they drift from the committed copy
+  entry: docs-drift-gate
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: docs drift gate (regenerate code-derived docs + diff)
+  pass_filenames: false
+  stages: [pre-push]

@@ -291,6 +291,14 @@
   minimum_pre_commit_version: '4.1.0'
   name: helm lint (charts/)
   pass_filenames: false
+- id: makefile-check
+  description: enforce the chrysa archetype-tiered Makefile contract (EXECUTION_STANDARD.md §1)
+  entry: makefile-check
+  files: (^|/)Makefile$
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: makefile contract check
+  pass_filenames: true
 - id: generate-changelog
   description: generate CHANGELOG.md from git history using git-cliff (requires git-cliff in PATH)
   entry: generate-changelog

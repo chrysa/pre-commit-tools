@@ -1,4 +1,5 @@
 #!make
+# makefile-tier: lib
 ifneq (,)
 	$(error This Makefile requires GNU Make)
 endif
@@ -118,8 +119,6 @@ quality-gate-verify: ## Verify no regression since baseline
 	@python3 scripts/quality_gate.py verify
 
 # ─── Compat aliases ───────────────────────────────────────────────────────────
-
-type-check: typecheck ## Legacy alias
 
 dev: ## Start development environment (install package in editable mode)
 	pip install -e .[dev]

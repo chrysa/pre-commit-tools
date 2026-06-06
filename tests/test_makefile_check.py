@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from pre_commit_hooks.makefile_check import check_makefile, main
@@ -89,6 +90,19 @@ class TestRequiredTargets:
         path = _write(tmp_path, content)
         errors, _ = check_makefile(path)
         assert any('missing required targets' in e and 'typecheck' in e for e in errors)
+
+
+class TestRecommendedTargets:
+    def test_missing_docker_test_is_warning_not_error(self, tmp_path: Path) -> None:
+        # docker-test is recommended for lib, not required: warn, do not fail.
+        content = CONFORMANT_LIB.replace(
+            'docker-test: ## Docker test\n\tdocker build -f Dockerfile.test -t t . && docker run --rm t\n\n',
+            '',
+        ).replace(' docker-test', '')
+        path = _write(tmp_path, content)
+        errors, warnings = check_makefile(path)
+        assert not any('missing required targets' in e for e in errors)
+        assert any('missing recommended targets' in w and 'docker-test' in w for w in warnings)
 
 
 class TestForbiddenNames:
@@ -240,6 +254,14 @@ class TestPhonyAndHelp:
         path = _write(tmp_path, content)
         errors, _ = check_makefile(path)
         assert any('.PHONY' in e for e in errors)
+
+    def test_shell_computed_phony_not_warned(self, tmp_path: Path) -> None:
+        # A `.PHONY: $(shell grep ...)` lists targets dynamically; no warning.
+        dynamic = ".PHONY: $(shell grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | cut -d: -f1)"
+        content = re.sub(r'^\.PHONY:.*$', dynamic, CONFORMANT_LIB, count=1, flags=re.MULTILINE)
+        path = _write(tmp_path, content)
+        _, warnings = check_makefile(path)
+        assert not any('.PHONY does not list' in w for w in warnings)
 
     def test_missing_help_fails(self, tmp_path: Path) -> None:
         content = CONFORMANT_LIB.replace(

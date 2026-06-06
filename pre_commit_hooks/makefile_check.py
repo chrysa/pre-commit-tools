@@ -28,17 +28,12 @@ from pathlib import Path
 
 VALID_TIERS = ('lib', 'python-app', 'fullstack', 'infra')
 
-# Required targets per tier (see EXECUTION_STANDARD.md §1.2 / §1.3).
+# Required targets per tier (see EXECUTION_STANDARD.md §1.2 / §1.3). These must
+# be definable correctly with no extra infrastructure, so they are mandatory.
 _CORE = {'help', 'install', 'lint', 'format', 'test', 'build', 'clean', 'pre-commit'}
-_LIB = _CORE | {'dev', 'typecheck', 'test-cov', 'docker-test'}
-_APP = _LIB | {
-    'docker-up',
-    'docker-down',
-    'quality-gate-baseline',
-    'quality-gate-verify',
-    'ci',
-}
-_FULLSTACK = _APP | {'web-build', 'web-lint', 'web-typecheck', 'e2e'}
+_LIB = _CORE | {'dev', 'typecheck', 'test-cov'}
+_APP = _LIB | {'docker-up', 'docker-down', 'ci'}
+_FULLSTACK = _APP
 _INFRA = _CORE | {'dev'}
 
 REQUIRED_BY_TIER: dict[str, set[str]] = {
@@ -46,6 +41,20 @@ REQUIRED_BY_TIER: dict[str, set[str]] = {
     'python-app': _APP,
     'fullstack': _FULLSTACK,
     'infra': _INFRA,
+}
+
+# Recommended targets per tier (§1.5). These depend on supporting infrastructure
+# (a Dockerfile.test, scripts/quality_gate.py, a wired frontend build), so their
+# absence is a warning, not an error — adopt them as the infra lands.
+_REC_LIB = {'docker-test'}
+_REC_APP = _REC_LIB | {'quality-gate-baseline', 'quality-gate-verify'}
+_REC_FULLSTACK = _REC_APP | {'web-build', 'web-lint', 'web-typecheck', 'e2e'}
+
+RECOMMENDED_BY_TIER: dict[str, set[str]] = {
+    'lib': _REC_LIB,
+    'python-app': _REC_APP,
+    'fullstack': _REC_FULLSTACK,
+    'infra': set(),
 }
 
 # Forbidden target name -> canonical replacement (§1.4).
@@ -177,6 +186,13 @@ def _check_structure(
         if missing:
             errors.append(f"tier '{tier}' is missing required targets: {', '.join(missing)}")
 
+    if tier in RECOMMENDED_BY_TIER:
+        missing_rec = sorted(RECOMMENDED_BY_TIER[tier] - targets)
+        if missing_rec:
+            warnings.append(
+                f"tier '{tier}' is missing recommended targets: {', '.join(missing_rec)}",
+            )
+
     errors.extend(
         f"forbidden target '{bad}' — rename to '{good}'" for bad, good in FORBIDDEN_TARGETS.items() if bad in targets
     )
@@ -187,7 +203,9 @@ def _check_structure(
     phony = _collect_phony(lines)
     if phony is None:
         errors.append('no .PHONY declaration found')
-    else:
+    # A shell-computed .PHONY (e.g. `.PHONY: $(shell grep ... )`) lists every
+    # target dynamically; we cannot resolve it statically, so trust it.
+    elif not any(line.startswith('.PHONY:') and 'shell' in line for line in lines):
         not_phony = sorted(targets - phony - {'help'})
         if not_phony:
             warnings.append(f'.PHONY does not list: {", ".join(not_phony)}')

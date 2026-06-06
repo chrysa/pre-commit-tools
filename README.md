@@ -52,6 +52,7 @@
     - [js-syntax-check](#js-syntax-check)
     - [ts-hardcoded-secret-detection](#ts-hardcoded-secret-detection)
     - [helm-lint](#helm-lint)
+    - [makefile-check](#makefile-check)
     - [generate-changelog](#generate-changelog)
 
 <!--TOC-->
@@ -530,6 +531,26 @@ charts/
 - id: helm-lint
   files: ^charts/
   pass_filenames: false
+```
+
+### makefile-check
+
+Enforce the chrysa archetype-tiered Makefile contract (shared-standards
+`EXECUTION_STANDARD.md` §1). Each Makefile must declare its tier on a marker line:
+
+```makefile
+# makefile-tier: lib        # one of: lib | python-app | fullstack | infra
+```
+
+The hook then fails on: a missing/invalid tier marker, a required target absent for the
+tier, a forbidden target name (`fmt`/`type-check`/`tests`), a legacy `docker-compose <cmd>`
+invocation, a glued `docker compose` typo, a missing `help` target or `.PHONY` line, or a
+lint/test/format rule that references a directory which does not exist. Targets missing from
+`.PHONY` and the absence of `## ` self-documenting comments are reported as warnings.
+
+```yaml
+- id: makefile-check
+  files: (^|/)Makefile$
 ```
 
 ### generate-changelog

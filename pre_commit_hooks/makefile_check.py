@@ -121,30 +121,37 @@ def _expand(token: str, variables: dict[str, str]) -> str:
     return re.sub(r'\$[({](\w+)[)}]', repl, token)
 
 
+def _strip_quotes(text: str) -> str:
+    """Replace quoted spans with a space so their contents are ignored."""
+    return re.sub(r'"[^"]*"|\'[^\']*\'', ' ', text)
+
+
 def _candidate_paths(recipe: str, variables: dict[str, str]) -> list[str]:
-    """Extract path arguments passed to a path-checking tool on a recipe line."""
+    """Extract host path arguments for path-checking tools invoked directly.
+
+    Only tools run *directly on the host* are checked: the tool must be the
+    command being executed (first token of a shell command), never an argument.
+    This deliberately ignores tools inside ``docker exec`` / ``docker compose
+    run`` (their paths are container-side) and package lists like
+    ``pip install pytest-cov`` (those are package names, not paths).
+    """
     paths: list[str] = []
-    # Only inspect up to the first shell separator so we stay on one command.
-    segment = re.split(r'&&|\|\||;', recipe, maxsplit=1)[0]
-    # Drop quoted spans so tool names inside echo strings are not mistaken
-    # for real invocations (e.g. @echo "Run mypy type checking").
-    segment = re.sub(r'"[^"]*"|\'[^\']*\'', ' ', segment)
-    tokens = segment.split()
-    capturing = False
-    for token in tokens:
-        bare = token.lstrip('@-')
-        if bare in PATH_TOOLS:
-            capturing = True
+    # Drop quoted spans, then any trailing shell ``#`` comment.
+    cleaned = _strip_quotes(recipe).split('#', 1)[0]
+    for command in re.split(r'&&|\|\||;|\|', cleaned):
+        tokens = command.split()
+        if not tokens or tokens[0].lstrip('@-') not in PATH_TOOLS:
             continue
-        if not capturing:
-            continue
-        if token.startswith('-') or '=' in token or token in _TOOL_SKIP:
-            continue
-        expanded = _expand(token, variables)
-        if '$' in expanded or any(ch in expanded for ch in '*?<>|"\''):
-            continue
-        if re.fullmatch(r'[A-Za-z0-9_][\w./-]*', expanded):
-            paths.append(expanded.rstrip('/'))
+        for token in tokens[1:]:
+            if token.startswith('-'):
+                break  # positional path args precede flags; stop at first flag
+            if '=' in token or token in _TOOL_SKIP:
+                continue
+            expanded = _expand(token, variables)
+            if '$' in expanded or any(ch in expanded for ch in '*?<>|"\''):
+                continue
+            if re.fullmatch(r'[A-Za-z0-9_][\w./-]*', expanded):
+                paths.append(expanded.rstrip('/'))
     return paths
 
 
@@ -201,9 +208,11 @@ def _check_recipes(lines: list[str], repo_root: Path) -> list[str]:
         recipe = raw.strip()
         if recipe.startswith('#'):
             continue
-        if _LEGACY_DC_RE.search(recipe):
+        # Strip quoted spans so e.g. echo "docker-compose config OK" is ignored.
+        unquoted = _strip_quotes(recipe)
+        if _LEGACY_DC_RE.search(unquoted):
             errors.append(f"legacy 'docker-compose' CLI (use 'docker compose'): {recipe}")
-        if _GLUED_DC_RE.search(recipe):
+        if _GLUED_DC_RE.search(unquoted):
             errors.append(f"glued 'docker compose' typo: {recipe}")
         errors.extend(
             f"rule references missing path '{candidate}': {recipe}"

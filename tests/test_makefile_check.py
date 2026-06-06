@@ -118,6 +118,15 @@ class TestDockerCompose:
         errors, _ = check_makefile(path)
         assert any('glued' in e for e in errors)
 
+    def test_legacy_string_in_echo_not_flagged(self, tmp_path: Path) -> None:
+        content = CONFORMANT_LIB.replace(
+            '\t@echo dev',
+            '\tdocker compose config && echo "docker-compose config OK"',
+        )
+        path = _write(tmp_path, content)
+        errors, _ = check_makefile(path)
+        assert not any('legacy' in e for e in errors)
+
     def test_compose_yml_filename_not_flagged(self, tmp_path: Path) -> None:
         content = CONFORMANT_LIB.replace(
             '\t@echo dev',
@@ -156,6 +165,73 @@ class TestMissingPaths:
         path = _write(tmp_path, content)
         errors, _ = check_makefile(path)
         assert not any('legacy' in e for e in errors)
+
+    def test_tool_inside_docker_exec_not_flagged(self, tmp_path: Path) -> None:
+        # Paths after a tool run *inside* a container are container-side.
+        content = CONFORMANT_LIB.replace(
+            'ruff check $(PKG) tests',
+            'docker exec $(BACKEND) ruff check app',
+        )
+        path = _write(tmp_path, content)
+        errors, _ = check_makefile(path)
+        assert not any('missing path' in e for e in errors)
+
+    def test_tool_inside_docker_compose_run_not_flagged(self, tmp_path: Path) -> None:
+        # `pytest` here is a compose *service* name plus a container command.
+        content = CONFORMANT_LIB.replace(
+            'pytest tests/\n',
+            'docker compose run --rm pytest bash -c "pytest /app/tests"\n',
+            1,
+        )
+        path = _write(tmp_path, content)
+        errors, _ = check_makefile(path)
+        assert not any('missing path' in e for e in errors)
+
+    def test_pip_install_package_list_not_flagged(self, tmp_path: Path) -> None:
+        # Package names after `pip install` are not host paths.
+        content = CONFORMANT_LIB.replace(
+            'pip install -e ".[dev]"',
+            'pip install ruff mypy pytest pytest-cov build twine',
+        )
+        path = _write(tmp_path, content)
+        errors, _ = check_makefile(path)
+        assert not any('missing path' in e for e in errors)
+
+    def test_flag_value_not_flagged_as_path(self, tmp_path: Path) -> None:
+        # The value of a flag (e.g. --browser chromium) is not a path.
+        content = CONFORMANT_LIB.replace(
+            'pytest tests/\n',
+            'pytest tests/ --browser chromium\n',
+            1,
+        )
+        path = _write(tmp_path, content)
+        errors, _ = check_makefile(path)
+        assert not any("missing path 'chromium'" in e for e in errors)
+
+    def test_inline_shell_comment_not_flagged(self, tmp_path: Path) -> None:
+        content = CONFORMANT_LIB.replace(
+            'mypy $(PKG)',
+            'mypy $(PKG) # Run mypy type checking',
+        )
+        path = _write(tmp_path, content)
+        errors, _ = check_makefile(path)
+        assert not any('missing path' in e for e in errors)
+
+    def test_host_run_missing_dir_still_caught(self, tmp_path: Path) -> None:
+        # A tool invoked directly on the host must still be path-checked.
+        content = CONFORMANT_LIB.replace('mypy $(PKG)', 'mypy genealogy_validator')
+        path = _write(tmp_path, content)
+        errors, _ = check_makefile(path)
+        assert any("missing path 'genealogy_validator'" in e for e in errors)
+
+    def test_pipe_to_interpreter_not_flagged(self, tmp_path: Path) -> None:
+        content = CONFORMANT_LIB.replace(
+            'ruff check $(PKG) tests',
+            'ruff check $(PKG) | python3 -c "import sys"',
+        )
+        path = _write(tmp_path, content)
+        errors, _ = check_makefile(path)
+        assert not any("missing path 'python3'" in e for e in errors)
 
 
 class TestPhonyAndHelp:

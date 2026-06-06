@@ -2,6 +2,11 @@ FROM python:3.14-slim AS deps
 
 WORKDIR /app
 
+# git is required by hooks/tests that inspect the working tree
+# (adr-gate staged-file lookup, dockerfile multi-stage check).
+RUN apt-get update && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN pip install --upgrade pip setuptools wheel
 
 COPY pyproject.toml ./

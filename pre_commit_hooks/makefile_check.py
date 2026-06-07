@@ -72,6 +72,38 @@ _LEGACY_DC_RE = re.compile(
     r'docker-compose\s+(up|down|build|run|logs|ps|exec|config|restart|stop|start|pull|--)',
 )
 _GLUED_DC_RE = re.compile(r'docker\s+compose[a-z]')
+_INCLUDE_RE = re.compile(r'^[ \t]*-?include[ \t]+(.+?)[ \t]*$', re.MULTILINE)
+_FIND_NAME_RE = re.compile(r'find\s+(\S+).*?-name\s+["\']?([^"\'\s]+)')
+
+
+def _included_files(text: str, root: Path) -> list[Path]:
+    """Resolve `include` directives to a best-effort list of existing files.
+
+    Many chrysa Makefiles split targets across `makefiles/*.makefile` pulled in
+    via `include $(shell find ... -name "*.makefile")`. The checker must read
+    those too, or it reports required targets as missing when they are simply
+    defined in an included fragment.
+    """
+    files: list[Path] = []
+    for match in _INCLUDE_RE.finditer(text):
+        spec = match.group(1)
+        find_specs = _FIND_NAME_RE.findall(spec)
+        if find_specs:
+            for directory, pattern in find_specs:
+                base = root / directory
+                if base.is_dir():
+                    files.extend(sorted(base.rglob(pattern)))
+            continue
+        wildcard = re.search(r'\$\(wildcard\s+([^)]+)\)', spec)
+        if wildcard:
+            for token in wildcard.group(1).split():
+                files.extend(f for f in sorted(root.glob(token)) if f.is_file())
+            continue
+        if '$(' in spec or '${' in spec:
+            continue  # unresolvable variable reference
+        for token in spec.split():
+            files.extend(f for f in sorted(root.glob(token)) if f.is_file())
+    return files
 
 
 def _find_marker_tier(text: str) -> str | None:
@@ -245,6 +277,13 @@ def check_makefile(path: Path) -> tuple[list[str], list[str]]:
     text = path.read_text(encoding='utf-8', errors='replace')
     lines = text.splitlines()
     targets = _collect_targets(lines)
+    # Targets may be defined in included fragments — fold them in so required
+    # targets are not reported missing when an `include`d file provides them.
+    for included in _included_files(text, path.parent):
+        try:
+            targets |= _collect_targets(included.read_text(encoding='utf-8', errors='replace').splitlines())
+        except OSError:
+            continue
 
     errors, warnings = _check_structure(text, lines, targets)
     errors.extend(_check_recipes(lines, path.parent))

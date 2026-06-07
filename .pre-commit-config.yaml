@@ -3,208 +3,224 @@ default_language_version:
 fail_fast: false
 minimum_pre_commit_version: 4.1.0
 repos:
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
-  hooks:
-  - id: trailing-whitespace
-  - id: end-of-file-fixer
-  - id: check-yaml
-    args:
-    - --allow-multiple-documents
-    exclude: ^\.github/ISSUE_TEMPLATE/
-  - id: debug-statements
-  - id: no-commit-to-branch
-    args: [--branch, main]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args:
+          - --allow-multiple-documents
+        exclude: ^\.github/ISSUE_TEMPLATE/
+      - id: debug-statements
+      - id: no-commit-to-branch
+        args: [--branch, main]
+      - id: check-json
+      - id: detect-private-key
 
-- repo: https://github.com/asottile/add-trailing-comma
-  rev: v4.0.0
-  hooks:
-  - id: add-trailing-comma
+  - repo: https://github.com/asottile/add-trailing-comma
+    rev: v4.0.0
+    hooks:
+      - id: add-trailing-comma
 
-- repo: https://github.com/frnmst/md-toc
-  rev: 9.0.0
-  hooks:
-  - id: md-toc
-    args: [--in-place, github, --header-levels, '6']
-    stages: [manual]
+  - repo: https://github.com/frnmst/md-toc
+    rev: 9.0.0
+    hooks:
+      - id: md-toc
+        args: [--in-place, github, --header-levels, '6']
+        stages: [manual]
 
-- repo: https://github.com/igorshubovych/markdownlint-cli
-  rev: v0.48.0
-  hooks:
-  - id: markdownlint
-    args: [--fix]
-    stages: [manual]
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.48.0
+    hooks:
+      - id: markdownlint
+        args: [--fix]
+        stages: [manual]
 
-- repo: https://github.com/executablebooks/mdformat
-  rev: 1.0.0
-  hooks:
-  - id: mdformat
-    additional_dependencies: [mdformat-gfm]
-    stages: [manual]
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 1.0.0
+    hooks:
+      - id: mdformat
+        additional_dependencies: [mdformat-gfm]
+        stages: [manual]
 
-- repo: https://github.com/lovesegfault/beautysh
-  rev: v6.4.3
-  hooks:
-  - id: beautysh
-    args: [--indent-size, '4']
+  - repo: https://github.com/lovesegfault/beautysh
+    rev: v6.4.3
+    hooks:
+      - id: beautysh
+        args: [--indent-size, '4']
 
-- repo: https://github.com/openstack/bashate
-  rev: 2.1.1
-  hooks:
-  - id: bashate
-    args: [--ignore=E006, E020]
+  - repo: https://github.com/openstack/bashate
+    rev: 2.1.1
+    hooks:
+      - id: bashate
+        args: [--ignore=E006, E020]
 
-- repo: https://github.com/jendrikseipp/vulture
-  rev: v2.9.1
-  hooks:
-  - id: vulture
-    args: [pre_commit_hooks/]
-    stages: [manual]
+  - repo: https://github.com/jendrikseipp/vulture
+    rev: v2.9.1
+    hooks:
+      - id: vulture
+        args: [pre_commit_hooks/]
+        stages: [manual]
 
-- repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.15.16
-  hooks:
-  - id: ruff-check
-    args: [--config=config-tools/ruff.toml, --fix]
-  - id: ruff-format
-    args: [--config=config-tools/ruff.toml]
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.16
+    hooks:
+      - id: ruff-check
+        args: [--config=config-tools/ruff.toml, --fix]
+      - id: ruff-format
+        args: [--config=config-tools/ruff.toml]
 
-- repo: https://github.com/pre-commit/pygrep-hooks
-  rev: v1.10.0
-  hooks:
-  - id: python-no-eval
-  - id: python-no-log-warn
-    exclude: ^(pre_commit_hooks/no_console_warn\.py|tests/test_js_hooks_new\.py)$
-  - id: python-use-type-annotations
-  - id: rst-backticks
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+    hooks:
+      - id: python-no-eval
+      - id: python-no-log-warn
+        exclude: ^(pre_commit_hooks/no_console_warn\.py|tests/test_js_hooks_new\.py)$
+      - id: python-use-type-annotations
+      - id: rst-backticks
 
-- repo: https://github.com/MarcoGorelli/auto-walrus
-  rev: 0.4.1
-  hooks:
-  - id: auto-walrus
+  - repo: https://github.com/MarcoGorelli/auto-walrus
+    rev: 0.4.1
+    hooks:
+      - id: auto-walrus
 
-- repo: https://github.com/dannysepler/rm_unneeded_f_str
-  rev: v0.2.0
-  hooks:
-  - id: rm-unneeded-f-str
+  - repo: https://github.com/dannysepler/rm_unneeded_f_str
+    rev: v0.2.0
+    hooks:
+      - id: rm-unneeded-f-str
 
-- repo: https://github.com/pypa/pip-audit
-  rev: v2.10.0
-  hooks:
-  - id: pip-audit
-    args: [--ignore-vuln, CVE-2026-3219, --ignore-vuln, CVE-2026-6357, --ignore-vuln, CVE-2025-8869, --ignore-vuln, 
-        CVE-2026-1703]
+  - repo: https://github.com/pypa/pip-audit
+    rev: v2.10.0
+    hooks:
+      - id: pip-audit
+        args: [--ignore-vuln, CVE-2026-3219, --ignore-vuln, CVE-2026-6357, --ignore-vuln, CVE-2025-8869, --ignore-vuln, CVE-2026-1703]
 
-- repo: https://github.com/Yelp/detect-secrets
-  rev: v1.5.0
-  hooks:
-  - id: detect-secrets
-    args: [--baseline, .secrets.baseline]
-    exclude: \.pre-commit-config\.yaml
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: [--baseline, .secrets.baseline]
+        exclude: \.pre-commit-config\.yaml
 
-- repo: https://github.com/asottile/pyupgrade
-  rev: v3.9.0
-  hooks:
-  - id: pyupgrade
-    args: [--py3-only, --py312-plus]
-    stages: [manual]
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.9.0
+    hooks:
+      - id: pyupgrade
+        args: [--py3-only, --py312-plus]
+        stages: [manual]
 
-- repo: https://github.com/chrysa/guideline-checker
-  rev: v0.0.1
-  hooks:
-  - id: guideline-check
-    stages: [pre-push, manual]
+  - repo: https://github.com/chrysa/guideline-checker
+    rev: v0.0.1
+    hooks:
+      - id: guideline-check
+        stages: [pre-push, manual]
 
-- repo: local
-  hooks:
-  - id: python-print-detection
-    name: detect print on python code
-    entry: print-detection
-    language: system
-    types: [python]
-  - id: python-pprint-detection
-    name: detect pprint on python code
-    entry: pprint-detection
-    language: system
-    types: [python]
-  - id: debugger-detection
-    name: detect debugger statements
-    entry: debugger-detection
-    language: system
-  - id: yaml-sorter
-    exclude: '^(\.github/|GitVersion\.yml)'
-    name: sort yaml files
-    entry: yaml-sorter
-    language: system
-    types: [yaml]
-  - id: json-sorter
-    name: sort json files
-    entry: json-sorter
-    language: system
-    types: [json]
-  - id: requirements-sort
-    name: sort requirements files
-    entry: requirements-sort
-    language: system
-    types: [text]
-    files: requirements.*\.txt$
-  - id: env-file-check
-    name: check env files for secrets
-    entry: env-file-check
-    language: system
-    types: [text]
-    files: \.env
-  - id: python-logger-detection
-    name: detect root logger usage
-    entry: logger-detection
-    language: system
-    types: [python]
-  - id: python-unreachable-code
-    name: detect unreachable code
-    entry: unreachable-code-detection
-    language: system
-    types: [python]
-  - id: python-dead-code
-    name: detect dead/unused code
-    entry: dead-code-detection
-    language: python
-    types: [python]
-    additional_dependencies: [".[dead_code]"]
-    stages: [manual]
-  - id: run-tests
-    name: run test suite (with coverage)
-    entry: make docker-test
-    language: system
-    pass_filenames: false
-    stages:
-    - pre-push
-  - id: sonar-scanner
-    name: sonar cloud analysis
-    entry: bash -c 'docker run --rm --env SONAR_TOKEN -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli:11 
-      -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=chrysa -Dsonar.projectKey=chrysa_pre-commit-tools 
-      -Dsonar.python.coverage.reportPaths=reports/coverage.xml -Dsonar.python.xunit.reportPath=reports/junit.xml'
-    language: system
-    pass_filenames: false
-    stages:
-    - pre-push
+  - repo: local
+    hooks:
+      - id: python-print-detection
+        name: detect print on python code
+        entry: print-detection
+        language: system
+        types: [python]
+      - id: python-pprint-detection
+        name: detect pprint on python code
+        entry: pprint-detection
+        language: system
+        types: [python]
+      - id: debugger-detection
+        name: detect debugger statements
+        entry: debugger-detection
+        language: system
+      - id: yaml-sorter
+        exclude: '^(\.github/|GitVersion\.yml)'
+        name: sort yaml files
+        entry: yaml-sorter
+        language: system
+        types: [yaml]
+      - id: json-sorter
+        name: sort json files
+        entry: json-sorter
+        language: system
+        types: [json]
+      - id: requirements-sort
+        name: sort requirements files
+        entry: requirements-sort
+        language: system
+        types: [text]
+        files: requirements.*\.txt$
+      - id: env-file-check
+        name: check env files for secrets
+        entry: env-file-check
+        language: system
+        types: [text]
+        files: \.env
+      - id: python-logger-detection
+        name: detect root logger usage
+        entry: logger-detection
+        language: system
+        types: [python]
+      - id: python-unreachable-code
+        name: detect unreachable code
+        entry: unreachable-code-detection
+        language: system
+        types: [python]
+      - id: python-dead-code
+        name: detect dead/unused code
+        entry: dead-code-detection
+        language: python
+        types: [python]
+        additional_dependencies: [".[dead_code]"]
+        stages: [manual]
+      - id: run-tests
+        name: run test suite (with coverage)
+        entry: make docker-test
+        language: system
+        pass_filenames: false
+        stages:
+          - pre-push
+      - id: sonar-scanner
+        name: sonar cloud analysis
+        entry: bash -c 'docker run --rm --env SONAR_TOKEN -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli:11 -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=chrysa -Dsonar.projectKey=chrysa_pre-commit-tools -Dsonar.python.coverage.reportPaths=reports/coverage.xml -Dsonar.python.xunit.reportPath=reports/junit.xml'
+        language: system
+        pass_filenames: false
+        stages:
+          - pre-push
 
-- repo: https://github.com/gitleaks/gitleaks
-  rev: v8.30.1
-  hooks:
-  - id: gitleaks
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
 
-- repo: https://github.com/compilerla/conventional-pre-commit
-  rev: v4.4.0
-  hooks:
-  - id: conventional-pre-commit
-    stages: [commit-msg]
-    args: [feat, fix, docs, style, refactor, test, chore, perf, revert, ci]
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [feat, fix, docs, style, refactor, test, chore, perf, revert, ci]
 
-- repo: https://github.com/chrysa/pre-commit-tools
-  rev: v0.1.1-92
-  hooks:
-  - id: adr-gate
-  - id: no-bare-except
-  - id: no-sync-in-async
-  - id: regression-gate
-    stages: [pre-push]
+  - repo: https://github.com/chrysa/pre-commit-tools
+    rev: v0.1.1-93
+    hooks:
+      - id: adr-gate
+      - id: no-bare-except
+      - id: no-sync-in-async
+      - id: regression-gate
+        stages: [pre-push]
+      - exclude: ^(\.github/|workflows/|templates/)
+        id: yaml-sorter
+      - id: json-sorter
+      - id: env-file-check
+      - id: env-example-sync
+      - id: debugger-detection
+      - id: python-print-detection
+      - id: python-pprint-detection
+        exclude: 'tests?/'
+      - id: python-logger-detection
+      - id: python-unreachable-code
+      - id: no-hardcoded-localhost
+        exclude: 'tests?/|\.test\.|\.spec\.'
+      - id: fastapi-missing-response-model
+        exclude: '^tests/'
+      - id: fastapi-missing-links
+        exclude: '^tests/'

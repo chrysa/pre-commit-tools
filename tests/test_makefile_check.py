@@ -248,6 +248,40 @@ class TestMissingPaths:
         assert not any("missing path 'python3'" in e for e in errors)
 
 
+class TestIncludes:
+    def test_target_defined_in_included_fragment(self, tmp_path: Path) -> None:
+        # `lint` lives in an included fragment, not the root Makefile.
+        root = CONFORMANT_LIB.replace(
+            'lint: ## Lint\n\truff check $(PKG) tests\n\n',
+            '',
+        ).replace('\nlint ', '\n')
+        root = 'include makefiles/extra.mk\n' + root
+        mkdir = tmp_path / 'makefiles'
+        mkdir.mkdir()
+        (mkdir / 'extra.mk').write_text('lint: ## Lint\n\truff check pkg\n', encoding='utf-8')
+        path = _write(tmp_path, root)
+        errors, _ = check_makefile(path)
+        assert not any('missing required targets' in e and 'lint' in e for e in errors)
+
+    def test_wildcard_include(self, tmp_path: Path) -> None:
+        root = CONFORMANT_LIB.replace('build: ## Build\n\tpython -m build\n\n', '').replace(' build ', ' ')
+        root = 'include $(wildcard *.makefile)\n' + root
+        (tmp_path / 'extra.makefile').write_text('build: ## Build\n\tpython -m build\n', encoding='utf-8')
+        path = _write(tmp_path, root)
+        errors, _ = check_makefile(path)
+        assert not any('missing required targets' in e and 'build' in e for e in errors)
+
+    def test_shell_find_include_glob(self, tmp_path: Path) -> None:
+        root = CONFORMANT_LIB.replace('test: ## Test\n\tpytest tests/\n\n', '').replace(' test ', ' ')
+        root = 'include $(shell find makefiles/ -name "*.makefile" | sort)\n' + root
+        mkdir = tmp_path / 'makefiles'
+        mkdir.mkdir()
+        (mkdir / 'a.makefile').write_text('test: ## Test\n\tpytest\n', encoding='utf-8')
+        path = _write(tmp_path, root)
+        errors, _ = check_makefile(path)
+        assert not any('missing required targets' in e and 'test' in e for e in errors)
+
+
 class TestPhonyAndHelp:
     def test_no_phony_fails(self, tmp_path: Path) -> None:
         content = '\n'.join(line for line in CONFORMANT_LIB.splitlines() if not line.startswith('.PHONY'))

@@ -200,8 +200,9 @@ repos:
         args: [feat, fix, docs, style, refactor, test, chore, perf, revert, ci]
 
   - repo: https://github.com/chrysa/pre-commit-tools
-    rev: v0.1.1-93
+    rev: v0.1.1-94
     hooks:
+    - id: makefile-check
       - id: adr-gate
       - id: no-bare-except
       - id: no-sync-in-async

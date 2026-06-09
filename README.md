@@ -7,564 +7,259 @@
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=chrysa_pre-commit-tools&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=chrysa_pre-commit-tools)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=chrysa_pre-commit-tools&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=chrysa_pre-commit-tools)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=chrysa_pre-commit-tools&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=chrysa_pre-commit-tools)
-[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org)
+[![Python 3.14+](https://img.shields.io/badge/python-3.14%2B-blue)](https://www.python.org)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![PyPI](https://img.shields.io/pypi/v/pre-commit-hooks-tools)](https://pypi.org/project/pre-commit-hooks-tools/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/chrysa/pre-commit-tools)
 [![Publish](https://github.com/chrysa/pre-commit-tools/actions/workflows/publish.yml/badge.svg)](https://github.com/chrysa/pre-commit-tools/actions/workflows/publish.yml)
 
-<!--TOC-->
+A collection of **49 ready-to-use [pre-commit](https://pre-commit.com) hooks** that catch debug leftovers, leaked secrets, dead code, and framework anti-patterns before they ever reach a commit — across Python, TypeScript/React, CSS, Dockerfiles, Helm, and config files.
 
-- [pre-commit-tools](#pre-commit-tools)
-  - [Using pre-commit-tools with pre-commit](#using-pre-commit-tools-with-pre-commit)
-  - [Hooks available](#hooks-available)
-    - [format-dockerfiles](#format-dockerfiles)
-    - [python-print-detection](#python-print-detection)
-    - [python-pprint-detection](#python-pprint-detection)
-    - [console-debug-detection](#console-debug-detection)
-    - [console-log-detection](#console-log-detection)
-    - [console-table-detection](#console-table-detection)
-    - [react-console-error-detection](#react-console-error-detection)
-    - [pylint-html-report](#pylint-html-report)
-    - [yaml-sorter](#yaml-sorter)
-    - [debugger-detection](#debugger-detection)
-    - [json-sorter](#json-sorter)
-    - [requirements-sort](#requirements-sort)
-    - [env-file-check](#env-file-check)
-    - [env-example-sync](#env-example-sync)
-    - [python-logger-detection](#python-logger-detection)
-    - [python-unreachable-code](#python-unreachable-code)
-    - [python-dead-code](#python-dead-code)
-    - [no-bare-except](#no-bare-except)
-    - [no-print-in-migration](#no-print-in-migration)
-    - [django-hardcoded-secret](#django-hardcoded-secret)
-    - [dockerfile-no-latest](#dockerfile-no-latest)
-    - [ts-unreachable-code](#ts-unreachable-code)
-    - [css-duplicate-property](#css-duplicate-property)
-    - [css-unused-variable](#css-unused-variable)
-    - [no-console-warn](#no-console-warn)
-    - [react-direct-dom](#react-direct-dom)
-    - [import-no-relative-parent](#import-no-relative-parent)
-    - [no-debug-in-settings](#no-debug-in-settings)
-    - [django-no-raw-sql](#django-no-raw-sql)
-    - [no-sync-in-async](#no-sync-in-async)
-    - [fastapi-missing-response-model](#fastapi-missing-response-model)
-    - [js-syntax-check](#js-syntax-check)
-    - [ts-hardcoded-secret-detection](#ts-hardcoded-secret-detection)
-    - [helm-lint](#helm-lint)
-    - [makefile-check](#makefile-check)
-    - [generate-changelog](#generate-changelog)
+**Who it's for:** teams and solo developers who want a single, opinionated pre-commit repo covering Python (Django, FastAPI), TypeScript/React, and infrastructure, without wiring up a dozen separate tools.
 
-<!--TOC-->
+## Why use it
 
-Some out-of-the-box hooks for pre-commit.
+- **Stop debug noise** — flag `print()`, `pprint()`, `console.log/debug/table/warn/error()`, debugger statements and root-logger calls before they land.
+- **Catch leaked secrets** — hardcoded keys in `.env`, Django settings, and TypeScript/JavaScript files.
+- **Find dead & unreachable code** — Python (AST + vulture) and TypeScript/JSX (tree-sitter).
+- **Enforce framework best practices** — Django (no raw SQL, no `DEBUG=True`, no print in migrations), FastAPI (`response_model`, HATEOAS links), React (no direct DOM, no inline styles, no async `useEffect`).
+- **Harden Dockerfiles** — no `:latest`, multi-stage builds, `HEALTHCHECK`, non-root user, auto-formatting.
+- **Keep files tidy** — sort YAML / JSON / requirements keys, sync `.env` ↔ `.env.example`, lint Helm charts.
 
-## Using pre-commit-tools with pre-commit
+All detection hooks support an inline `disable` comment (see each hook below) to suppress a specific line.
 
-Add this to your `.pre-commit-config.yaml`
+## Installation
 
-```yaml
--   repo: https://github.com/chrysa/pre-commit-tools
-    - rev: v0.1.1-37
-    hooks:
-          - id: console-debug-detection
-          - id: console-log-detection
-          - id: console-table-detection
-          - id: react-console-error-detection
-          - id: format-dockerfiles
-          - id: dockerfile-no-latest
-          - id: python-print-detection
-          - id: python-pprint-detection
-          - id: no-bare-except
-          - id: no-print-in-migration
-          - id: django-hardcoded-secret
-          - id: yaml-sorter
-          - id: debugger-detection
-          - id: json-sorter
-          - id: requirements-sort
-          - id: env-file-check
-          - id: env-example-sync
-          - id: python-logger-detection
-          - id: python-unreachable-code
-          # optional — run manually: pre-commit run python-dead-code --hook-stage manual --all-files
-          - id: python-dead-code
-            stages: [manual]
-          - id: ts-unreachable-code
-          - id: css-duplicate-property
-          - id: css-unused-variable
-          - id: no-console-warn
-          - id: react-direct-dom
-          - id: import-no-relative-parent
-          - id: no-debug-in-settings
-          - id: django-no-raw-sql
-          - id: no-sync-in-async
-          - id: fastapi-missing-response-model
-          - id: js-syntax-check
-          - id: ts-hardcoded-secret-detection
-          # requires helm in PATH
-          - id: helm-lint
-          # generate-changelog uses git-cliff; run manually or on CI
-          - id: generate-changelog
-            stages: [manual]
+You don't install this package directly — [pre-commit](https://pre-commit.com) fetches it for you. Make sure pre-commit itself is installed:
 
-# Optional — guideline-checker (structural coding guidelines)
-# Validates project structure, naming conventions, and coding standards.
-# See https://github.com/chrysa/guideline-checker
-#-  repo: https://github.com/chrysa/guideline-checker
-#   rev: ''  # Use the ref you want to point at
-#   hooks:
-#     - id: guideline-check
-#       stages: [pre-push, manual]
+```bash
+pip install pre-commit   # or: pipx install pre-commit
 ```
 
-## Hooks available
+## Usage
 
-### format-dockerfiles
+Add the repo to your project's `.pre-commit-config.yaml`, then enable only the hooks you want:
 
-- Add shebang `# syntax=docker/dockerfile:1.4` if missing
-- Group consecutive same-instruction blocks without blank lines
-- Merge consecutive `RUN` or `ENV` instructions on one command line with continuation
+```yaml
+repos:
+  - repo: https://github.com/chrysa/pre-commit-tools
+    rev: v0.1.1-93   # pin to a released tag
+    hooks:
+      # debug leftovers
+      - id: python-print-detection
+      - id: console-log-detection
+      - id: debugger-detection
+      # secrets
+      - id: env-file-check
+      - id: django-hardcoded-secret
+      - id: ts-hardcoded-secret-detection
+      # file hygiene
+      - id: yaml-sorter
+      - id: json-sorter
+      - id: requirements-sort
+      # dead / unreachable code
+      - id: python-unreachable-code
+      # optional — heavier, run on the manual stage to avoid false positives
+      - id: python-dead-code
+        stages: [manual]
+```
 
-**New options:**
+Then install the git hook and run it:
+
+```bash
+pre-commit install
+pre-commit run --all-files
+```
+
+Hooks tagged `stages: [manual]` (`python-dead-code`, `generate-changelog`) or `stages: [pre-push]` (`regression-gate`, `docs-drift-gate`) only run when explicitly invoked:
+
+```bash
+pre-commit run python-dead-code --hook-stage manual --all-files
+```
+
+## Hooks
+
+### Debug-leftover detection
+
+| Hook id | Detects | Inline disable |
+|---|---|---|
+| `python-print-detection` | `print()` in Python (excludes `tests/`) | `# print-detection: disable` |
+| `python-pprint-detection` | `pprint()` in Python (excludes `tests/`) | `# pprint-detection: disable` |
+| `console-debug-detection` | `console.debug()` in `.js`/`.gs`/`.ts`/`.tsx` | `// console-debug-detection: disable` |
+| `console-log-detection` | `console.log()` | `// console-log-detection: disable` |
+| `console-table-detection` | `console.table()` | `// console-table-detection: disable` |
+| `react-console-error-detection` | `console.error()` in `.js`/`.ts`/`.jsx`/`.tsx` | `// console-error-detection: disable` |
+| `no-console-warn` | `console.warn()` in `.js`/`.gs`/`.ts`/`.jsx`/`.tsx` | `// no-console-warn: disable` |
+| `debugger-detection` | `breakpoint()`, `pdb`/`ipdb`/`pudb.set_trace()` | `# debugger-detection: disable` |
+| `python-logger-detection` | root `logging.*` calls instead of a named logger | `# logger-detection: disable` |
+
+### Secret detection
+
+| Hook id | Detects |
+|---|---|
+| `env-file-check` | potential secrets in `.env` files (placeholders like `${VAR}`, `changeme` are ignored) |
+| `django-hardcoded-secret` | `SECRET_KEY`/`PASSWORD`/`API_KEY`/`TOKEN`/`PRIVATE_KEY = "..."` in Python (env-var lookups ignored). Disable: `# django-hardcoded-secret: disable` |
+| `ts-hardcoded-secret-detection` | hardcoded keys/tokens in `.js`/`.ts`/`.jsx`/`.tsx` — AWS `AKIA…`, GitHub `ghp_…`, Stripe `sk_live_…` (`process.env`/`import.meta.env` ignored). Disable: `// ts-hardcoded-secret: disable` |
+
+### Dead & unreachable code
+
+| Hook id | Detects | Notes |
+|---|---|---|
+| `python-unreachable-code` | statements after `return`/`raise`/`break`/`continue` (Python `ast`) | Disable: `# unreachable-code: disable` |
+| `ts-unreachable-code` | unreachable code in `.ts`/`.tsx`/`.js`/`.jsx` (tree-sitter) | needs `tree-sitter`, `tree-sitter-typescript`. Disable: `// unreachable-code: disable` |
+| `python-dead-code` | unused functions/vars/imports/classes via [vulture](https://github.com/jendrikseipp/vulture) | `manual` stage; `--min-confidence`, `--exclude`, `--whitelist` |
+
+### Python quality
+
+| Hook id | Detects | Inline disable |
+|---|---|---|
+| `no-bare-except` | bare `except:` clauses | `# no-bare-except: disable` |
+| `python-no-type-ignore` | `# type: ignore` without a justification comment | — |
+
+### Django
+
+| Hook id | Detects | Inline disable |
+|---|---|---|
+| `no-print-in-migration` | `print()` in `migrations/*.py` | `# no-print-in-migration: disable` |
+| `no-debug-in-settings` | `DEBUG = True` in `settings*.py` | `# no-debug-in-settings: disable` |
+| `django-no-raw-sql` | `.raw()` / `cursor.execute()` (SQL-injection risk) | `# django-no-raw-sql: disable` |
+
+### FastAPI
+
+| Hook id | Detects | Inline disable |
+|---|---|---|
+| `fastapi-missing-response-model` | routes without `response_model=` | `# fastapi-missing-response-model: disable` |
+| `fastapi-missing-links` | response models without a `links` field (HATEOAS) | — |
+| `no-sync-in-async` | `time.sleep`/`requests.*`/`subprocess.*` inside `async def` | `# no-sync-in-async: disable` |
+
+### React / TypeScript
+
+| Hook id | Detects | Inline disable |
+|---|---|---|
+| `react-direct-dom` | `document.getElementById/querySelector` etc. in `.jsx`/`.tsx` | `// react-direct-dom: disable` |
+| `react-no-inline-styles` | `style={{…}}` inline styles in `.jsx`/`.tsx` | — |
+| `react-no-async-in-useeffect` | async function passed directly to `useEffect()` | — |
+| `import-no-relative-parent` | deep relative parent imports (`../../`) — prefer `@/` aliases | `// import-no-relative-parent: disable` |
+| `ts-no-any` | explicit `any` (`: any`, `as any`, `<any>`) in `.ts`/`.tsx` (excludes tests) | — |
+| `js-syntax-check` | invalid `.js`/`.gs` syntax via `node --check` (skips if Node absent) | — |
+
+### CSS
+
+| Hook id | Detects | Inline disable |
+|---|---|---|
+| `css-duplicate-property` | duplicate property declarations and duplicate `#id` selectors | `/* css-duplicate-property: disable */`, `/* css-duplicate-id: disable */` |
+| `css-unused-variable` | `--custom-properties` declared but never used via `var()` | `/* css-unused-variable: disable */` |
+
+### Dockerfiles
+
+| Hook id | What it does |
+|---|---|
+| `format-dockerfiles` | format & normalize Dockerfiles (see options below) |
+| `dockerfile-no-latest` | reject `FROM image:latest` (`scratch` allowed). Disable: `# dockerfile-no-latest: disable` |
+| `dockerfile-multi-stage-check` | require a multi-stage build (≥ 2 `FROM` stages) |
+| `dockerfile-healthcheck` | require a `HEALTHCHECK` in the final stage |
+| `dockerfile-non-root-user` | reject final stage running as root (no `USER` / `USER root`) |
+
+### Infra, config & files
+
+| Hook id | What it does |
+|---|---|
+| `yaml-sorter` | sort YAML keys alphabetically (in-place) |
+| `json-sorter` | sort JSON keys alphabetically (in-place) |
+| `requirements-sort` | sort `requirements*.txt` and `setup.cfg` dependencies |
+| `env-example-sync` | check `.env` and `.env.example` have the same keys |
+| `no-hardcoded-localhost` | reject hardcoded `localhost`/`127.0.0.1` URLs in `.py`/`.ts`/`.tsx`/`.js`/`.jsx` (excludes tests) |
+| `helm-lint` | `helm lint --strict` on `charts/<namespace>/<service>/` (skips if `helm` absent) |
+| `makefile-check` | enforce the chrysa tiered Makefile contract |
+| `pylint-with-html-report` | run Pylint and emit an HTML report |
+
+### Project governance (chrysa-specific)
+
+| Hook id | What it does | Stage |
+|---|---|---|
+| `adr-gate` | require a `DECISIONS.md` update when architecture-sensitive files change | commit |
+| `detect-duplicated-copilot-instructions` | flag per-repo `copilot-instructions.md` sections already in workspace-level instructions | commit |
+| `generate-changelog` | (re)generate `CHANGELOG.md` from git history via [git-cliff](https://github.com/orhun/git-cliff) | `manual` |
+| `regression-gate` | block push if coverage or test count regresses below `.quality-baseline.json` | `pre-push` |
+| `docs-drift-gate` | regenerate code-derived docs and block push if they drift from the committed copy | `pre-push` |
+
+## Hook options
+
+### `format-dockerfiles`
+
+- Adds `# syntax=docker/dockerfile:1.4` shebang if missing.
+- Groups consecutive same-instruction blocks; merges consecutive `RUN`/`ENV` into one command.
 
 | Option | Description |
 |---|---|
-| `--sort-args` | Sort `ARG` instructions alphabetically |
-| `--sort-envs` | Sort `ENV` instructions alphabetically |
-| `--separate-arg-blocks` | Separate literal `ARG` from variable-dependent `ARG` (e.g. `ARG FOO=${BAR}`) |
-| `-c / --config` | Path to a `.format-dockerfiles.toml` config file |
-
-Config file example (`.format-dockerfiles.toml`):
+| `--sort-args` | sort `ARG` instructions alphabetically |
+| `--sort-envs` | sort `ENV` instructions alphabetically |
+| `--separate-arg-blocks` | separate literal `ARG` from variable-dependent `ARG` (e.g. `ARG FOO=${BAR}`) |
+| `-c / --config` | path to a `.format-dockerfiles.toml` config file |
 
 ```toml
+# .format-dockerfiles.toml
 [format-dockerfiles]
 sort_args = true
 sort_envs = true
 separate_arg_blocks = true
 ```
 
-### python-print-detection
-
-Detect `print()` calls in Python files. Use `# print-detection: disable` to ignore a specific line.
-
-### python-pprint-detection
-
-Detect `pprint()` calls in Python files. Use `# pprint-detection: disable` to ignore a specific line.
-
-### console-debug-detection
-
-Detect `console.debug()` calls in JavaScript/Google AppScript (`.js`, `.gs`) files.
-Use `// console-debug-detection: disable` to ignore a specific line.
-
-### console-log-detection
-
-Detect `console.log()` calls in JavaScript/Google AppScript files.
-Use `// console-log-detection: disable` to ignore a specific line.
-
-### console-table-detection
-
-Detect `console.table()` calls in JavaScript/Google AppScript files.
-Use `// console-table-detection: disable` to ignore a specific line.
-
-### pylint-html-report
-
-Run [Pylint](https://pylint.org) over Python files and generate an HTML report via [pylint-report](https://github.com/ddeepwell/pylint-report).
-
-```yaml
-- id: pylint-with-html-report
-  additional_dependencies: [pylint, pylint-report]
-  args:
-    - '--output-html=reports/pylint'   # directory for the HTML report (default: ./html)
-    - '--output-json=pylint.json'      # keep the intermediate JSON (omit to auto-delete)
-```
+### `python-dead-code`
 
 | Option | Default | Description |
 |---|---|---|
-| `--output-html` | `./html` | Directory where the HTML report is written |
-| `--output-json` | auto-deleted | Path for the intermediate JSON report; deleted after conversion unless specified |
-
-### yaml-sorter
-
-Sort YAML file keys alphabetically (recursive). Modifies files in-place and returns 1 if any file was changed.
-To skip a file, exclude it in your `.pre-commit-config.yaml`.
-Boolean and mixed-type keys are handled safely.
-
-### debugger-detection
-
-Detect debugger statements (`breakpoint()`, `pdb.set_trace()`, `ipdb.set_trace()`, `pudb.set_trace()`) in Python files.
-Use `# debugger-detection: disable` to ignore a specific line.
-
-### json-sorter
-
-Sort JSON file keys alphabetically (recursive). Modifies files in-place and returns 1 if any file was changed.
-
-### requirements-sort
-
-Sort Python dependency files alphabetically. Modifies files in-place and returns 1 if any file was changed.
-
-**Supported files**
-
-| File pattern | What is sorted |
-|---|---|
-| `requirements*.txt` | All package lines (case-insensitive); comments and blank lines are moved to the top |
-| `setup.cfg` | `install_requires` entries; extras keys in `[options.extras_require]` and their dependencies |
-
-**Example — setup.cfg**
-
-```ini
-# Before
-[options.extras_require]
-yaml =
-    PyYAML==6.0.1
-dead_code =
-    vulture>=2.0
-    aardvark>=1.0
-
-# After
-[options.extras_require]
-dead_code =
-    aardvark>=1.0
-    vulture>=2.0
-yaml =
-    PyYAML==6.0.1
-```
-
-### env-file-check
-
-Detect potential secrets committed in `.env` files (passwords, tokens, API keys, etc.).
-Placeholder values (`<value>`, `${VAR}`, `changeme`, etc.) are ignored.
-
-### python-logger-detection
-
-Detect direct use of the root `logging` module (e.g. `logging.info(...)`) instead of a named logger.
-Use `# logger-detection: disable` to ignore a specific line.
-
-### python-unreachable-code
-
-Detect **explicit** unreachable code — statements after `return`, `raise`, `break`, or `continue` — using Python's `ast` module. Works with Python 3.12, 3.13 and 3.14.
-
-**Language**: Python only (AST-based, no external dependency).
-
-No configuration needed. Returns 1 if any unreachable statement is found.
-
-```python
-def f():
-    return 1
-    x = 2  # ← detected: unreachable code after return
-```
-
-Use `# unreachable-code: disable` on the unreachable line to suppress a specific violation.
-
-### python-dead-code
-
-Detect **implicit** dead/unused code (unused functions, variables, imports, classes) using [vulture](https://github.com/jendrikseipp/vulture).
-
-**Language**: Python only. **Not language-agnostic** — vulture analyses Python ASTs.
-
-**Dynamic code generation**: vulture may produce false positives on names used only via `getattr`, `__all__`, decorators, or dynamic dispatch. Use a [whitelist file](https://github.com/jendrikseipp/vulture#whitelists) to suppress them.
-
-This hook runs in the `manual` stage by default to avoid false positives on entry points.
+| `--min-confidence` | `80` | minimum confidence % to report (0–100) |
+| `--exclude` | — | space-separated glob patterns to skip |
+| `--whitelist` | — | vulture whitelist `.py` files to suppress false positives |
 
 ```yaml
 - id: python-dead-code
   stages: [manual]
   args:
     - '--min-confidence=80'
-    # Exclude paths matching these glob patterns
     - '--exclude=tests/ migrations/ **/conftest.py'
-    # Whitelist file listing names used dynamically (suppresses false positives)
     - '--whitelist=whitelist.py'
   additional_dependencies: [vulture>=2.0]
 ```
 
+> vulture may produce false positives on names used only via `getattr`, `__all__`, decorators, or dynamic dispatch — use a [whitelist file](https://github.com/jendrikseipp/vulture#whitelists). This hook runs in the `manual` stage by default to avoid false positives on entry points.
+
+### `pylint-with-html-report`
+
 | Option | Default | Description |
 |---|---|---|
-| `--min-confidence` | `80` | Minimum confidence % to report (0–100) |
-| `--exclude` | — | Space-separated glob patterns of paths to skip |
-| `--whitelist` | — | Vulture whitelist `.py` files to suppress false positives |
-
-Run manually:
-
-```bash
-pre-commit run python-dead-code --hook-stage manual --all-files
-```
-
-### ts-unreachable-code
-
-Detect **explicit** unreachable code — statements after `return`, `throw`, `break`, or `continue` — in TypeScript (`.ts`), TSX (`.tsx`), JavaScript (`.js`) and JSX (`.jsx`) files, using a real AST via [tree-sitter](https://github.com/tree-sitter/tree-sitter).
-
-**Language**: TypeScript / TSX / JavaScript / JSX (React). The TSX parser is used for `.tsx`/`.jsx` to handle JSX syntax.
-
-**Dynamic code generation**: tree-sitter performs syntactic analysis only, so dynamically evaluated code is unaffected.
-
-Use `// unreachable-code: disable` on the unreachable line to suppress a specific violation.
-
-```typescript
-function f() {
-  throw new Error('not implemented');
-  return 42;  // ← detected: unreachable code after throw
-}
-```
+| `--output-html` | `./html` | directory where the HTML report is written |
+| `--output-json` | auto-deleted | path for the intermediate JSON report; deleted after conversion unless specified |
 
 ```yaml
-- id: ts-unreachable-code
-  additional_dependencies:
-    - tree-sitter>=0.23
-    - tree-sitter-typescript>=0.23
-```
-
-### css-duplicate-property
-
-Detect **duplicate CSS property declarations** within the same rule block, and **duplicate `#id` selectors** across the stylesheet. Duplicate properties hide the first declaration; duplicate IDs violate CSS specificity best-practices and make maintenance harder.
-
-**Language**: CSS (`.css`). SCSS/Less are not currently supported.
-
-Use `/* css-duplicate-property: disable */` on the duplicate property line to suppress a specific violation.
-Use `/* css-duplicate-id: disable */` on the duplicate ID selector line to suppress a specific violation.
-
-```css
-.foo {
-  color: red;    /* ← first declaration */
-  color: blue;   /* ← detected: duplicate property "color" (first at line 2) */
-}
-
-#hero { color: red; }   /* ← first occurrence */
-#hero { color: blue; }  /* ← detected: duplicate ID selector "hero" (first at line 6) */
-```
-
-Nested rule blocks are tracked independently (each `{…}` scope has its own seen-properties map).
-
-### css-unused-variable
-
-Detect **CSS custom properties** (`--var-name`) that are declared but never used anywhere in the file via `var(--var-name)`.
-
-**Language**: CSS (`.css`). SCSS/Less are not currently supported.
-
-Use `/* css-unused-variable: disable */` on the declaration line to suppress a specific violation.
-
-```css
-:root {
-  --color-primary: #007bff;  /* ← used below */
-  --color-ghost: #aaa;       /* ← detected: declared but never used */
-}
-.btn { color: var(--color-primary); }
-```
-
-### react-console-error-detection
-
-Detect `console.error()` calls in JavaScript/TypeScript/React files. Complements `console-log-detection`, `console-debug-detection` and `console-table-detection`.
-
-**Language**: `.js`, `.ts`, `.jsx`, `.tsx`.
-
-Use `// console-error-detection: disable` on the line to suppress a specific violation.
-
-### no-bare-except
-
-Detect bare `except:` clauses (without specifying an exception type) in Python files. Bare excepts catch all exceptions including `SystemExit`, `KeyboardInterrupt` and `GeneratorExit`, which can mask serious errors.
-
-Use `# no-bare-except: disable` to suppress a specific line.
-
-```python
-# WRONG
-try:
-    do_something()
-except:          # ← detected
-    pass
-
-# OK
-try:
-    do_something()
-except ValueError:
-    pass
-```
-
-### no-print-in-migration
-
-Detect `print()` calls in Django migration files (`migrations/*.py`). Print statements committed in migrations will be shown every time migrations run.
-
-Use `# no-print-in-migration: disable` to suppress a specific line.
-
-### django-hardcoded-secret
-
-Detect hardcoded secrets directly assigned in Python files. Catches patterns like `SECRET_KEY = "..."`, `PASSWORD = "..."`, `API_KEY = "..."`, `TOKEN = "..."` and `PRIVATE_KEY = "..."`.
-
-Values referencing environment variables (`os.environ`, `os.getenv`, `env()`, `config()`, etc.) are **not** flagged.
-
-Use `# django-hardcoded-secret: disable` to suppress a specific line.
-
-```python
-# WRONG — detected
-SECRET_KEY = 'django-insecure-abc123'
-
-# OK — not flagged
-SECRET_KEY = os.environ['SECRET_KEY']
-SECRET_KEY = env('SECRET_KEY')
-```
-
-### dockerfile-no-latest
-
-Detect `FROM image:latest` instructions in Dockerfiles. Using `:latest` makes builds non-reproducible.
-`FROM scratch` is always allowed.
-
-Use `# dockerfile-no-latest: disable` to suppress a specific line.
-
-```dockerfile
-# WRONG
-FROM python:latest
-
-# OK
-FROM python:3.12-slim
-```
-
-### env-example-sync
-
-Check that `.env` and `.env.example` files contain the same set of keys. Ensures that new environment variables added to `.env` are documented in `.env.example` (with empty or placeholder values), and vice-versa.
-
-```yaml
-- id: env-example-sync
+- id: pylint-with-html-report
+  additional_dependencies: [pylint, pylint-report]
   args:
-    - '--env-file=.env'           # default
-    - '--example-file=.env.example'  # default
+    - '--output-html=reports/pylint'
+    - '--output-json=pylint.json'
 ```
+
+### `env-example-sync`
 
 | Option | Default | Description |
 |---|---|---|
-| `--env-file` | `.env` | Path to the private `.env` file |
-| `--example-file` | `.env.example` | Path to the public example file |
+| `--env-file` | `.env` | path to the private `.env` file |
+| `--example-file` | `.env.example` | path to the public example file |
 
----
+### `makefile-check`
 
-### no-console-warn
-
-Detect `console.warn()` calls in JavaScript/TypeScript/React files (`.js`, `.gs`, `.ts`, `.jsx`, `.tsx`).
-Use `// no-console-warn: disable` to suppress a specific line.
-
-### react-direct-dom
-
-Detect direct DOM manipulation (`document.getElementById`, `document.querySelector`, etc.) in React files (`.jsx`, `.tsx`).
-Direct DOM access bypasses React's virtual DOM — use refs or state instead.
-Use `// react-direct-dom: disable` to suppress a specific line.
-
-### import-no-relative-parent
-
-Detect deep relative parent imports (`../../`) in TypeScript/JavaScript files.
-Use path aliases (`@/`) instead. Two or more `../` levels trigger a violation.
-Use `// import-no-relative-parent: disable` to suppress a specific line.
-
-### no-debug-in-settings
-
-Detect `DEBUG = True` in Django settings files (`settings*.py`).
-Use `# no-debug-in-settings: disable` to suppress a specific line.
-
-### django-no-raw-sql
-
-Detect raw SQL queries (`.raw()` and `cursor.execute()`) in Django Python files.
-These patterns bypass the ORM and risk SQL injection.
-Use `# django-no-raw-sql: disable` to suppress a specific line.
-
-### no-sync-in-async
-
-Detect synchronous blocking calls inside `async def` functions:
-
-| Blocked call | Suggested async replacement |
-|---|---|
-| `time.sleep()` | `asyncio.sleep()` |
-| `requests.get/post/put/delete/patch()` | `httpx.AsyncClient` or `aiohttp` |
-| `subprocess.run/call/check_output()` | `asyncio.create_subprocess_exec` |
-
-Use `# no-sync-in-async: disable` to suppress a specific line.
-
-### fastapi-missing-response-model
-
-Detect FastAPI route handlers (`@app.get`, `@app.post`, etc.) that do not declare a `response_model=` parameter.
-This prevents automatic response schema generation and validation.
-Use `# fastapi-missing-response-model: disable` on the decorator line to suppress.
-
-```yaml
-- id: fastapi-missing-response-model
-  files: '(routers?|views?|api)/.*\.py$'
-```
-
-### js-syntax-check
-
-Validate JavaScript and Google Apps Script (`.js`, `.gs`) file syntax using `node --check`.
-Requires Node.js to be installed in PATH. If Node.js is not available, the hook exits 0 (safe skip).
-
-```yaml
-- id: js-syntax-check
-  files: '\.(js|gs)$'
-```
-
-### ts-hardcoded-secret-detection
-
-Detect hardcoded API keys, tokens and passwords in TypeScript/JavaScript files (`.js`, `.ts`, `.jsx`, `.tsx`).
-Catches patterns like `const API_KEY = "..."`, `const token = "sk_live_..."`, AWS key prefixes (`AKIA...`), GitHub tokens (`ghp_...`), and Stripe keys (`sk_live_...`).
-
-Values referencing environment variables (`process.env`, `import.meta.env`) are **not** flagged. Short values (< 8 chars) are ignored.
-
-Use `// ts-hardcoded-secret: disable` on the line to suppress a specific violation.
-
-```typescript
-// WRONG — detected
-const API_KEY = 'my-secret-api-key-value-hardcoded';
-
-// OK — not flagged
-const API_KEY = process.env.API_KEY;
-```
-
-### helm-lint
-
-Run `helm lint --strict` on all charts found in `charts/<namespace>/<service>/` (depth 2 under `charts/`).
-Requires `helm` to be installed in PATH.
-
-Expected directory structure:
-
-```text
-charts/
-  <namespace>/
-    <service>/     ← helm lint --strict is run here
-      Chart.yaml
-      values.yaml
-```
-
-```yaml
-- id: helm-lint
-  files: ^charts/
-  pass_filenames: false
-```
-
-### makefile-check
-
-Enforce the chrysa archetype-tiered Makefile contract (shared-standards
-`EXECUTION_STANDARD.md` §1). Each Makefile must declare its tier on a marker line:
+Enforces the chrysa archetype-tiered Makefile contract (shared-standards `EXECUTION_STANDARD.md` §1). Each Makefile must declare its tier:
 
 ```makefile
 # makefile-tier: lib        # one of: lib | python-app | fullstack | infra
 ```
 
-The hook then fails on: a missing/invalid tier marker, a required target absent for the
-tier, a forbidden target name (`fmt`/`type-check`/`tests`), a legacy `docker-compose <cmd>`
-invocation, a glued `docker compose` typo, a missing `help` target or `.PHONY` line, or a
-lint/test/format rule that references a directory which does not exist. Targets missing from
-`.PHONY` and the absence of `## ` self-documenting comments are reported as warnings.
+Fails on a missing/invalid tier marker, a required target absent for the tier, a forbidden target name (`fmt`/`type-check`/`tests`), a legacy `docker-compose <cmd>` invocation, a glued `docker compose` typo, a missing `help` target or `.PHONY` line, or a lint/test/format rule referencing a directory that does not exist. Missing `.PHONY` entries and absent `## ` self-documenting comments are reported as warnings.
 
-```yaml
-- id: makefile-check
-  files: (^|/)Makefile$
-```
+## Related
 
-### generate-changelog
+- [chrysa/guideline-checker](https://github.com/chrysa/guideline-checker) — structural coding-guidelines checker (project structure, naming, standards), usable as a companion pre-commit hook.
 
-Generate or update a `CHANGELOG.md` using [git-cliff](https://github.com/orhun/git-cliff) on every commit to `main`.
-Requires `git-cliff` to be installed in PATH.
+## License
 
-This hook runs in the `manual` stage by default — trigger it via CI or explicitly:
-
-```bash
-pre-commit run generate-changelog --hook-stage manual
-```
-
-```yaml
-- id: generate-changelog
-  stages: [manual]
-```
+MIT

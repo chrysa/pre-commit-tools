@@ -1,165 +1,33 @@
 ---
+# Thin caller of the generalized chrysa lean CI (compose-backed app).
+# Gate = pre-commit; reports -> Sonar; tests via make docker-test; sonar.
+# Auto-versioning stays in release.yml (GitVersion).
+
 name: CI
 
 on:
     pull_request:
-        branches:
-            - main
+        branches: [main]
     push:
-        branches:
-            - main
-            - "feat/**"
-            - "feature/**"
-            - "fix/**"
-            - "chore/**"
-            - "ci/**"
-            - "release/**"
+        branches: [main, "feat/**", "fix/**", "chore/**", "ci/**"]
     workflow_dispatch:
 
-# Required for publish-unit-test-result-action and SonarCloud
 permissions:
-    checks: write
     contents: read
+    checks: write
     pull-requests: write
-    statuses: write
 
 concurrency:
-    group: ${{ github.workflow }}-${{ github.ref }}
+    group: ci-${{ github.ref }}
     cancel-in-progress: true
 
 jobs:
-    config:
-        name: Build matrix config
-        runs-on: ubuntu-latest
-        timeout-minutes: 5
-        outputs:
-            python-versions: ${{ steps.matrix.outputs.python-versions }}
-            latest-python: ${{ steps.matrix.outputs.latest-python }}
-        steps:
-            - id: matrix
-              shell: bash
-              run: |
-                  echo 'python-versions=["3.14"]' >> "$GITHUB_OUTPUT"
-                  echo 'latest-python=3.14' >> "$GITHUB_OUTPUT"
-
-    pre-commit:
-        name: Pre-commit checks
-        needs: config
-        runs-on: ubuntu-latest
-        timeout-minutes: 15
-        steps:
-            - uses: actions/checkout@v6.0.3
-            - uses: chrysa/github-actions/python-setup@v1.1.3
-              with:
-                  python-version: ${{ needs.config.outputs.latest-python }}
-            - uses: chrysa/github-actions/install-project@v1.1.3
-              with:
-                  extras: yaml,format_dockerfile,ts_unreachable_code
-            - uses: pre-commit/action@v3.0.1
-              env:
-                  SKIP: no-commit-to-branch
-
-    ruff:
-        name: Ruff (${{ matrix.python-version }})
-        needs: config
-        runs-on: ubuntu-latest
-        timeout-minutes: 15
-        strategy:
-            fail-fast: false
-            matrix:
-                python-version: ${{ fromJson(needs.config.outputs.python-versions) }}
-        steps:
-            - uses: actions/checkout@v6.0.3
-
-            - name: Setup environment
-              uses: chrysa/github-actions/tool-setup@v1.1.3
-              with:
-                  python-version: ${{ matrix.python-version }}
-                  extras: "lint,format_dockerfile,yaml,dead_code"
-
-            - name: Ruff checks
-              uses: chrysa/github-actions/ruff-check@v1.1.3
-              with:
-                  python-version: ${{ matrix.python-version }}
-                  latest-python: ${{ needs.config.outputs.latest-python }}
-                  config: config-tools/ruff.toml
-                  sources: "pre_commit_hooks tests"
-
-    mypy:
-        name: Mypy (${{ matrix.python-version }})
-        needs: config
-        runs-on: ubuntu-latest
-        continue-on-error: true
-        timeout-minutes: 20
-        strategy:
-            fail-fast: false
-            matrix:
-                python-version: ${{ fromJson(needs.config.outputs.python-versions) }}
-        steps:
-            - uses: actions/checkout@v6.0.3
-
-            - name: Setup environment
-              uses: chrysa/github-actions/tool-setup@v1.1.3
-              with:
-                  python-version: ${{ matrix.python-version }}
-                  extras: "typecheck,format_dockerfile,yaml,dead_code"
-
-            - name: Mypy checks
-              uses: chrysa/github-actions/mypy-check@v1.1.3
-              with:
-                  python-version: ${{ matrix.python-version }}
-                  latest-python: ${{ needs.config.outputs.latest-python }}
-                  config-file: pyproject.toml
-                  sources: pre_commit_hooks
-
-    test:
-        name: Test (${{ matrix.python-version }})
-        needs: config
-        runs-on: ubuntu-latest
-        timeout-minutes: 30
-        strategy:
-            fail-fast: false
-            matrix:
-                python-version: ${{ fromJson(needs.config.outputs.python-versions) }}
-        steps:
-            - uses: actions/checkout@v6.0.3
-
-            - name: Check Node.js version
-              shell: bash
-              run: node --version || echo "node not available"
-
-            - name: Setup environment
-              uses: chrysa/github-actions/tool-setup@v1.1.3
-              with:
-                  python-version: ${{ matrix.python-version }}
-                  extras: "test,format_dockerfile,yaml,ts_unreachable_code,dead_code"
-
-            - name: Run tests
-              uses: chrysa/github-actions/run-tests@v1.1.3
-              with:
-                  python-version: ${{ matrix.python-version }}
-                  latest-python: ${{ needs.config.outputs.latest-python }}
-                  cov-module: pre_commit_hooks
-
-    sonar:
-        name: SonarCloud analysis
-        needs: [config, ruff, mypy, test]
-        if: always()
-        runs-on: ubuntu-latest
-        timeout-minutes: 15
-        steps:
-            - uses: actions/checkout@v6.0.3
-              with:
-                  fetch-depth: 0
-
-            - name: SonarCloud scan
-              uses: chrysa/github-actions/sonar-scan-python@v1.1.3
-              with:
-                  python-version: ${{ needs.config.outputs.latest-python }}
-                  sonar-token: ${{ secrets.SONAR_TOKEN }}
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  project-key: chrysa_pre-commit-tools
-                  organization: chrysa
-                  project-name: pre-commit-tools
-                  sources: pre_commit_hooks
-                  tests: tests
+    ci:
+        uses: chrysa/github-actions/.github/workflows/ci-python-app.yml@main
+        with:
+            sources: "."
+            typecheck-paths: pre_commit_hooks
+            project-key: chrysa_pre-commit-tools
+            project-name: pre-commit-tools
+            sonar-sources: "."
+        secrets: inherit

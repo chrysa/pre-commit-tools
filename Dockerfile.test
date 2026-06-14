@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends git \
 RUN pip install --upgrade pip setuptools wheel
 
 COPY pyproject.toml ./
-RUN pip install ".[test,yaml,ts_unreachable_code]"
+RUN pip install ".[test,yaml,ts_unreachable_code,format_dockerfile,dead_code]"
 
 FROM deps AS test
 

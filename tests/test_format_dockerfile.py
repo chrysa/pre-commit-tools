@@ -14,12 +14,26 @@ dockerfile_parse = pytest.importorskip(
     reason='dockerfile-parse not installed',
 )
 
+from pre_commit_hooks import format_dockerfile  # noqa: E402
 from pre_commit_hooks.format_dockerfile import (  # noqa: E402
     FormatDockerfile,
+    _fetch_dockerfile_tags,
     _load_config,
     _sort_arg_env_blocks,
+    _version_tuple,
     main,
 )
+
+
+@pytest.fixture(autouse=True)
+def _no_network(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """Keep version-lag checks offline by default and isolate the tag cache."""
+    monkeypatch.setattr(format_dockerfile, '_fetch_dockerfile_tags', lambda: [])
+    monkeypatch.setattr(
+        format_dockerfile,
+        '_TAGS_CACHE_FILE',
+        tmp_path / 'tags_cache.json',
+    )
 
 
 def _write(tmp_path: Path, name: str, content: str) -> str:
@@ -251,3 +265,160 @@ class TestFormatDockerfileClass:
         fd.load_dockerfile(dockerfile_path=Path(f))
         fd.format_file()
         assert 'HEALTHCHECK' in fd.content
+
+
+DOCKERFILE_NEWER_HEADER = """\
+# syntax=docker/dockerfile:1.7
+FROM python:3.13-slim
+RUN pip install requests
+"""
+
+DOCKERFILE_HEADER_NO_MINOR = """\
+# syntax=docker/dockerfile:1
+FROM python:3.13-slim
+RUN pip install requests
+"""
+
+
+class TestSyntaxHeaderVersion:
+    def test_any_version_header_preserved(self, tmp_path: Path) -> None:
+        f = _write(tmp_path, 'Dockerfile', DOCKERFILE_NEWER_HEADER)
+        fd = FormatDockerfile()
+        fd.load_dockerfile(dockerfile_path=Path(f))
+        fd.format_file()
+        # Non-default version is kept, not downgraded or duplicated.
+        assert '# syntax=docker/dockerfile:1.7' in fd.content
+        assert '# syntax=docker/dockerfile:1.4' not in fd.content
+        assert fd.content.count('# syntax=docker/dockerfile') == 1
+
+    def test_bare_major_header_detected(self, tmp_path: Path) -> None:
+        f = _write(tmp_path, 'Dockerfile', DOCKERFILE_HEADER_NO_MINOR)
+        fd = FormatDockerfile()
+        fd.load_dockerfile(dockerfile_path=Path(f))
+        assert fd._header_version() == '1'
+
+    def test_missing_header_returns_none(self, tmp_path: Path) -> None:
+        f = _write(tmp_path, 'Dockerfile', SIMPLE_DOCKERFILE)
+        fd = FormatDockerfile()
+        fd.load_dockerfile(dockerfile_path=Path(f))
+        assert fd._header_version() is None
+
+    def test_non_syntax_comment_returns_none(self, tmp_path: Path) -> None:
+        f = _write(tmp_path, 'Dockerfile', '# just a comment\nFROM python:3.13-slim\n')
+        fd = FormatDockerfile()
+        fd.load_dockerfile(dockerfile_path=Path(f))
+        assert fd._header_version() is None
+
+
+class TestVersionTuple:
+    def test_pads_to_three_parts(self) -> None:
+        assert _version_tuple('1') == (1, 0, 0)
+        assert _version_tuple('1.7') == (1, 7, 0)
+        assert _version_tuple('1.7.3') == (1, 7, 3)
+
+    def test_ordering(self) -> None:
+        assert _version_tuple('1.4') < _version_tuple('1.7')
+        assert _version_tuple('1.4.0') == _version_tuple('1.4')
+
+
+class TestVersionLag:
+    def test_warns_when_three_or_more_behind(
+        self,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        monkeypatch.setattr(
+            format_dockerfile,
+            '_fetch_dockerfile_tags',
+            lambda: ['1.4.0', '1.5.0', '1.6.0', '1.7.0'],
+        )
+        fd = FormatDockerfile()
+        fd.dockerfile = Path('Dockerfile')
+        with caplog.at_level('WARNING'):
+            fd._check_version_lag(version='1.4')
+        assert 'releases behind' in caplog.text
+        assert '1.7.0' in caplog.text
+
+    def test_no_warning_when_within_threshold(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        monkeypatch.setattr(
+            format_dockerfile,
+            '_fetch_dockerfile_tags',
+            lambda: ['1.4.0', '1.5.0', '1.6.0'],
+        )
+        fd = FormatDockerfile()
+        with caplog.at_level('WARNING'):
+            fd._check_version_lag(version='1.5')
+        assert 'releases behind' not in caplog.text
+
+    def test_no_warning_when_fetch_empty(
+        self,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        # autouse fixture already makes _fetch_dockerfile_tags return [].
+        fd = FormatDockerfile()
+        with caplog.at_level('WARNING'):
+            fd._check_version_lag(version='1.0')
+        assert 'releases behind' not in caplog.text
+
+
+class _FakeResponse:
+    def __init__(self, payload: bytes) -> None:
+        self._payload = payload
+
+    def read(self) -> bytes:
+        return self._payload
+
+    def __enter__(self) -> _FakeResponse:
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        return None
+
+
+class TestFetchDockerfileTags:
+    def test_network_error_returns_empty(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        def _boom(*args: object, **kwargs: object) -> None:
+            raise OSError('no network')
+
+        monkeypatch.setattr(format_dockerfile.urllib.request, 'urlopen', _boom)
+        assert _fetch_dockerfile_tags() == []
+
+    def test_success_filters_and_caches(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        import json as _json
+
+        payload = _json.dumps(
+            {
+                'results': [
+                    {'name': '1.7.0'},
+                    {'name': '1.6.0'},
+                    {'name': 'latest'},
+                    {'name': '1.7.0-labs'},
+                    {'name': 123},
+                ],
+            },
+        ).encode('utf-8')
+        monkeypatch.setattr(
+            format_dockerfile.urllib.request,
+            'urlopen',
+            lambda *a, **k: _FakeResponse(payload),
+        )
+        tags = _fetch_dockerfile_tags()
+        assert tags == ['1.7.0', '1.6.0']
+        # Second call hits the fresh cache without touching the network.
+        monkeypatch.setattr(
+            format_dockerfile.urllib.request,
+            'urlopen',
+            lambda *a, **k: (_ for _ in ()).throw(AssertionError('network used')),
+        )
+        assert _fetch_dockerfile_tags() == ['1.7.0', '1.6.0']

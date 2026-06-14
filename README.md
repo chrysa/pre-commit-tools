@@ -122,6 +122,8 @@ Add this to your `.pre-commit-config.yaml`
 ### format-dockerfiles
 
 - Add shebang `# syntax=docker/dockerfile:1.4` if missing
+- Accept **any** pinned `# syntax=docker/dockerfile:<version>` header (e.g. `1`, `1.7`, `1.7.0`) and keep it as-is — only a missing header is rewritten/blocked
+- Warn (non-blocking) when the pinned version trails the latest stable `docker/dockerfile` release on Docker Hub by 3 or more releases. The tag list is fetched best-effort (3 s timeout, cached 24 h) and any network failure is ignored, so the hook never breaks an offline commit
 - Group consecutive same-instruction blocks without blank lines
 - Merge consecutive `RUN` or `ENV` instructions on one command line with continuation
 

@@ -44,10 +44,12 @@ class TestSortYamlFile:
         _changed, result = sort_yaml_file(False, data, {})
         assert isinstance(result, dict)
 
-    def test_list_of_scalars_sorted(self) -> None:
+    def test_list_of_scalars_preserved(self) -> None:
+        """Scalar sequences keep their original order (YAML sequences are ordered)."""
         data = {'items': ['c', 'a', 'b']}
         _changed, result = sort_yaml_file(False, data, {})
-        assert result['items'] == ['a', 'b', 'c']
+        assert result['items'] == ['c', 'a', 'b']
+        assert not _changed
 
     def test_list_of_dicts_not_sorted(self) -> None:
         """Lists containing dicts should be left as-is."""
@@ -55,6 +57,15 @@ class TestSortYamlFile:
         data = {'items': inner}
         _changed, result = sort_yaml_file(False, data, {})
         assert result['items'] == inner
+
+    def test_healthcheck_sequence_order_preserved(self) -> None:
+        """Regression: order-sensitive sequences (e.g. docker-compose healthcheck.test)
+        must keep their exact order while sibling mapping keys are still sorted.
+        """
+        data = {'healthcheck': {'test': ['CMD', 'curl', '-f', 'http://x/health']}}
+        _changed, result = sort_yaml_file(False, data, {})
+        assert result['healthcheck']['test'] == ['CMD', 'curl', '-f', 'http://x/health']
+        assert not _changed
 
 
 class TestYamlSorterMain:

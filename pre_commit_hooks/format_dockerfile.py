@@ -3,9 +3,14 @@
 
 from __future__ import annotations
 
+import json
 import logging
 import re
+import tempfile
+import time
 import tomllib
+import urllib.error
+import urllib.request
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -23,8 +28,93 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
+# Default header injected when a Dockerfile has none. Adding it modifies the
+# file, so the hook returns 1 and the commit is blocked until it is committed.
 SHEBANG = '# syntax=docker/dockerfile:1.4'
 _RUN_JOIN = ' \\\n    && '
+
+# Matches any pinned syntax-frontend header, e.g.
+#   # syntax=docker/dockerfile:1
+#   # syntax=docker/dockerfile:1.7
+#   # syntax=docker/dockerfile:1.7.0
+_SYNTAX_HEADER_PATTERN = re.compile(
+    r'^#\s*syntax\s*=\s*docker/dockerfile:(\d+(?:\.\d+){0,2})\s*$',
+)
+
+# How many newer stable releases the pinned version may trail before we warn.
+_VERSION_LAG_THRESHOLD = 3
+
+# Docker Hub tag listing for the official syntax frontend image.
+_DOCKERHUB_TAGS_URL = 'https://hub.docker.com/v2/repositories/docker/dockerfile/tags?page_size=100'
+_DOCKERHUB_TIMEOUT = 3.0
+# Only plain X.Y.Z stable tags — excludes 'latest', 'labs', '*-rc*', etc.
+_STABLE_TAG_PATTERN = re.compile(r'^\d+\.\d+\.\d+$')
+
+# Cache the tag listing so we hit the network at most once per day instead of
+# on every commit. Network failures fall back to "no warning", never an error.
+_TAGS_CACHE_FILE = Path(tempfile.gettempdir()) / 'format_dockerfile_syntax_tags.json'
+_TAGS_CACHE_TTL = 86400  # seconds (24h)
+
+
+def _version_tuple(version: str) -> tuple[int, int, int]:
+    """Normalise a dotted version to a 3-tuple so X.Y and X.Y.Z compare fairly."""
+    parts = [int(part) for part in version.split('.')]
+    while len(parts) < 3:
+        parts.append(0)
+    return (parts[0], parts[1], parts[2])
+
+
+def _read_tags_cache() -> list[str] | None:
+    """Return cached stable tags if the cache is fresh, else None."""
+    try:
+        raw = json.loads(_TAGS_CACHE_FILE.read_text(encoding='utf-8'))
+        if time.time() - float(raw['fetched_at']) < _TAGS_CACHE_TTL:
+            tags = raw['tags']
+            return [str(tag) for tag in tags]
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+    return None
+
+
+def _write_tags_cache(tags: list[str]) -> None:
+    """Persist stable tags with a fetch timestamp; ignore write failures."""
+    try:
+        _TAGS_CACHE_FILE.write_text(
+            json.dumps({'fetched_at': time.time(), 'tags': tags}),
+            encoding='utf-8',
+        )
+    except OSError:
+        pass
+
+
+def _fetch_dockerfile_tags() -> list[str]:
+    """Return stable docker/dockerfile tags from Docker Hub (cached, best-effort).
+
+    Returns an empty list on any network/parse error so version-lag checking is
+    skipped silently — it must never break an offline commit.
+    """
+    if (cached := _read_tags_cache()) is not None:
+        return cached
+    try:
+        request = urllib.request.Request(  # noqa: S310 — fixed HTTPS Docker Hub URL
+            _DOCKERHUB_TAGS_URL,
+            headers={'User-Agent': 'format-dockerfile-hook'},
+        )
+        with urllib.request.urlopen(  # noqa: S310 — fixed HTTPS Docker Hub URL
+            request,
+            timeout=_DOCKERHUB_TIMEOUT,
+        ) as response:
+            payload = json.loads(response.read().decode('utf-8'))
+    except (urllib.error.URLError, OSError, ValueError, TimeoutError):
+        return []
+    tags = [
+        result['name']
+        for result in payload.get('results', [])
+        if isinstance(result.get('name'), str) and _STABLE_TAG_PATTERN.match(result['name'])
+    ]
+    _write_tags_cache(tags)
+    return tags
+
 
 # Matches ARG lines that reference another variable: ARG FOO=${BAR} or ARG FOO=${BAR}-extra
 _ARG_VAR_PATTERN = re.compile(r'ARG\s+\w+\s*=\s*.*\$\{')
@@ -122,10 +212,35 @@ class FormatDockerfile:
         logger.debug('remove split lines ..........')
         return re.sub(r' \\\n +', ' ', content)
 
-    def _as_header(self) -> bool:
-        logger.debug('verify if header is present ..........')
+    def _header_version(self) -> str | None:
+        """Return the pinned syntax version if line 0 is a syntax header, else None.
+
+        Accepts any version (1, 1.7, 1.7.0…), not only the default SHEBANG, so an
+        up-to-date header is preserved instead of being duplicated or downgraded.
+        """
+        logger.debug('verify if syntax header is present ..........')
+        if not self.parser.structure:
+            return None
         line = self.parser.structure[0]
-        return self._is_type(line=line, instruction_type='COMMENT') and self._get_line_content(line=line) == SHEBANG
+        if not self._is_type(line=line, instruction_type='COMMENT'):
+            return None
+        match = _SYNTAX_HEADER_PATTERN.match(self._get_line_content(line=line))
+        return match.group(1) if match else None
+
+    def _check_version_lag(self, *, version: str) -> None:
+        """Warn (non-blocking) if the pinned version trails latest by >= threshold."""
+        tags = _fetch_dockerfile_tags()
+        if not tags:
+            return
+        pinned = _version_tuple(version)
+        newer = [tag for tag in tags if _version_tuple(tag) > pinned]
+        if len(newer) >= _VERSION_LAG_THRESHOLD:
+            latest = max(tags, key=_version_tuple)
+            target = self.dockerfile if self.dockerfile is not None else 'Dockerfile'
+            logger.warning(
+                f'{target}: syntax version {version} is {len(newer)} releases behind '
+                f'latest {latest}; consider updating the # syntax header',
+            )
 
     def _define_header(self) -> None:
         logger.debug('add shebang ..........')
@@ -176,17 +291,17 @@ class FormatDockerfile:
         return self._get_line_instruction(line=line) == instruction_type
 
     def _validate_header(self) -> list[Line]:
-        logger.debug('validate shebang ..........')
-        if self._as_header():
-            logger.debug('shebang is present ..........')
+        logger.debug('validate syntax header ..........')
+        if (version := self._header_version()) is not None:
+            logger.debug(f'syntax header present (version {version}) ..........')
             self._format_simple_line(
                 line_content=self._get_line_content(line=self.parser.structure[0]),
                 line_instruction='COMMENT',
             )
+            self._check_version_lag(version=version)
             return self.parser.structure[1:]
-        else:
-            self._define_header()
-            return self.parser.structure
+        self._define_header()
+        return self.parser.structure
 
     def _get_previous_instruction(self, *, index: int) -> str:
         return self._get_line_instruction(line=self.origin_content[index - 1])
@@ -261,6 +376,7 @@ class FormatDockerfile:
 
     def load_dockerfile(self, *, dockerfile_path: Path) -> None:
         logger.debug(f'read {dockerfile_path} ..........')
+        self.dockerfile = dockerfile_path
         self.parser.dockerfile_path = dockerfile_path
         with open(dockerfile_path) as stream:
             raw_text = stream.read()
@@ -272,13 +388,13 @@ class FormatDockerfile:
             logger.debug(f'update {file} ..........')
             with open(file, 'w') as stream:
                 stream.write(self.content.strip() + '\n')
-            print(f'{file} .......... formatted')
+            print(f'{file} .......... formatted')  # print-detection: disable -- CLI output
             self.return_value = 1
         else:
             # Restore original: format_file() writes intermediate content to disk as a side effect
             with open(file, 'w') as stream:
                 stream.write(self._raw_content)
-            print(f'{file} .......... unchanged')
+            print(f'{file} .......... unchanged')  # print-detection: disable -- CLI output
 
 
 def main(argv: Sequence[str] | None = None) -> int:

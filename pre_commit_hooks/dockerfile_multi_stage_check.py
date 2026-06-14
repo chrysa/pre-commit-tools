@@ -8,13 +8,16 @@ from collections.abc import Sequence
 
 _DISABLE_COMMENT = '# dockerfile-multi-stage-check: disable'
 _FROM_RE = re.compile(r'^\s*FROM\s+\S+', re.IGNORECASE)
-_FROM_SCRATCH_RE = re.compile(r'^\s*FROM\s+scratch(\s|$)', re.IGNORECASE)
 
 Violation = tuple[str, int, str]
 
 
 def detect_missing_multi_stage(source: str, filename: str) -> list[Violation]:
-    """Return violations when the Dockerfile has only one non-scratch FROM stage."""
+    """Return violations when the Dockerfile has fewer than two FROM stages.
+
+    Every FROM counts as a stage, including a final ``FROM scratch`` — a build
+    that copies artefacts into ``scratch`` is still a valid multi-stage build.
+    """
     if _DISABLE_COMMENT in source:
         return []
 
@@ -23,7 +26,7 @@ def detect_missing_multi_stage(source: str, filename: str) -> list[Violation]:
         line_stripped = line.strip()
         if line_stripped.startswith('#'):
             continue
-        if _FROM_RE.match(line) and not _FROM_SCRATCH_RE.match(line):
+        if _FROM_RE.match(line):
             from_count += 1
 
     if from_count < 2:

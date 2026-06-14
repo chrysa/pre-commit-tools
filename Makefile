@@ -62,7 +62,7 @@ format-check: ## Check ruff formatting (no changes)
 	ruff format --check --config=config-tools/ruff.toml $(PACKAGE_DIR)
 
 typecheck: ## Run mypy type checking
-	mypy --config-file=setup.cfg $(PACKAGE_DIR)
+	mypy --config-file=pyproject.toml $(PACKAGE_DIR)
 
 pylint: ## Run pylint static analysis
 	pylint --rcfile=setup.cfg --reports=no --score=no --persistent=no $(PACKAGE_DIR)

@@ -1,5 +1,11 @@
 #!/usr/bin/python3
-"""Hook to sort YAML files keys alphabetically."""
+"""Hook to sort YAML mapping keys alphabetically.
+
+Only mapping (dict) keys are sorted, recursively. YAML sequences (lists)
+are ordered by the YAML spec and are always left in their original order:
+reordering them corrupts order-sensitive YAML such as docker-compose
+``healthcheck.test``, GitHub Actions ``steps`` and command argument lists.
+"""
 
 from __future__ import annotations
 
@@ -17,7 +23,7 @@ def sort_yaml_file(
     data: dict[Any, Any],
     _initial_sorted: dict[Any, Any] | None = None,
 ) -> tuple[bool, dict[Any, Any]]:
-    """Sort a YAML dict recursively; return updated change flag and sorted dict."""
+    """Sort mapping keys recursively; sequences keep their original order."""
     sorted_data = dict(sorted(data.items(), key=lambda item: str(item[0])))
     changed_file_state |= list(sorted_data.keys()) != list(data.keys())
     for key, value in sorted_data.items():
@@ -28,11 +34,8 @@ def sort_yaml_file(
                 value,
             )
         elif isinstance(value, list):
-            if all(not isinstance(item, (dict, list)) for item in value):
-                sorted_data[key] = sorted(value)
-                changed_file_state |= sorted_data[key] != value
-            else:
-                sorted_data[key] = value
+            # YAML sequences are ordered by spec: never reorder them.
+            sorted_data[key] = value
         else:
             sorted_data[key] = value
     return changed_file_state, sorted_data

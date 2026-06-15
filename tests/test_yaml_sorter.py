@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
+
+import yaml
 
 from pre_commit_hooks.yaml_sorter import main, sort_yaml_file
 
@@ -86,3 +89,38 @@ class TestYamlSorterMain:
 
     def test_empty_args_returns_0(self) -> None:
         assert main([]) == 0
+
+
+class TestWorkflowCorruptionGuard:
+    """Issue #215 — yaml-sorter must never touch GitHub Actions workflows."""
+
+    def test_on_key_is_corrupted_to_true_when_rewritten(self, tmp_path: Path) -> None:
+        """Characterizes WHY workflows are excluded: PyYAML (YAML 1.1) coerces the
+        top-level `on:` trigger key to the boolean True and re-serializes it as
+        `true:`, silently removing the workflow's triggers. This is the corruption
+        the hook-level exclude protects against; if the sorter is ever made
+        YAML-1.2-safe, this test should be replaced by an `on:`-preserving one.
+        """
+        # `jobs` before `on` so alphabetical sorting forces a rewrite.
+        wf = _write(
+            tmp_path,
+            'wf.yaml',
+            'jobs:\n  a:\n    runs-on: ubuntu-latest\non:\n  push:\n    branches: [main]\n',
+        )
+        assert main([wf]) == 1  # keys reordered -> file rewritten
+        rewritten = Path(wf).read_text()
+        assert 'true:' in rewritten  # `on:` was coerced to the boolean True
+        # the workflow no longer has a usable top-level trigger key
+        assert True in yaml.safe_load(rewritten)
+
+    def test_hook_definition_excludes_workflows(self) -> None:
+        """The yaml-sorter hook must carry an `exclude` that matches
+        `.github/workflows/` so consumers never corrupt their workflows.
+        """
+        hooks_file = Path(__file__).parents[1] / '.pre-commit-hooks.yaml'
+        hooks = yaml.safe_load(hooks_file.read_text())
+        sorter = next(h for h in hooks if h['id'] == 'yaml-sorter')
+        assert 'exclude' in sorter, 'yaml-sorter must exclude unsafe paths'
+        assert re.search(sorter['exclude'], '.github/workflows/ci.yml'), (
+            f'exclude {sorter["exclude"]!r} must match GitHub workflow paths'
+        )

@@ -53,7 +53,9 @@ def _sort_dep_block(dep_lines: list[str]) -> list[str]:
 
 
 def _sort_extras_require_section(
-    lines: list[str], start: int, result: list[str]
+    lines: list[str],
+    start: int,
+    result: list[str],
 ) -> tuple[list[str], int]:
     """Process ``[options.extras_require]`` block; return (result, new_index)."""
     i = start

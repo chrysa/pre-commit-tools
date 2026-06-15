@@ -81,6 +81,10 @@
     - PyYAML
   description: sort yaml files keys alphabetically
   entry: yaml-sorter
+  # GitHub Actions workflows must never be sorted: PyYAML is a YAML 1.1 loader,
+  # so the top-level `on:` key parses as the boolean True and is re-serialized
+  # as `true:`, silently stripping the workflow's triggers (see issue #215).
+  exclude: '\.github/workflows/'
   language: python
   minimum_pre_commit_version: '4.1.0'
   name: sort yaml files

@@ -89,7 +89,12 @@ def detect_duplicate_properties(content: str, filename: str) -> list[Violation]:
             scope_stack.append({})
 
         _check_property_line(
-            stripped, original_lines[lineno - 1], lineno, scope_stack, violations, filename
+            stripped,
+            original_lines[lineno - 1],
+            lineno,
+            scope_stack,
+            violations,
+            filename,
         )
 
         # Update nesting for closing braces
@@ -152,7 +157,13 @@ def detect_duplicate_ids(content: str, filename: str) -> list[IdViolation]:
         close_count = stripped.count('}')
 
         _check_id_line(
-            stripped, original_lines[lineno - 1], lineno, depth, seen_ids, violations, filename
+            stripped,
+            original_lines[lineno - 1],
+            lineno,
+            depth,
+            seen_ids,
+            violations,
+            filename,
         )
 
         depth += open_count - close_count

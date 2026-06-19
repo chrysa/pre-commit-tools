@@ -52,6 +52,51 @@ pre-commit: ## Hooks
 """
 
 
+MAIN_SHELL_INCLUDE = '\n'.join(
+    (
+        '# makefile-tier: lib',
+        '.DEFAULT_GOAL := help',
+        '',
+        '.PHONY: help',
+        '',
+        'help: ## Show available targets',
+        '\t@echo help',
+        '',
+        'include $(shell find . -type f -name "*.Makefile" -not -path "*/.*")',
+        '',
+    ),
+)
+MAIN_GLOB_INCLUDE = MAIN_SHELL_INCLUDE.replace(
+    'include $(shell find . -type f -name "*.Makefile" -not -path "*/.*")',
+    'include makefiles/*.Makefile',
+)
+SUB_TARGETS = '\n'.join(
+    (
+        'install: ## Install',
+        '\tpip install -e .',
+        'dev: ## Dev',
+        '\t@echo dev',
+        'lint: ## Lint',
+        '\t@echo lint',
+        'format: ## Format',
+        '\t@echo format',
+        'typecheck: ## Types',
+        '\t@echo typecheck',
+        'test: ## Test',
+        '\t@echo test',
+        'clean: ## Clean',
+        '\t@echo clean',
+        'build: ## Build',
+        '\t@echo build',
+        'test-cov: ## Cov',
+        '\t@echo cov',
+        'pre-commit: ## PC',
+        '\t@echo pc',
+        '',
+    ),
+)
+
+
 def _write(tmp_path: Path, content: str, *, dirs: tuple[str, ...] = ('mypkg', 'tests')) -> Path:
     for name in dirs:
         (tmp_path / name).mkdir(exist_ok=True)
@@ -271,3 +316,46 @@ class TestPhonyAndHelp:
         path = _write(tmp_path, content)
         errors, _ = check_makefile(path)
         assert any("missing 'help'" in e for e in errors)
+
+
+class TestIncludedTargets:
+    """Targets defined in `include`d sub-makefiles must satisfy the contract."""
+
+    def _setup(self, tmp_path: Path, main: str) -> Path:
+        (tmp_path / 'makefiles').mkdir(exist_ok=True)
+        (tmp_path / 'makefiles' / 'targets.Makefile').write_text(
+            SUB_TARGETS,
+            encoding='utf-8',
+        )
+        path = tmp_path / 'Makefile'
+        path.write_text(main, encoding='utf-8')
+        return path
+
+    def test_shell_find_include_resolves_targets(self, tmp_path: Path) -> None:
+        path = self._setup(tmp_path, MAIN_SHELL_INCLUDE)
+        errors, _ = check_makefile(path)
+        assert not any('missing required targets' in e for e in errors)
+
+    def test_glob_include_resolves_targets(self, tmp_path: Path) -> None:
+        path = self._setup(tmp_path, MAIN_GLOB_INCLUDE)
+        errors, _ = check_makefile(path)
+        assert not any('missing required targets' in e for e in errors)
+
+    def test_without_include_targets_still_missing(self, tmp_path: Path) -> None:
+        # No sub-makefile written -> include resolves to nothing -> still failing.
+        path = tmp_path / 'Makefile'
+        path.write_text(MAIN_SHELL_INCLUDE, encoding='utf-8')
+        errors, _ = check_makefile(path)
+        assert any('missing required targets' in e for e in errors)
+
+    def test_hidden_dir_sub_makefiles_ignored(self, tmp_path: Path) -> None:
+        # A sub-makefile under a hidden dir must NOT count (find idiom skips them).
+        (tmp_path / '.cache').mkdir(exist_ok=True)
+        (tmp_path / '.cache' / 'targets.Makefile').write_text(
+            SUB_TARGETS,
+            encoding='utf-8',
+        )
+        path = tmp_path / 'Makefile'
+        path.write_text(MAIN_SHELL_INCLUDE, encoding='utf-8')
+        errors, _ = check_makefile(path)
+        assert any('missing required targets' in e for e in errors)

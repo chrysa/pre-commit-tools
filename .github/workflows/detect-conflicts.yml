@@ -11,4 +11,4 @@ concurrency:
 
 jobs:
     call:
-        uses: chrysa/github-actions/.github/workflows/detect-conflicts.yml@main
+        uses: chrysa/github-actions/.github/workflows/detect-conflicts.yml@v1.2.0

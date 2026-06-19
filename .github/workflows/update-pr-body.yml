@@ -7,4 +7,4 @@ on:
 
 jobs:
     call:
-        uses: chrysa/github-actions/.github/workflows/update-pr-body.yml@main
+        uses: chrysa/github-actions/.github/workflows/update-pr-body.yml@v1.2.0

@@ -136,7 +136,7 @@
   additional_dependencies:
     - vulture>=2.0
   args: ['--min-confidence=80']
-  description: detect unused/dead code (functions, variables, imports) using vulture
+  description: detect unused/dead code (functions, variables, imports) using vulture, with dynamic-import awareness and optional test-only detection
   entry: dead-code-detection
   language: python
   minimum_pre_commit_version: '4.1.0'

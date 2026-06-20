@@ -263,7 +263,9 @@ Detect **implicit** dead/unused code (unused functions, variables, imports, clas
 
 **Language**: Python only. **Not language-agnostic** — vulture analyses Python ASTs.
 
-**Dynamic code generation**: vulture may produce false positives on names used only via `getattr`, `__all__`, decorators, or dynamic dispatch. Use a [whitelist file](https://github.com/jendrikseipp/vulture#whitelists) to suppress them.
+**Dynamic-import awareness** (default-on): names reached only through `importlib.import_module`, `__import__`, `getattr`/`setattr`/`hasattr`, `globals()`/`vars()`/`locals()` subscripts or `entry_points` are collected from the AST and filtered out of vulture's report, removing those false positives automatically. Disable with `--no-dynamic-imports`. A [whitelist file](https://github.com/jendrikseipp/vulture#whitelists) still covers names this heuristic cannot reach (e.g. `__all__`, decorators).
+
+**Test-only detection** (`--detect-test-only`): flags production symbols that are referenced *only* from test files (test helpers/backdoors leaking into prod). These findings fail the hook by default; `--warn-only` downgrades them to a report (genuinely dead code still fails). Detection scans both production and test files in one invocation, so set `pass_filenames: false` (or run over the whole tree at the `manual` stage) when enabling it. Test files are recognised by `--test-pattern` (default `tests/ test_*.py *_test.py conftest.py`).
 
 This hook runs in the `manual` stage by default to avoid false positives on entry points.
 
@@ -276,6 +278,8 @@ This hook runs in the `manual` stage by default to avoid false positives on entr
     - '--exclude=tests/ migrations/ **/conftest.py'
     # Whitelist file listing names used dynamically (suppresses false positives)
     - '--whitelist=whitelist.py'
+    # Opt-in: also flag prod symbols used only by tests
+    # - '--detect-test-only'
   additional_dependencies: [vulture>=2.0]
 ```
 
@@ -284,6 +288,10 @@ This hook runs in the `manual` stage by default to avoid false positives on entr
 | `--min-confidence` | `80` | Minimum confidence % to report (0–100) |
 | `--exclude` | — | Space-separated glob patterns of paths to skip |
 | `--whitelist` | — | Vulture whitelist `.py` files to suppress false positives |
+| `--no-dynamic-imports` | off | Disable dynamic-import awareness (report names reached via importlib/getattr/…) |
+| `--detect-test-only` | off | Also flag production symbols referenced only from test files |
+| `--test-pattern` | `tests/ test_*.py *_test.py conftest.py` | File patterns marking test files |
+| `--warn-only` | off | Report test-only findings without failing the hook |
 
 Run manually:
 

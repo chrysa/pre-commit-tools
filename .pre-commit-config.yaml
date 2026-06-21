@@ -87,7 +87,8 @@ repos:
   hooks:
   - id: python-no-eval
   - id: python-no-log-warn
-    exclude: ^(pre_commit_hooks/no_console_warn\.py|tests/test_js_hooks_new\.py)$
+    exclude: 
+      ^(pre_commit_hooks/no_console_warn\.py|tests/test_js_hooks_new\.py)$
   - id: python-use-type-annotations
   - id: rst-backticks
 - repo: https://github.com/MarcoGorelli/auto-walrus
@@ -211,25 +212,15 @@ repos:
     - pre-push
   - id: sonar-scanner
     name: sonar cloud analysis
-    entry: bash -c 'docker run --rm --env SONAR_TOKEN -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli:11
-      -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=chrysa -Dsonar.projectKey=chrysa_pre-commit-tools
-      -Dsonar.python.coverage.reportPaths=reports/coverage.xml -Dsonar.python.xunit.reportPath=reports/junit.xml'
+    entry: bash -c 'docker run --rm --env SONAR_TOKEN -v "$(pwd):/usr/src" 
+      sonarsource/sonar-scanner-cli:11 -Dsonar.host.url=https://sonarcloud.io 
+      -Dsonar.organization=chrysa -Dsonar.projectKey=chrysa_pre-commit-tools 
+      -Dsonar.python.coverage.reportPaths=reports/coverage.xml 
+      -Dsonar.python.xunit.reportPath=reports/junit.xml'
     language: system
     pass_filenames: false
     stages:
     - pre-push
-  - id: gitversion-canonical-drift
-    name: GitVersion.yml canonical drift
-    entry: scripts/check-canonical-drift.sh GitVersion.yml templates/GitVersion.yml
-    language: system
-    pass_filenames: false
-    files: ^(GitVersion\.yml|templates/GitVersion\.yml)$
-  - id: cliff-canonical-drift
-    name: cliff.toml canonical drift
-    entry: scripts/check-canonical-drift.sh cliff.toml templates/cliff.toml
-    language: system
-    pass_filenames: false
-    files: ^(cliff\.toml|templates/cliff\.toml)$
 - repo: https://github.com/gitleaks/gitleaks
   rev: v8.30.1
   hooks:

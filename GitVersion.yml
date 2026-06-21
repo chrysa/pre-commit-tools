@@ -1,17 +1,26 @@
 branches:
-  feat:
+  chore:
+    increment: Patch
+    mode: ContinuousDeployment
+    regex: ^chore/
+    tag: alpha
+  feature:
     increment: Minor
-    regex: ^feat/.*$
+    mode: ContinuousDeployment
+    regex: ^feat/
+    tag: alpha
   fix:
     increment: Patch
-    label: fix
-    regex: ^fix[/-]
-    source-branches:
-    - main
-  release:
+    mode: ContinuousDeployment
+    regex: ^fix/
+    tag: beta
+  main:
     increment: Patch
-    label: rc
-    regex: ^release[/-]
-    source-branches:
-    - main
-workflow: GitHubFlow/v1
+    mode: ContinuousDelivery
+    regex: ^main$
+    tag: ''
+increment: Inherit
+major-version-bump-message: ^(feat|fix|refactor)(\(.+\))?!:.+
+minor-version-bump-message: ^feat(\(.+\))?:.+
+mode: ContinuousDeployment
+patch-version-bump-message: ^(fix|refactor|perf|docs|chore)(\(.+\))?:.+

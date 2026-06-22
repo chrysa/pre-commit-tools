@@ -30,7 +30,7 @@ logger.addHandler(ch)
 
 # Default header injected when a Dockerfile has none. Adding it modifies the
 # file, so the hook returns 1 and the commit is blocked until it is committed.
-SHEBANG = '# syntax=docker/dockerfile:1.4'
+SHEBANG = '# syntax=docker/dockerfile:1.7'
 _RUN_JOIN = ' \\\n    && '
 
 # Matches any pinned syntax-frontend header, e.g.

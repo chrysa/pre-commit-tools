@@ -91,6 +91,46 @@ def _collect_targets(lines: list[str]) -> set[str]:
     return targets
 
 
+_INCLUDE_RE = re.compile(r'^\s*-?include\s+(.+?)\s*$')
+_FIND_NAME_RE = re.compile(r'-name\s+["\']?([^"\'\s]+)')
+
+
+def _included_makefile_paths(directive: str, base: Path) -> list[Path]:
+    """Resolve an ``include`` argument to concrete sub-makefile paths.
+
+    Handles the chrysa conventions the static checker otherwise misses:
+    ``include $(shell find . -name "*.Makefile" ...)`` and plain globs such as
+    ``include makefiles/*.Makefile``. Hidden directories are skipped (the find
+    idiom does ``-not -path '*/.*'``). Unresolvable ``$(...)`` tokens are ignored.
+    """
+    name_match = _FIND_NAME_RE.search(directive)
+    if '$(shell' in directive and 'find' in directive:
+        pattern = name_match.group(1) if name_match else '*.[Mm]akefile'
+        candidates: list[Path] = list(base.glob(f'**/{pattern}'))
+    else:
+        candidates = [match for token in directive.split() if '$' not in token for match in base.glob(token)]
+    resolved: list[Path] = []
+    for candidate in candidates:
+        if any(part.startswith('.') for part in candidate.relative_to(base).parts):
+            continue
+        if candidate.is_file():
+            resolved.append(candidate)
+    return resolved
+
+
+def _collect_included_targets(lines: list[str], base: Path) -> set[str]:
+    """Union of targets declared in files pulled in via ``include`` directives."""
+    targets: set[str] = set()
+    for line in lines:
+        match = _INCLUDE_RE.match(line)
+        if not match:
+            continue
+        for sub in _included_makefile_paths(match.group(1), base):
+            sub_lines = sub.read_text(encoding='utf-8', errors='replace').splitlines()
+            targets |= _collect_targets(sub_lines)
+    return targets
+
+
 def _collect_vars(lines: list[str]) -> dict[str, str]:
     variables: dict[str, str] = {}
     for line in lines:
@@ -245,6 +285,7 @@ def check_makefile(path: Path) -> tuple[list[str], list[str]]:
     text = path.read_text(encoding='utf-8', errors='replace')
     lines = text.splitlines()
     targets = _collect_targets(lines)
+    targets |= _collect_included_targets(lines, path.parent)
 
     errors, warnings = _check_structure(text, lines, targets)
     errors.extend(_check_recipes(lines, path.parent))

@@ -49,16 +49,28 @@ def _model_has_links(class_def: ast.ClassDef) -> bool:
     return False
 
 
+_GENERIC_WRAPPERS = frozenset({'list', 'List', 'Optional'})
+
+
+def _extract_model_name_from_value(value: ast.expr) -> str | None:
+    """Return the model class name from a response_model keyword value node."""
+    if isinstance(value, ast.Name):
+        return value.id
+    if (
+        isinstance(value, ast.Subscript)
+        and isinstance(value.value, ast.Name)
+        and value.value.id in _GENERIC_WRAPPERS
+        and isinstance(value.slice, ast.Name)
+    ):
+        return value.slice.id
+    return None
+
+
 def _get_response_model_name(dec: ast.Call) -> str | None:
     """Extract the class name from response_model=ClassName in a decorator."""
     for kw in dec.keywords:
         if kw.arg == 'response_model':
-            if isinstance(kw.value, ast.Name):
-                return kw.value.id
-            if isinstance(kw.value, ast.Subscript) and isinstance(kw.value.value, ast.Name):
-                if kw.value.value.id in {'list', 'List', 'Optional'}:
-                    if isinstance(kw.value.slice, ast.Name):
-                        return kw.value.slice.id
+            return _extract_model_name_from_value(kw.value)
     return None
 
 
@@ -67,6 +79,33 @@ def _get_decorator_method(dec: ast.expr) -> str | None:
     if isinstance(dec, ast.Call) and isinstance(dec.func, ast.Attribute):
         return dec.func.attr
     return None
+
+
+def _check_decorator_for_violation(
+    dec: ast.expr,
+    node: ast.FunctionDef | ast.AsyncFunctionDef,
+    lines: list[str],
+    models: dict[str, ast.ClassDef],
+    filename: str,
+) -> Violation | None:
+    """Return a violation if *dec* is a route decorator whose response model lacks links."""
+    if not isinstance(dec, ast.Call):
+        return None
+    method = _get_decorator_method(dec)
+    if method not in _ROUTE_METHODS:
+        return None
+    if _is_disable_comment(lines, dec.lineno):
+        return None
+    model_name = _get_response_model_name(dec)
+    if model_name is None or model_name not in models:
+        return None
+    if _model_has_links(models[model_name]):
+        return None
+    return (
+        filename,
+        node.lineno,
+        f"response model {model_name!r} used in route {node.name!r} has no 'links' field (HATEOAS)",
+    )
 
 
 def detect_missing_links(source: str, filename: str) -> list[Violation]:
@@ -82,24 +121,9 @@ def detect_missing_links(source: str, filename: str) -> list[Violation]:
         if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             continue
         for dec in node.decorator_list:
-            if not isinstance(dec, ast.Call):
-                continue
-            method = _get_decorator_method(dec)
-            if method not in _ROUTE_METHODS:
-                continue
-            if _is_disable_comment(lines, dec.lineno):
-                continue
-            model_name = _get_response_model_name(dec)
-            if model_name is None or model_name not in models:
-                continue
-            if not _model_has_links(models[model_name]):
-                violations.append(
-                    (
-                        filename,
-                        node.lineno,
-                        f"response model {model_name!r} used in route {node.name!r} has no 'links' field (HATEOAS)",
-                    ),
-                )
+            violation = _check_decorator_for_violation(dec, node, lines, models, filename)
+            if violation is not None:
+                violations.append(violation)
     return violations
 
 

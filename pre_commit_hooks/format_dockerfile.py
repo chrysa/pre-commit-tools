@@ -131,6 +131,42 @@ def _load_config(config_path: Path) -> dict[str, bool]:
         return {}
 
 
+def _collect_consecutive_block(lines: list[str], i: int, prefix: str) -> tuple[list[str], int]:
+    """Collect consecutive lines starting with *prefix* (case-insensitive); return (block, new_i)."""
+    block: list[str] = []
+    while i < len(lines) and lines[i].strip().upper().startswith(prefix):
+        block.append(lines[i])
+        i += 1
+    return block, i
+
+
+def _emit_arg_block(
+    block: list[str],
+    result: list[str],
+    *,
+    sort_args: bool,
+    separate_arg_blocks: bool,
+) -> None:
+    """Append sorted/separated ARG block lines to *result* in-place."""
+    if separate_arg_blocks:
+        literal = [ln for ln in block if not _ARG_VAR_PATTERN.search(ln)]
+        variable = [ln for ln in block if _ARG_VAR_PATTERN.search(ln)]
+        if sort_args:
+            literal.sort(key=str.casefold)
+            variable.sort(key=str.casefold)
+        if literal and variable:
+            result.extend(literal)
+            result.append('')
+            result.extend(variable)
+        else:
+            result.extend(literal + variable)
+    elif sort_args:
+        block.sort(key=str.casefold)
+        result.extend(block)
+    else:
+        result.extend(block)
+
+
 def _sort_arg_env_blocks(
     content: str,
     *,
@@ -148,33 +184,10 @@ def _sort_arg_env_blocks(
         instruction = stripped.split()[0].upper() if stripped.split() else ''
 
         if instruction == 'ARG' and (sort_args or separate_arg_blocks):
-            # Collect consecutive ARG lines
-            block: list[str] = []
-            while i < len(lines) and lines[i].strip().upper().startswith('ARG'):
-                block.append(lines[i])
-                i += 1
-            if separate_arg_blocks:
-                literal = [ln for ln in block if not _ARG_VAR_PATTERN.search(ln)]
-                variable = [ln for ln in block if _ARG_VAR_PATTERN.search(ln)]
-                if sort_args:
-                    literal.sort(key=str.casefold)
-                    variable.sort(key=str.casefold)
-                if literal and variable:
-                    result.extend(literal)
-                    result.append('')
-                    result.extend(variable)
-                else:
-                    result.extend(literal + variable)
-            elif sort_args:
-                block.sort(key=str.casefold)
-                result.extend(block)
-            else:
-                result.extend(block)
+            block, i = _collect_consecutive_block(lines, i, 'ARG')
+            _emit_arg_block(block, result, sort_args=sort_args, separate_arg_blocks=separate_arg_blocks)
         elif instruction == 'ENV' and sort_envs:
-            block = []
-            while i < len(lines) and lines[i].strip().upper().startswith('ENV'):
-                block.append(lines[i])
-                i += 1
+            block, i = _collect_consecutive_block(lines, i, 'ENV')
             block.sort(key=str.casefold)
             result.extend(block)
         else:

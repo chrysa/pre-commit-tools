@@ -31,26 +31,35 @@ _DISABLE_COMMENT = '// unreachable-code: disable'
 _TSX_SUFFIXES: frozenset[str] = frozenset({'.tsx', '.jsx'})
 
 
+def _is_statement_node(child: object) -> bool:
+    """Return True if *child* is a named, non-trivial statement node."""
+    return child.is_named and child.type not in ('comment', 'ERROR')  # type: ignore[attr-defined]
+
+
+def _statements_from_case(children: list[object]) -> list[object]:
+    """Return named statement children of a switch case/default clause."""
+    stmts: list[object] = []
+    past_colon = False
+    for child in children:
+        if not past_colon:
+            if child.type == ':':  # type: ignore[attr-defined]
+                past_colon = True
+            continue
+        if _is_statement_node(child):
+            stmts.append(child)
+    return stmts
+
+
 def _statements_of(node: object) -> list[object]:
     """Return the direct statement children of a block or case node."""
     node_type: str = node.type  # type: ignore[attr-defined]
     children: list[object] = node.children  # type: ignore[attr-defined]
 
     if node_type in _BLOCK_TYPES:
-        return [c for c in children if c.is_named and c.type not in ('comment', 'ERROR')]  # type: ignore[attr-defined]
+        return [c for c in children if _is_statement_node(c)]
 
     if node_type in _CASE_TYPES:
-        # Skip tokens up to and including ':' then collect named statement children
-        past_colon = False
-        stmts: list[object] = []
-        for child in children:
-            if not past_colon:
-                if child.type == ':':  # type: ignore[attr-defined]
-                    past_colon = True
-                continue
-            if child.is_named and child.type not in ('comment', 'ERROR'):  # type: ignore[attr-defined]
-                stmts.append(child)
-        return stmts
+        return _statements_from_case(children)
 
     return []
 

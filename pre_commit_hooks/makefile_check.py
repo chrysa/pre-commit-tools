@@ -142,6 +142,9 @@ def _collect_vars(lines: list[str]) -> dict[str, str]:
     return variables
 
 
+_PHONY_MARKER = '.PHONY:'
+
+
 def _collect_phony(lines: list[str]) -> set[str] | None:
     """Return the union of all .PHONY target names, or None if no .PHONY line."""
     phony: set[str] = set()
@@ -149,10 +152,10 @@ def _collect_phony(lines: list[str]) -> set[str] | None:
     collecting = False
     for raw in lines:
         line = raw.rstrip('\n')
-        if line.startswith('.PHONY:'):
+        if line.startswith(_PHONY_MARKER):
             found = True
             collecting = True
-            line = line[len('.PHONY:') :]
+            line = line[len(_PHONY_MARKER) :]
         elif not collecting:
             continue
         cont = line.endswith('\\')
@@ -175,6 +178,27 @@ def _strip_quotes(text: str) -> str:
     return re.sub(r'"[^"]*"|\'[^\']*\'', ' ', text)
 
 
+def _is_valid_path_token(expanded: str) -> bool:
+    """Return True if *expanded* looks like a safe literal host path argument."""
+    if '$' in expanded or any(ch in expanded for ch in '*?<>|"\''):
+        return False
+    return bool(re.fullmatch(r'[A-Za-z0-9_][\w./-]*', expanded))
+
+
+def _extract_paths_from_command(tokens: list[str], variables: dict[str, str]) -> list[str]:
+    """Extract valid host path arguments from a single shell command's token list."""
+    paths: list[str] = []
+    for token in tokens[1:]:
+        if token.startswith('-'):
+            break  # positional path args precede flags; stop at first flag
+        if '=' in token or token in _TOOL_SKIP:
+            continue
+        expanded = _expand(token, variables)
+        if _is_valid_path_token(expanded):
+            paths.append(expanded.rstrip('/'))
+    return paths
+
+
 def _candidate_paths(recipe: str, variables: dict[str, str]) -> list[str]:
     """Extract host path arguments for path-checking tools invoked directly.
 
@@ -191,16 +215,7 @@ def _candidate_paths(recipe: str, variables: dict[str, str]) -> list[str]:
         tokens = command.split()
         if not tokens or tokens[0].lstrip('@-') not in PATH_TOOLS:
             continue
-        for token in tokens[1:]:
-            if token.startswith('-'):
-                break  # positional path args precede flags; stop at first flag
-            if '=' in token or token in _TOOL_SKIP:
-                continue
-            expanded = _expand(token, variables)
-            if '$' in expanded or any(ch in expanded for ch in '*?<>|"\''):
-                continue
-            if re.fullmatch(r'[A-Za-z0-9_][\w./-]*', expanded):
-                paths.append(expanded.rstrip('/'))
+        paths.extend(_extract_paths_from_command(tokens, variables))
     return paths
 
 
@@ -245,7 +260,7 @@ def _check_structure(
         errors.append('no .PHONY declaration found')
     # A shell-computed .PHONY (e.g. `.PHONY: $(shell grep ... )`) lists every
     # target dynamically; we cannot resolve it statically, so trust it.
-    elif not any(line.startswith('.PHONY:') and 'shell' in line for line in lines):
+    elif not any(line.startswith(_PHONY_MARKER) and 'shell' in line for line in lines):
         not_phony = sorted(targets - phony - {'help'})
         if not_phony:
             warnings.append(f'.PHONY does not list: {", ".join(not_phony)}')

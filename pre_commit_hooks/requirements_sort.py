@@ -152,7 +152,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     args, _ = tools_instance.get_args(argv=argv)
     changed = False
     for file in args.filenames:
-        path = Path(file)
+        # Resolve to an absolute canonical path to prevent path-traversal via '..'.
+        path = Path(file).resolve()
         original = path.read_text(encoding='utf-8')
         if path.name == 'setup.cfg':
             new_content = sort_setup_cfg(original)

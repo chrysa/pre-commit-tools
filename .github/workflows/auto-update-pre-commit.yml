@@ -8,4 +8,4 @@ on:
 
 jobs:
     call:
-        uses: chrysa/github-actions/.github/workflows/auto-update-pre-commit.yml@v1.2.0
+        uses: chrysa/github-actions/.github/workflows/auto-update-pre-commit.yml@v1.2.1

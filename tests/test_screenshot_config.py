@@ -99,3 +99,11 @@ class TestLoadConfig:
         path = _write(tmp_path, 'strategy: glob-url\nroutes:\n  - {url: /x, name: x}\n')
         with pytest.raises(ConfigError):
             load_config(path)
+
+    def test_non_numeric_viewport_raises(self, tmp_path: Path) -> None:
+        path = _write(
+            tmp_path,
+            'strategy: glob-url\nviewport: {width: abc, height: 600}\n',
+        )
+        with pytest.raises(ConfigError):
+            load_config(path)

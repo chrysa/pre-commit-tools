@@ -109,3 +109,8 @@ class TestPublishHook:
         monkeypatch.setattr(screenshot_publish, 'git_add', lambda paths: staged.append(paths))
         assert screenshot_publish.main([]) == 0
         assert staged == []
+
+    def test_malformed_config_does_not_block(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / '.screenshot-sync.yaml').write_text('strategy: bogus\n', encoding='utf-8')
+        assert screenshot_publish.main([]) == 0

@@ -80,3 +80,8 @@ class TestCaptureHook:
 
         monkeypatch.setattr(screenshot_capture, 'capture_targets', boom)
         assert screenshot_capture.main(['src/pages/Login.tsx']) == 1
+
+    def test_malformed_config_does_not_block(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / '.screenshot-sync.yaml').write_text('strategy: bogus\n', encoding='utf-8')
+        assert screenshot_capture.main([]) == 0

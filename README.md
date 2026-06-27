@@ -584,6 +584,13 @@ pre-commit run generate-changelog --hook-stage manual
 Capture screenshots of the UI screens affected by a commit and publish them to
 the README and/or a Notion page. Two composable hooks linked by a manifest.
 
+**Note on Notion:** the Notion publisher *appends* image blocks on each run, so
+committing repeatedly with `notion.enabled` will accumulate duplicate images on
+the page. The README target is idempotent; the Notion target is not (idempotent
+Notion publishing is a planned follow-up). Enable Notion when you want an
+append-only log of screenshots, or publish to Notion deliberately rather than on
+every commit.
+
 ```yaml
 - repo: https://github.com/chrysa/pre-commit-tools
   rev: v0.0.34

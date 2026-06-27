@@ -101,10 +101,13 @@ def load_config(path: str | Path = CONFIG_FILENAME) -> Config | None:
         raise ConfigError(f'strategy must be one of {sorted(_STRATEGIES)}, got {strategy!r}')
 
     viewport_raw = _as_dict(raw.get('viewport'), 'viewport')
-    viewport = Viewport(
-        width=int(viewport_raw.get('width', 1280)),
-        height=int(viewport_raw.get('height', 800)),
-    )
+    try:
+        viewport = Viewport(
+            width=int(viewport_raw.get('width', 1280)),
+            height=int(viewport_raw.get('height', 800)),
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        raise ConfigError(f'invalid viewport in {path}: {exc}') from exc
 
     storybook_raw = _as_dict(raw.get('storybook'), 'storybook')
     try:

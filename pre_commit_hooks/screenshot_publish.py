@@ -7,7 +7,7 @@ import argparse
 import os
 from collections.abc import Sequence
 
-from pre_commit_hooks.screenshot_sync.config import load_config
+from pre_commit_hooks.screenshot_sync.config import ConfigError, load_config
 from pre_commit_hooks.screenshot_sync.gitutil import git_add
 from pre_commit_hooks.screenshot_sync.manifest import read_manifest
 from pre_commit_hooks.screenshot_sync.publish import notion
@@ -21,7 +21,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument('filenames', nargs='*', help='Ignored (pass_filenames: false).')
     parser.parse_args(argv)
 
-    config = load_config()
+    try:
+        config = load_config()
+    except ConfigError as exc:
+        return skip_or_fail(False, f'invalid .screenshot-sync.yaml: {exc}')
     if config is None:
         return 0
 

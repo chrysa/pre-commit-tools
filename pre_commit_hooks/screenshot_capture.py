@@ -12,7 +12,7 @@ from pre_commit_hooks.screenshot_sync.capture.runner import (
     CaptureFailedError,
     capture_targets,
 )
-from pre_commit_hooks.screenshot_sync.config import load_config
+from pre_commit_hooks.screenshot_sync.config import ConfigError, load_config
 from pre_commit_hooks.screenshot_sync.gitutil import git_add
 from pre_commit_hooks.screenshot_sync.manifest import write_manifest
 from pre_commit_hooks.screenshot_sync.reporting import skip_or_fail
@@ -24,7 +24,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument('filenames', nargs='*', help='Staged files (from pre-commit).')
     args = parser.parse_args(argv)
 
-    config = load_config()
+    try:
+        config = load_config()
+    except ConfigError as exc:
+        return skip_or_fail(False, f'invalid .screenshot-sync.yaml: {exc}')
     if config is None:
         return 0
 

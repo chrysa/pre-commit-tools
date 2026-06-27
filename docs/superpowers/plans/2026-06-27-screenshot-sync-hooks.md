@@ -539,7 +539,7 @@ def _config(**overrides: object) -> Config:
         'publish': PublishConfig(),
     }
     base.update(overrides)
-    return Config(**base)  # type: ignore[arg-type]  # test helper builds a full kwargs dict
+    return Config(**base)
 
 
 class TestMatches:
@@ -939,7 +939,7 @@ def capture_targets(
                     try:
                         page.goto(target.full_url, wait_until='networkidle', timeout=15000)
                         page.screenshot(path=str(png), full_page=True)
-                    except Exception as exc:  # noqa: BLE001 - re-raised as domain error
+                    except Exception as exc:
                         raise CaptureFailedError(
                             f'failed to capture {target.full_url}: {exc}'
                         ) from exc
@@ -948,7 +948,7 @@ def capture_targets(
                 browser.close()
     except CaptureFailedError:
         raise
-    except Exception as exc:  # noqa: BLE001 - launch/driver problems => unavailable
+    except Exception as exc:
         raise BrowserUnavailableError(f'cannot launch browser: {exc}') from exc
     return shots
 ```

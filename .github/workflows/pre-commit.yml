@@ -13,8 +13,8 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 15
         steps:
-            - uses: actions/checkout@v6.0.3
-            - uses: actions/setup-python@v6
+            - uses: actions/checkout@v7.0.0
+            - uses: actions/setup-python@v6.2.0
               with:
                   python-version: "3.14"
             - name: Install package for system hooks

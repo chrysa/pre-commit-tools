@@ -19,7 +19,7 @@ jobs:
             semVer: ${{ steps.gitversion.outputs.semVer }}
             should-release: ${{ steps.tag-check.outputs.should-release }}
         steps:
-            - uses: actions/checkout@v6.0.3
+            - uses: actions/checkout@v7.0.0
               with:
                   fetch-depth: 0
             - name: Determine version
@@ -45,10 +45,10 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 15
         steps:
-            - uses: actions/checkout@v6.0.3
+            - uses: actions/checkout@v7.0.0
               with:
                   fetch-depth: 0
-            - uses: actions/setup-python@v6
+            - uses: actions/setup-python@v6.2.0
               with:
                   python-version: "3.14" # keep in sync with config job in ci.yml
             - name: Update version in pyproject.toml
@@ -95,7 +95,7 @@ jobs:
         permissions:
             contents: write
         steps:
-            - uses: actions/checkout@v6.0.3
+            - uses: actions/checkout@v7.0.0
               with:
                   fetch-depth: 0
 

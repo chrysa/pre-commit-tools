@@ -61,6 +61,16 @@ class TestCaptureHook:
         monkeypatch.setattr(screenshot_capture, 'capture_targets', boom)
         assert screenshot_capture.main(['src/pages/Login.tsx']) == 0
 
+    def test_capture_failed_skips_when_not_strict(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.chdir(tmp_path)
+        _write_config(tmp_path, _GLOB_CONFIG)
+
+        def boom(targets: object, out: object, vp: object) -> list[Shot]:
+            raise runner.CaptureFailedError('page unreachable')
+
+        monkeypatch.setattr(screenshot_capture, 'capture_targets', boom)
+        assert screenshot_capture.main(['src/pages/Login.tsx']) == 0
+
     def test_browser_unavailable_fails_when_strict(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.chdir(tmp_path)
         _write_config(tmp_path, _GLOB_CONFIG + 'strict: true\n')

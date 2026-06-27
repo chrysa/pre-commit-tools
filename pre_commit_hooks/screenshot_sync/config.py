@@ -106,10 +106,15 @@ def load_config(path: str | Path = CONFIG_FILENAME) -> Config | None:
         height=int(viewport_raw.get('height', 800)),
     )
 
-    routes = [Route(match=r['match'], url=r['url'], name=r['name']) for r in raw.get('routes', []) or []]
-    fixed_routes = [FixedRoute(url=r['url'], name=r['name']) for r in raw.get('fixed_routes', []) or []]
     storybook_raw = _as_dict(raw.get('storybook'), 'storybook')
-    stories = [StoryEntry(match=s['match'], id=s['id'], name=s['name']) for s in storybook_raw.get('stories', []) or []]
+    try:
+        routes = [Route(match=r['match'], url=r['url'], name=r['name']) for r in raw.get('routes', []) or []]
+        fixed_routes = [FixedRoute(url=r['url'], name=r['name']) for r in raw.get('fixed_routes', []) or []]
+        stories = [
+            StoryEntry(match=s['match'], id=s['id'], name=s['name']) for s in storybook_raw.get('stories', []) or []
+        ]
+    except (KeyError, TypeError) as exc:
+        raise ConfigError(f'invalid config in {path}: {exc}') from exc
 
     publish_raw = _as_dict(raw.get('publish'), 'publish')
     readme_raw = _as_dict(publish_raw.get('readme'), 'publish.readme')
@@ -127,18 +132,15 @@ def load_config(path: str | Path = CONFIG_FILENAME) -> Config | None:
         ),
     )
 
-    try:
-        return Config(
-            strategy=strategy,
-            base_url=str(raw.get('base_url', '')),
-            output_dir=str(raw.get('output_dir', 'docs/screenshots')),
-            viewport=viewport,
-            strict=bool(raw.get('strict', False)),
-            routes=routes,
-            fixed_routes=fixed_routes,
-            storybook_url=str(storybook_raw.get('url', '')),
-            stories=stories,
-            publish=publish,
-        )
-    except (KeyError, TypeError) as exc:
-        raise ConfigError(f'invalid config in {path}: {exc}') from exc
+    return Config(
+        strategy=strategy,
+        base_url=str(raw.get('base_url', '')),
+        output_dir=str(raw.get('output_dir', 'docs/screenshots')),
+        viewport=viewport,
+        strict=bool(raw.get('strict', False)),
+        routes=routes,
+        fixed_routes=fixed_routes,
+        storybook_url=str(storybook_raw.get('url', '')),
+        stories=stories,
+        publish=publish,
+    )

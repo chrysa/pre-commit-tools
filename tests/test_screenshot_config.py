@@ -94,3 +94,8 @@ class TestLoadConfig:
         path = _write(tmp_path, 'strategy: [unclosed\n')
         with pytest.raises(ConfigError):
             load_config(path)
+
+    def test_route_missing_required_field_raises(self, tmp_path: Path) -> None:
+        path = _write(tmp_path, 'strategy: glob-url\nroutes:\n  - {url: /x, name: x}\n')
+        with pytest.raises(ConfigError):
+            load_config(path)

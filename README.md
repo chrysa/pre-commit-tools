@@ -578,3 +578,40 @@ pre-commit run generate-changelog --hook-stage manual
 - id: generate-changelog
   stages: [manual]
 ```
+
+### screenshot-capture / screenshot-publish
+
+Capture screenshots of the UI screens affected by a commit and publish them to
+the README and/or a Notion page. Two composable hooks linked by a manifest.
+
+```yaml
+- repo: https://github.com/chrysa/pre-commit-tools
+  rev: v0.0.34
+  hooks:
+    - id: screenshot-capture
+    - id: screenshot-publish
+```
+
+Add a `.screenshot-sync.yaml` to the consuming repo (absent → both hooks are
+no-ops):
+
+```yaml
+strategy: glob-url            # glob-url | storybook | fixed-routes
+base_url: http://localhost:5173
+output_dir: docs/screenshots
+viewport: { width: 1280, height: 800 }
+strict: false                # true = blocking on failure; false = warn + skip
+routes:
+  - { match: "src/pages/Login.*", url: /login, name: login }
+publish:
+  readme: { enabled: true, file: README.md, marker: screenshots }
+  notion: { enabled: false, page_id: "", image_base_url: "" }   # NOTION_API_KEY via env
+```
+
+`screenshot-capture` renders the routes whose source files changed (Playwright),
+writes PNGs + a manifest under `output_dir`, and stages them. `screenshot-publish`
+reads the manifest and updates the README section between
+`<!-- screenshots:start -->` / `<!-- screenshots:end -->` and/or appends image
+blocks to the Notion page. By default neither hook blocks the commit; set
+`strict: true` to make environment/network failures blocking. Playwright browser
+binaries are not auto-installed — run `playwright install chromium` once per repo.

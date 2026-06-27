@@ -81,3 +81,31 @@ class TestPublishHook:
         )
         assert screenshot_publish.main([]) == 0
         assert calls == {'page_id': 'p1', 'token': 'tok'}
+
+    def test_notion_error_skips_when_not_strict(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.chdir(tmp_path)
+        _config(
+            tmp_path,
+            'strategy: glob-url\noutput_dir: docs/screenshots\n'
+            'publish:\n'
+            '  readme: {enabled: false}\n'
+            '  notion: {enabled: true, page_id: p1}\n',
+        )
+        write_manifest('docs/screenshots', [Shot(name='a', path='a.png', url='/a')])
+        monkeypatch.setenv('NOTION_API_KEY', 'tok')
+
+        def boom(page_id: str, shots: object, token: str, image_base_url: str) -> None:
+            raise notion.NotionError('boom')
+
+        monkeypatch.setattr(notion, 'publish', boom)
+        assert screenshot_publish.main([]) == 0
+
+    def test_readme_no_change_not_staged(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.chdir(tmp_path)
+        _config(tmp_path, _README_ONLY)
+        write_manifest('docs/screenshots', [Shot(name='a', path='a.png', url='/a')])
+        monkeypatch.setattr(screenshot_publish, 'update_readme_file', lambda *a, **k: False)
+        staged: list[list[str]] = []
+        monkeypatch.setattr(screenshot_publish, 'git_add', lambda paths: staged.append(paths))
+        assert screenshot_publish.main([]) == 0
+        assert staged == []

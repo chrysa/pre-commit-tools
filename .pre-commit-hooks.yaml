@@ -400,3 +400,26 @@
   name: docs drift gate (regenerate code-derived docs + diff)
   pass_filenames: false
   stages: [pre-push]
+- id: screenshot-capture
+  additional_dependencies:
+    - playwright
+    - PyYAML
+  description: screenshot UI screens affected by staged files (Playwright; gracefully skips if unavailable)
+  entry: screenshot-capture
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: capture screenshots of changed UI screens
+  pass_filenames: true
+  stages: [pre-commit]
+  types_or: ["ts", "tsx", "javascript", "jsx", "css", "file"]
+- id: screenshot-publish
+  additional_dependencies:
+    - requests
+    - PyYAML
+  description: publish captured screenshots to README and/or Notion from the manifest
+  entry: screenshot-publish
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: publish screenshots to README/Notion
+  pass_filenames: false
+  stages: [pre-commit]

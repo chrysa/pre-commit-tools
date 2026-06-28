@@ -27,7 +27,7 @@ class TestPiiInLogs:
         assert main([_py(tmp_path, 'email = request.json["email"]\n')]) == 0
 
     def test_disable_comment_skips(self, tmp_path: Path) -> None:
-        assert main([_py(tmp_path, 'logger.info(user.email)  # pii: disable\n')]) == 0
+        assert main([_py(tmp_path, 'logger.info(user.email)  # pii-in-logs: disable\n')]) == 0
 
     def test_fingerprint_not_flagged(self, tmp_path: Path) -> None:
         assert main([_py(tmp_path, 'device_fingerprint(token_hash)\n')]) == 0

@@ -635,7 +635,7 @@ binaries are not auto-installed — run `playwright install chromium` once per r
 | `python-os-environ-direct` | Detect direct `os.environ[...]` / `os.getenv(...)` access outside settings/config modules | `# os-environ-direct: disable` |
 | `python-file-too-long` | Detect Python files exceeding 500 lines (split the module) | — |
 | `python-function-too-long` | Detect Python functions exceeding 50 lines (extract helpers) | — |
-| `docker-compose-missing-restart` | Detect Docker Compose services missing `restart: unless-stopped` | `# compose-missing-restart: disable` (service comment) |
+| `docker-compose-missing-restart` | Detect Docker Compose services missing `restart: unless-stopped` | _no inline escape; suppress via repo `exclude:` or `SKIP=docker-compose-missing-restart`_ |
 | `react-useeffect-fetch` | Detect `fetch`/`axios` calls inside a React `useEffect` callback (use a query library instead) | `// react-useeffect-fetch: disable` |
 
 #### RGPD / privacy (Tasks 10–15)

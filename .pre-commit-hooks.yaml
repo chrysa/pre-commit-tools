@@ -483,7 +483,7 @@
     - PyYAML
   description: 'detect Docker Compose services missing restart: unless-stopped'
   entry: compose-missing-restart
-  files: '(^|/)docker-compose[^/]*\.ya?ml$'
+  files: '(^|/)(docker-)?compose[^/]*\.ya?ml$'
   language: python
   minimum_pre_commit_version: '4.1.0'
   name: detect compose services missing restart policy
@@ -514,6 +514,7 @@
 - id: python-pii-in-logs
   description: detect PII (email/token/password/card/ssn/iban/phone) in logging calls (RGPD)
   entry: pii-in-logs
+  exclude: 'tests?/'
   language: python
   minimum_pre_commit_version: '4.1.0'
   name: detect PII in logging calls

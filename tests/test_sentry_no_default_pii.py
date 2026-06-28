@@ -24,4 +24,4 @@ class TestSentryNoDefaultPii:
         assert main([_py(tmp_path, 'sentry_sdk.init(dsn=DSN, send_default_pii=False)\n')]) == 0
 
     def test_disable_comment_skips(self, tmp_path: Path) -> None:
-        assert main([_py(tmp_path, 'send_default_pii=True  # sentry-pii: disable\n')]) == 0
+        assert main([_py(tmp_path, 'send_default_pii=True  # sentry-no-default-pii: disable\n')]) == 0

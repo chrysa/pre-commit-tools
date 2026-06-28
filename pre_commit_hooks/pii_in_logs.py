@@ -14,7 +14,7 @@ _PATTERN = re.compile(
     re.IGNORECASE,
 )
 _COMMENTED = re.compile(r'^\s*#')
-_DISABLE = re.compile(r'pii\s*:\s*disable')
+_DISABLE = re.compile(r'pii-in-logs\s*:\s*disable')
 
 
 def main(argv: Sequence[str] | None = None) -> int:

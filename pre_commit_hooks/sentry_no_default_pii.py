@@ -10,7 +10,7 @@ from pre_commit_hooks.tools.pattern_detection import PatternDetection
 
 _PATTERN = re.compile(r'send_default_pii\s*=\s*True')
 _COMMENTED = re.compile(r'^\s*#.*send_default_pii')
-_DISABLE = re.compile(r'sentry-pii\s*:\s*disable')
+_DISABLE = re.compile(r'sentry-no-default-pii\s*:\s*disable')
 
 
 def main(argv: Sequence[str] | None = None) -> int:

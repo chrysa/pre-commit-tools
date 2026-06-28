@@ -17,6 +17,6 @@ def resolve_targets(config: Config, changed_files: list[str]) -> list[CaptureTar
                     name=route.name,
                     url=route.url,
                     full_url=f'{base}{route.url}',
-                )
+                ),
             )
     return targets

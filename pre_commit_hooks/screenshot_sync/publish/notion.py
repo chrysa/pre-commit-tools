@@ -28,7 +28,7 @@ def build_blocks(shots: list[Shot], image_base_url: str) -> list[dict]:
                         'type': 'external',
                         'external': {'url': f'{base}/{shot.path}'},
                     },
-                }
+                },
             )
         else:
             blocks.append(
@@ -40,10 +40,10 @@ def build_blocks(shots: list[Shot], image_base_url: str) -> list[dict]:
                             {
                                 'type': 'text',
                                 'text': {'content': f'{shot.name}: {shot.path}'},
-                            }
-                        ]
+                            },
+                        ],
                     },
-                }
+                },
             )
     return blocks
 

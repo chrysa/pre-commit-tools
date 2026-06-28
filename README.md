@@ -622,3 +622,29 @@ reads the manifest and updates the README section between
 blocks to the Notion page. By default neither hook blocks the commit; set
 `strict: true` to make environment/network failures blocking. Playwright browser
 binaries are not auto-installed — run `playwright install chromium` once per repo.
+### Standards & RGPD detection hooks
+
+#### Coding standards (Tasks 1–9)
+
+| Hook id | Purpose | Disable escape |
+|---|---|---|
+| `python-no-external-tool-config` | Detect forbidden standalone tool config files (`ruff.toml`, `mypy.ini`, `pytest.ini`, `.coveragerc`) — configuration must live in `pyproject.toml` | — |
+| `python-no-setup-files` | Detect `setup.py` / `setup.cfg` packaging files — use `pyproject.toml` instead | — |
+| `python-cors-allow-all` | Detect wildcard CORS (`allow_origins=['*']` / `CORS_ALLOW_ALL_ORIGINS=True`) | `# cors-allow-all: disable` |
+| `python-no-create-all` | Detect `Base.metadata.create_all()` / `engine.create_all()` calls outside migrations/alembic | `# no-create-all: disable` |
+| `python-os-environ-direct` | Detect direct `os.environ[...]` / `os.getenv(...)` access outside settings/config modules | `# os-environ-direct: disable` |
+| `python-file-too-long` | Detect Python files exceeding 500 lines (split the module) | — |
+| `python-function-too-long` | Detect Python functions exceeding 50 lines (extract helpers) | — |
+| `docker-compose-missing-restart` | Detect Docker Compose services missing `restart: unless-stopped` | _no inline escape; suppress via repo `exclude:` or `SKIP=docker-compose-missing-restart`_ |
+| `react-useeffect-fetch` | Detect `fetch`/`axios` calls inside a React `useEffect` callback (use a query library instead) | `// react-useeffect-fetch: disable` |
+
+#### RGPD / privacy (Tasks 10–15)
+
+| Hook id | Purpose | Disable escape |
+|---|---|---|
+| `sentry-no-default-pii` | Detect `send_default_pii=True` in Sentry initialisation — transmits PII to Sentry by default | `# sentry-no-default-pii: disable` |
+| `react-no-token-in-localstorage` | Detect auth tokens stored in `localStorage` (prefer `httpOnly` cookies) | `// react-token-localstorage: disable` |
+| `python-pii-in-logs` | Detect PII (email, token, password, card number, SSN, IBAN, phone) passed to logging calls | `# pii-in-logs: disable` |
+| `django-cookie-security` | Enforce `SESSION_COOKIE_SECURE`, `SESSION_COOKIE_HTTPONLY`, `CSRF_COOKIE_SECURE` and `CSRF_COOKIE_HTTPONLY` in Django production settings | — |
+| `fastapi-cookie-insecure` | Detect `response.set_cookie()` calls missing `secure=True`, `httponly=True`, or `samesite=` | `# fastapi-cookie-insecure: disable` |
+| `pii-hardcoded` | Detect hardcoded personal data (French NIR, IBAN, real email address, FR phone number) in source files | `# pii-hardcoded: disable` / `// pii-hardcoded: disable` |

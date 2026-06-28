@@ -18,9 +18,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     ret = 0
     for filename in args.filenames:
         if Path(filename).name in _FORBIDDEN:
-            print(
-                f'[{filename}] forbidden: move tool config into [tool.*] of pyproject.toml'
-            )  # print-detection: disable
+            msg = f'[{filename}] forbidden: move tool config into [tool.*] of pyproject.toml'
+            print(msg)  # print-detection: disable
             ret = 1
     return ret
 

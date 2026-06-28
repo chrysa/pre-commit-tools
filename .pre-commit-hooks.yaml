@@ -423,3 +423,123 @@
   name: publish screenshots to README/Notion
   pass_filenames: false
   stages: [pre-commit]
+- id: python-no-external-tool-config
+  description: detect forbidden standalone tool config files (ruff.toml, mypy.ini, pytest.ini, .coveragerc)
+  entry: no-external-tool-config
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect forbidden standalone tool config files
+  pass_filenames: true
+  files: '(^|/)(ruff\.toml|mypy\.ini|\.mypy\.ini|pytest\.ini|\.coveragerc)$'
+- id: python-no-setup-files
+  description: detect forbidden setup.py / packaging setup.cfg (use pyproject.toml)
+  entry: no-setup-files
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect forbidden setup packaging files
+  pass_filenames: true
+  files: '(^|/)setup\.(py|cfg)$'
+- id: python-cors-allow-all
+  description: detect wildcard CORS (allow_origins=['*'] / CORS_ALLOW_ALL_ORIGINS=True)
+  entry: cors-allow-all-detection
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect wildcard CORS configuration
+  types: ["python"]
+- id: python-no-create-all
+  description: detect create_all() schema creation outside migrations
+  entry: no-create-all
+  exclude: 'migrations/|alembic/|tests?/'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect create_all() outside migrations
+  types: ["python"]
+- id: python-os-environ-direct
+  description: detect direct os.environ/os.getenv access outside settings modules
+  entry: os-environ-direct
+  exclude: 'settings.*\.py|config.*\.py|conftest\.py|tests?/'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect direct os.environ access
+  types: ["python"]
+- id: python-file-too-long
+  description: detect Python files exceeding 500 lines
+  entry: file-too-long
+  exclude: 'migrations/|tests?/'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect over-long files (>500 lines)
+  types: ["python"]
+- id: python-function-too-long
+  description: detect Python functions exceeding 50 lines
+  entry: function-too-long
+  exclude: 'tests?/'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect over-long functions (>50 lines)
+  types: ["python"]
+- id: docker-compose-missing-restart
+  additional_dependencies:
+    - PyYAML
+  description: 'detect Docker Compose services missing restart: unless-stopped'
+  entry: compose-missing-restart
+  files: '(^|/)docker-compose[^/]*\.ya?ml$'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect compose services missing restart policy
+  pass_filenames: true
+- id: react-useeffect-fetch
+  description: detect data fetching (fetch/axios) inside a React useEffect callback
+  entry: react-useeffect-fetch
+  files: \.(jsx|tsx)$
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect fetch/axios inside useEffect
+  types_or: ["tsx", "jsx", "file"]
+- id: sentry-no-default-pii
+  description: detect Sentry send_default_pii=True (RGPD)
+  entry: sentry-no-default-pii
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect Sentry send_default_pii=True
+  types: ["python"]
+- id: react-no-token-in-localstorage
+  description: detect auth tokens stored in localStorage (RGPD; prefer httpOnly cookies)
+  entry: react-token-localstorage
+  files: \.(ts|tsx)$
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect auth tokens in localStorage
+  types_or: ["ts", "tsx", "file"]
+- id: python-pii-in-logs
+  description: detect PII (email/token/password/card/ssn/iban/phone) in logging calls (RGPD)
+  entry: pii-in-logs
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect PII in logging calls
+  types: ["python"]
+- id: django-cookie-security
+  description: enforce Django production cookie-security flags (RGPD/ePrivacy)
+  entry: django-cookie-security
+  files: 'settings.*prod.*\.py$|settings/prod\.py$'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: enforce Django cookie-security flags
+  pass_filenames: true
+  types: ["python"]
+- id: fastapi-cookie-insecure
+  description: detect set_cookie() missing secure/httponly/samesite (RGPD/ePrivacy)
+  entry: fastapi-cookie-insecure
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect insecure set_cookie calls
+  pass_filenames: true
+  types: ["python"]
+- id: pii-hardcoded
+  description: detect hardcoded personal data (NIR, IBAN, real email, FR phone) in source (RGPD)
+  entry: pii-hardcoded
+  exclude: 'tests?/'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect hardcoded personal data
+  types_or: ["python", "ts", "tsx", "javascript", "file"]

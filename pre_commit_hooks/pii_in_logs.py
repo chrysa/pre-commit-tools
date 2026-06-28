@@ -9,7 +9,7 @@ from collections.abc import Sequence
 from pre_commit_hooks.tools.pattern_detection import PatternDetection
 
 _PATTERN = re.compile(
-    r'(?:\b(?:logger|logging|log)\s*\.\s*(?:debug|info|warning|error|critical|exception)|print)\s*\('
+    r'(?:\b(?:logger|logging|log)\s*\.\s*(?:debug|info|warning|error|critical|exception)|\bprint)\s*\('
     r'.*\b(email|password|passwd|token|card|ssn|nir|iban|phone)\b',
     re.IGNORECASE,
 )

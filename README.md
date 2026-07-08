@@ -30,6 +30,7 @@
     - [debugger-detection](#debugger-detection)
     - [json-sorter](#json-sorter)
     - [requirements-sort](#requirements-sort)
+    - [ignore-file-sorter](#ignore-file-sorter)
     - [env-file-check](#env-file-check)
     - [env-example-sync](#env-example-sync)
     - [python-logger-detection](#python-logger-detection)
@@ -82,6 +83,7 @@ Add this to your `.pre-commit-config.yaml`
           - id: debugger-detection
           - id: json-sorter
           - id: requirements-sort
+          - id: ignore-file-sorter
           - id: env-file-check
           - id: env-example-sync
           - id: python-logger-detection
@@ -229,6 +231,39 @@ dead_code =
     vulture>=2.0
 yaml =
     PyYAML==6.0.1
+```
+
+### ignore-file-sorter
+
+Sort the entries of ignore files (`.gitignore`, `.dockerignore`, `.npmignore`,
+`.eslintignore`, `.prettierignore`, `.helmignore`, …) alphabetically
+(case-insensitive). Modifies files in-place and returns 1 if any file was
+changed. It targets any dotfile whose name ends in `ignore` (regex
+`(^|/)\.[^/]*ignore$`).
+
+Comment lines and blank lines are **anchors**: they keep their position, so
+section headers and grouping are preserved. Only the pattern lines within a
+contiguous run are reordered. A leading `!` is ignored for the sort key so a
+negation pattern stays next to the pattern it whitelists.
+
+```gitignore
+# Before                # After
+# logs                  # logs
+*.tmp                   *.log
+*.log                   *.tmp
+
+node_modules            build
+build                   node_modules
+```
+
+**Custom ordering** — pass `--sort-script PATH` to delegate ordering to your own
+script instead of the alphabetical default. The script receives the whole file
+content on **stdin** and the filename as its first argument, and must print the
+sorted content to **stdout**:
+
+```yaml
+      - id: ignore-file-sorter
+        args: ["--sort-script", "./scripts/my_ignore_sort.py"]
 ```
 
 ### env-file-check

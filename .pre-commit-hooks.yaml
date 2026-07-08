@@ -110,6 +110,14 @@
   minimum_pre_commit_version: '4.1.0'
   name: sort requirements files
   types: ["text"]
+- id: ignore-file-sorter
+  description: sort the entries of ignore files (.gitignore, .dockerignore, …) alphabetically
+  entry: ignore-file-sorter
+  files: '(^|/)\.[^/]*ignore$'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: sort ignore files
+  types: ["text"]
 - id: env-file-check
   description: detect potential secrets committed in .env files
   entry: env-file-check

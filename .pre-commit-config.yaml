@@ -129,7 +129,7 @@ repos:
     stages:
     - manual
 - repo: https://github.com/chrysa/guideline-checker
-  rev: v1.4.0
+  rev: v1.9.1
   hooks:
   - id: guideline-check
     stages:

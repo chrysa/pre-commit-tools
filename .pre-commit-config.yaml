@@ -143,18 +143,24 @@ repos:
     name: detect print on python code
     entry: print-detection
     language: system
+    # hook implementations, CLI scripts and test fixtures legitimately print
+    exclude: ^(pre_commit_hooks|scripts|tests)/
     types:
     - python
   - id: python-pprint-detection
     name: detect pprint on python code
     entry: pprint-detection
     language: system
+    exclude: ^(pre_commit_hooks|tests)/
     types:
     - python
   - id: debugger-detection
     name: detect debugger statements
     entry: debugger-detection
     language: system
+    exclude: ^tests/
+    types:
+    - python
   - id: yaml-sorter
     exclude: ^(\.github/|GitVersion\.yml)
     name: sort yaml files
@@ -186,6 +192,7 @@ repos:
     name: detect root logger usage
     entry: logger-detection
     language: system
+    exclude: ^tests/
     types:
     - python
   - id: python-unreachable-code

@@ -39,9 +39,7 @@ class PatternDetection:
         """Run detection across all files and return 1 if a violation is found."""
         tools_instance = PreCommitTools()
         tools_instance.set_params(help_msg=help_msg)
-        namespace_args, _ = tools_instance.get_args(
-            argv=argv if argv is not None else [],
-        )
+        namespace_args, _ = tools_instance.get_args(argv=argv)
         ret_val: int = 0
         for file in namespace_args.filenames:
             file_path = Path(file)

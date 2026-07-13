@@ -43,6 +43,7 @@
     - [ts-unreachable-code](#ts-unreachable-code)
     - [css-duplicate-property](#css-duplicate-property)
     - [css-unused-variable](#css-unused-variable)
+    - [css-outside-stylesheet-detection](#css-outside-stylesheet-detection)
     - [no-console-warn](#no-console-warn)
     - [react-direct-dom](#react-direct-dom)
     - [import-no-relative-parent](#import-no-relative-parent)
@@ -94,6 +95,7 @@ Add this to your `.pre-commit-config.yaml`
           - id: ts-unreachable-code
           - id: css-duplicate-property
           - id: css-unused-variable
+          - id: css-outside-stylesheet-detection
           - id: no-console-warn
           - id: react-direct-dom
           - id: import-no-relative-parent
@@ -393,6 +395,25 @@ Use `/* css-unused-variable: disable */` on the declaration line to suppress a s
   --color-ghost: #aaa;       /* ← detected: declared but never used */
 }
 .btn { color: var(--color-primary); }
+```
+
+### css-outside-stylesheet-detection
+
+Detect **CSS written outside of `.css`/`.scss` files** (CSS-in-JS). Flags the common carriers that leak styling into JS/TS/JSX/TSX/HTML/Vue sources instead of a dedicated stylesheet:
+
+- styled-components / emotion tagged templates: `` styled.button` ``, `` styled(Card)` ``, `` css` ``, `` createGlobalStyle` ``, `` keyframes` ``, `` injectGlobal` ``
+- inline `<style>` blocks embedded in markup
+
+**Language**: `.js`, `.jsx`, `.ts`, `.tsx`, `.html`, `.htm`, `.vue`.
+
+Inline `style={{ ... }}` attributes are handled separately by [react-no-inline-styles](#react-no-inline-styles).
+
+Use `// css-outside-stylesheet: disable` on the offending line to suppress a specific violation.
+
+```tsx
+const Button = styled.button`   // ← detected: CSS in a .tsx file
+  color: red;
+`;
 ```
 
 ### react-console-error-detection

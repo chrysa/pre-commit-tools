@@ -179,6 +179,14 @@
   minimum_pre_commit_version: '4.1.0'
   name: detect unused CSS custom properties
   types: ["css"]
+- id: css-outside-stylesheet-detection
+  description: detect CSS written outside CSS/SCSS files (styled-components/emotion tagged templates, <style> blocks)
+  entry: css-outside-stylesheet-detection
+  files: \.(js|jsx|ts|tsx|html|htm|vue)$
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect CSS outside CSS/SCSS files (CSS-in-JS)
+  types_or: ["javascript", "jsx", "ts", "tsx", "html", "vue", "file"]
 - id: react-console-error-detection
   description: detect console.error() calls in JavaScript/TypeScript/React files
   entry: react-console-error-detection

@@ -277,4 +277,4 @@ repos:
   - exclude: ^tests/
     id: fastapi-missing-links
   repo: https://github.com/chrysa/pre-commit-tools
-  rev: v0.1.1-95
+  rev: v0.1.1-97

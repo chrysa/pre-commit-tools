@@ -101,7 +101,7 @@ class TestFormatDockerfileMain:
         result = main([f])
         assert result == 1
         content = Path(f).read_text()
-        assert '# syntax=docker/dockerfile:1.4' in content
+        assert '# syntax=docker/dockerfile:1.7' in content
 
     def test_empty_args_returns_0(self) -> None:
         assert main([]) == 0

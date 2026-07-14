@@ -3,7 +3,6 @@ default_language_version:
 fail_fast: false
 minimum_pre_commit_version: 4.1.0
 exclude: ^\.claude/
-
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v5.0.0
@@ -143,7 +142,6 @@ repos:
     name: detect print on python code
     entry: print-detection
     language: system
-    # hook implementations, CLI scripts and test fixtures legitimately print
     exclude: ^(pre_commit_hooks|scripts|tests)/
     types:
     - python
@@ -249,7 +247,7 @@ repos:
     - revert
     - ci
 - repo: https://github.com/chrysa/pre-commit-tools
-  rev: v0.1.1-95
+  rev: v0.1.1-97
   hooks:
   - id: makefile-check
   - id: adr-gate

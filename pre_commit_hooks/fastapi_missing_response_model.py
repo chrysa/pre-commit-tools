@@ -44,12 +44,13 @@ def _status_code_has_no_body(dec: ast.Call) -> bool:
     """Return True if the route declares a status code that carries no body."""
     for kw in dec.keywords:
         if kw.arg == 'status_code' and isinstance(kw.value, ast.Constant):
-            return int(kw.value.value) in _NO_BODY_STATUS_CODES
+            value = kw.value.value
+            return isinstance(value, int) and value in _NO_BODY_STATUS_CODES
     return False
 
 
 def _check_decorator_violation(
-    dec: ast.Call,
+    dec: ast.expr,
     node: ast.FunctionDef | ast.AsyncFunctionDef,
     lines: list[str],
     filename: str,

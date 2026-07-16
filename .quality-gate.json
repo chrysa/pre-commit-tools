@@ -3,8 +3,9 @@
     "build": "make build",
     "coverage": "make test-cov",
     "lint": "make lint",
+    "security_secrets": "detect-secrets-hook --baseline .secrets.baseline $(git ls-files)",
     "tests": "make test",
-    "types": "make type-check"
+    "types": "make typecheck"
   },
   "description": "Quality gate configuration for Python project",
   "thresholds": {

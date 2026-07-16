@@ -200,8 +200,16 @@ class QualityGate:
                 f'GATE_RESULT|{gate_name}|{status}|metric={result["metric"]}|exit={result["exit_code"]}|mode=baseline',
             )
 
+        # The baseline is committed; `verify` only reads metrics. Persisting raw
+        # command output would bloat it to ~350 KB of logs and embed the very
+        # patterns this repo's own hooks detect (debugger calls, secrets).
+        persisted = dict(baseline_data)
+        persisted['gates'] = {
+            name: {key: value for key, value in result.items() if key != 'output'}
+            for name, result in baseline_data['gates'].items()
+        }
         with open(self.baseline_path, 'w', encoding='utf-8') as handle:
-            json.dump(baseline_data, handle, indent=2)
+            json.dump(persisted, handle, indent=2)
 
         report = {
             'mode': 'baseline',

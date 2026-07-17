@@ -85,6 +85,7 @@ pii-in-logs = "pre_commit_hooks.pii_in_logs:main"
 django-cookie-security = "pre_commit_hooks.django_cookie_security:main"
 fastapi-cookie-insecure = "pre_commit_hooks.fastapi_cookie_insecure:main"
 pii-hardcoded = "pre_commit_hooks.pii_hardcoded:main"
+dependabot-classified-deps = "pre_commit_hooks.dependabot_classified_deps:main"
 
 [project.optional-dependencies]
 dead_code = ["vulture>=2.0"]

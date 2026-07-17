@@ -560,3 +560,13 @@
   minimum_pre_commit_version: '4.1.0'
   name: detect hardcoded personal data
   types_or: ["python", "ts", "tsx", "javascript", "file"]
+- id: dependabot-classified-deps
+  additional_dependencies:
+    - ruamel.yaml
+  description: bidirectionally sync Dependabot groups with declared Python deps (add new, prune removed) and fail on unclassified packages
+  entry: dependabot-classified-deps
+  files: '(^|/)(setup\.cfg|pyproject\.toml|\.github/dependabot\.ya?ml)$'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: dependabot dependency classification
+  pass_filenames: false

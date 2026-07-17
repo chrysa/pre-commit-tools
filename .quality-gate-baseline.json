@@ -1,62 +1,62 @@
 {
-  "recorded_at": "2026-07-16T09:27:39.295043",
   "gates": {
-    "Tests": {
-      "gate": "Tests",
-      "command": "make test",
+    "Build": {
+      "command": "make build",
       "exit_code": 0,
-      "metric_name": "passed_tests",
+      "gate": "Build",
       "metric": 0,
-      "timestamp": "2026-07-16T09:28:02.774161"
+      "metric_name": "build_status",
+      "timestamp": "2026-07-16T09:28:59.887660"
     },
     "Coverage": {
-      "gate": "Coverage",
       "command": "make test-cov",
       "exit_code": 0,
-      "metric_name": "coverage_percentage",
+      "gate": "Coverage",
       "metric": 58.0,
+      "metric_name": "coverage_percentage",
       "timestamp": "2026-07-16T09:28:20.686448"
     },
     "Lint": {
-      "gate": "Lint",
       "command": "make lint",
       "exit_code": 0,
-      "metric_name": "warning_count",
+      "gate": "Lint",
       "metric": 0,
+      "metric_name": "warning_count",
       "timestamp": "2026-07-16T09:28:20.968633"
     },
-    "Types": {
-      "gate": "Types",
-      "command": "make typecheck",
-      "exit_code": 0,
-      "metric_name": "error_count",
-      "metric": 0,
-      "timestamp": "2026-07-16T09:28:36.157274"
-    },
-    "Build": {
-      "gate": "Build",
-      "command": "make build",
-      "exit_code": 0,
-      "metric_name": "build_status",
-      "metric": 0,
-      "timestamp": "2026-07-16T09:28:59.887660"
-    },
     "Secrets": {
-      "gate": "Secrets",
       "command": "detect-secrets-hook --baseline .secrets.baseline $(git ls-files)",
       "exit_code": 0,
-      "metric_name": "secret_count",
+      "gate": "Secrets",
       "metric": 0,
+      "metric_name": "secret_count",
       "timestamp": "2026-07-16T09:29:26.861915"
     },
+    "Tests": {
+      "command": "make test",
+      "exit_code": 0,
+      "gate": "Tests",
+      "metric": 0,
+      "metric_name": "passed_tests",
+      "timestamp": "2026-07-16T09:28:02.774161"
+    },
+    "Types": {
+      "command": "make typecheck",
+      "exit_code": 0,
+      "gate": "Types",
+      "metric": 0,
+      "metric_name": "error_count",
+      "timestamp": "2026-07-16T09:28:36.157274"
+    },
     "VulnDeps": {
-      "gate": "VulnDeps",
       "command": "pip-audit 2>&1 || npm audit --audit-level=high 2>&1 || true",
       "exit_code": 0,
-      "metric_name": "vuln_count",
+      "gate": "VulnDeps",
       "metric": 6,
+      "metric_name": "vuln_count",
       "timestamp": "2026-07-16T09:29:55.032957"
     }
   },
+  "recorded_at": "2026-07-16T09:27:39.295043",
   "valid": true
 }

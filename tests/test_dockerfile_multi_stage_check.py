@@ -53,6 +53,40 @@ class TestDetectMissingMultiStage:
         assert len(violations) == 1
 
 
+class TestRequireTargets:
+    def test_missing_dev_target_detected(self) -> None:
+        src = 'FROM python:3.14 AS builder\nRUN pip install app\nFROM python:3.14-slim AS production\n'
+        violations = detect_missing_multi_stage(src, 'Dockerfile', ['production', 'dev'])
+        assert len(violations) == 1
+        assert "'dev'" in violations[0][2]
+
+    def test_both_targets_present_ok(self) -> None:
+        src = (
+            'FROM python:3.14 AS base\nFROM base AS production\n'
+            'RUN true\nFROM production AS dev\nRUN pip install pytest\n'
+        )
+        assert detect_missing_multi_stage(src, 'Dockerfile', ['production', 'dev']) == []
+
+    def test_target_match_is_case_insensitive(self) -> None:
+        src = 'FROM x AS builder\nFROM x AS Production\nFROM x AS DEV\n'
+        assert detect_missing_multi_stage(src, 'Dockerfile', ['production', 'dev']) == []
+
+    def test_both_targets_missing_two_violations(self) -> None:
+        src = 'FROM x AS builder\nFROM x AS runtime\n'
+        violations = detect_missing_multi_stage(src, 'Dockerfile', ['production', 'dev'])
+        assert len(violations) == 2
+
+    def test_no_require_targets_keeps_default_behavior(self) -> None:
+        src = 'FROM x AS builder\nFROM x AS runtime\n'
+        assert detect_missing_multi_stage(src, 'Dockerfile') == []
+
+    def test_single_stage_short_circuits_before_target_check(self) -> None:
+        src = 'FROM python:3.14\n'
+        violations = detect_missing_multi_stage(src, 'Dockerfile', ['production', 'dev'])
+        assert len(violations) == 1
+        assert 'multi-stage' in violations[0][2].lower()
+
+
 class TestDockerfileMultiStageCheckMain:
     def test_multi_stage_returns_0(self, tmp_path: Path) -> None:
         f = _write(

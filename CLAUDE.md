@@ -7,73 +7,29 @@ A collection of [pre-commit](https://pre-commit.com) hooks for code quality chec
 
 ---
 
-## Essential commands
+## Commands
+
+All checks go through `make` targets — never invoke `ruff`/`pytest`/`mypy` directly on the host
+outside the make wrapper. Ruff config lives in `config-tools/ruff.toml`.
 
 ```bash
-# Full dev installation
-pip install -e ".[format_dockerfile,yaml,dead_code]"
-pip install ruff mypy pylint pytest pytest-cov build twine
+make install-dev        # Editable install with all extras + dev tooling
+make quality            # lint + format-check + typecheck
+make test               # All tests
+make test-fail-fast     # Stop on first failure
+make test-cov           # Tests with coverage report
+make pre-commit         # Run all pre-commit hooks on every file
 
-# Linting / formatting
-ruff check --config=config-tools/ruff.toml pre_commit_hooks tests
-ruff format --config=config-tools/ruff.toml pre_commit_hooks
-
-# Type-checking
-mypy --config-file=pyproject.toml pre_commit_hooks
-
-# Tests
-pytest                             # all tests
-pytest tests/test_my_hook.py -v   # single file
-pytest --failed-first -x          # stop on first failure
-
-# Pre-commit (on all files)
-pip install -e .                   # REQUIRED before pre-commit run
-pre-commit run --all-files
-
-# Makefile shortcuts
-make install-dev
-make quality    # lint + format-check + type-check
-make test
-make test-cov
-```
-
----
-
-## Local test procedure
-
-All checks must go through `make` targets. Never invoke `ruff`/`pytest`/`mypy` directly on the host outside of the make wrapper.
-
-```bash
-# 1. Install
-make install-dev
-
-# 2. Full quality check (lint + format + type-check)
-make quality
-
-# 3. Run tests
-make test                  # all tests
-make test-fail-fast        # stop on first failure
-make test-cov              # with coverage report
-
-# 4. Run all pre-commit hooks on every file
-make pre-commit
-
-# 5. Validate GitHub Actions workflows (requires actionlint)
+# Validate GitHub Actions workflows (requires actionlint)
 docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:latest
 ```
 
-### Regression gate (before every PR)
-```bash
-make quality && make test-cov
-# Coverage must stay >= 85%. Lint warnings must be 0.
-```
+- **Regression gate (before every PR)**: `make quality && make test-cov`.
+- **Single test**: `pytest tests/test_my_hook.py -v`.
+- `pip install -e .` is REQUIRED before `pre-commit run` — hook entry points must be importable.
 
 ---
 
-
-## Language Rules
-
-- Language: English — all code, comments, documentation, instructions, and configuration files must be in English.
 ## Architecture
 
 ```
@@ -168,14 +124,6 @@ result: Any = ext.call()  # noqa: ANN401 — third-party untyped API
 | `ts_unreachable_code` | `ts-unreachable-code-detection` (tree-sitter) |
 | `pylint_report` | `pylint-report-html` |
 
-## Compact instructions
-
-When compacting, always preserve:
-1. List of all files modified this session (with paths)
-2. Current task description and next steps
-3. Any uncommitted / unpushed changes
-4. Open blockers and errors not yet resolved
-
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
@@ -220,12 +168,121 @@ This project is indexed by GitNexus as **pre-commit-tools** (1214 symbols, 2689 
 
 <!-- gitnexus:end -->
 
-## Skills
 
-Shared skills from `shared-standards/.claude/skills/`:
+<!-- chrysa:standards:start · managed by distribute-standards.sh · DO NOT EDIT -->
+# chrysa — Transverse Standards
 
-- `ui-ux/SKILL.md` — UX/UI/ergonomics across ALL surfaces (web, CLI, VS Code, Discord, desktop, game, agent) + WCAG 2.1 AA + dark mode + i18n FR+EN (load when building any human-facing surface)
+These conventions are identical across every chrysa repo. Repo-specific rules live in the
+local `CLAUDE.md`; this file is the shared baseline imported by it.
 
-<!-- chrysa:standards-import:start -->
-@.chrysa/STANDARDS.md
-<!-- chrysa:standards-import:end -->
+## Cross-cutting stack (settled ADRs — do not relitigate)
+
+| Layer            | Decision                                                        |
+|------------------|----------------------------------------------------------------|
+| Python           | 3.14 target (CI matrix 3.12 + 3.14)                            |
+| FastAPI          | >= 0.115 + Pydantic v2                                          |
+| Frontend         | React 19 + TypeScript + Vite 6                                  |
+| UI               | shadcn/ui + Tailwind CSS                                        |
+| State            | TanStack Query + Zustand                                        |
+| DB               | PostgreSQL 16 + Redis 7                                         |
+| ORM              | SQLAlchemy 2.0 async + Alembic                                  |
+| Auth             | 4 modes: Google OAuth2 · local (bcrypt) · LDAP · VCS OAuth      |
+| i18n             | react-i18next + fastapi-babel · FR + EN from V1                 |
+| Monorepo         | Turborepo + pnpm workspaces                                     |
+| Versioning       | GitVersion (semantic auto — never bump manually)               |
+| Quality CI       | SonarCloud (0 hotspot · rating A)                               |
+| Linting          | Ruff + Mypy (Python) · ESLint (TS)                             |
+| Pre-commit       | detect-secrets + ruff + mypy + commitlint                      |
+| Error handling   | withErrorHandling() → auto GitHub Issue on failure             |
+| Hosting          | Kimsufi · Docker Compose (local) · Nginx · Certbot · Tailscale  |
+| Monitoring       | Sentry + Uptime Kuma (self-hosted)                            |
+| Agents           | Claude API (primary) · Ollama (fallback)                       |
+| Orchestration    | LangGraph (stateful) · PydanticAI (structured outputs)         |
+
+## Non-negotiable conventions
+
+- **Language**: English — all code, comments, docs, instructions, and config files.
+- **Commits**: Conventional Commits (`feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `ci`).
+- **Branches**: `feature/`, `bugfix/`, `chore/`, `hotfix/`, `release/` · default branch `develop`.
+- **Merge**: squash merge only · force push forbidden · auto-merge requires CI + owner.
+- **One PR per issue**, scoped tight. Every PR references an issue (`Closes/Fixes/Refs #N`).
+  Exception: label `hotfix`. The `enforce-issue-link` workflow is a blocking status check.
+- **Dark mode** mandatory from V1. **Accessibility** WCAG 2.1 AA.
+- **Notion logging**: every advancement and modification (progress, decisions, state
+  changes) is logged in Notion — the single source of truth. Run `@notion-sync` after any
+  state change; in case of conflict between local docs and Notion, Notion wins.
+- **No hardcoded constants** in code — neither backend (Python) nor frontend (TS).
+  All constants and config values (thresholds, business rules, labels, URLs, magic
+  numbers) live in **external YAML files** and are loaded at runtime. Code reads them
+  through a typed loader (Pydantic Settings backend · generated typed module frontend),
+  never as inline literals. Only language-level enums (e.g. `status.HTTP_*`) are exempt.
+- **Semantic URLs & code** — URLs are resource-oriented and human-readable: lowercase,
+  hyphenated, plural-noun collections, no verbs or actions in the path (`GET /invoices/42`,
+  never `/getInvoice?id=42`); REST shapes follow the `api-design` skill. Code is
+  self-describing: intention-revealing names over comments, semantic HTML elements
+  (`<nav>`, `<button>`, `<main>`, `<header>`…) never a `<div>` wired as a control, and
+  ARIA used only to fill gaps native semantics cannot express.
+
+## Quality gates
+
+- Test coverage **>= 85%** by default. A repo may override upward, never below 80%.
+- Lint warnings: **0**. Mypy clean. SonarCloud rating **A**, 0 security hotspot.
+- Max function lines 50 · max file lines 500 · cyclomatic complexity heuristic <= 10.
+
+## Makefile targets
+
+- **Referential**: `Forge-Stack-Workshop/base-makefile` (`Makefile.basic`, `Makefile.python`,
+  `Makefile.with-sub-folder`) is the single source of truth for target names and behaviour.
+- **Canonical naming** — follow base-makefile verbatim, one word where it is one word:
+  `typecheck` (**never** `type-check`), `test-cov`, `format-check`, `quality-gate-verify`,
+  `docker-test`, `ci`. Renaming or aliasing a canonical target is forbidden.
+- **Mandatory socle** — every application repo MUST expose, with these exact names and intent:
+  `help install install-dev lint format format-check typecheck test test-cov pre-commit clean
+  ci quality-gate-baseline quality-gate-verify`. Non-applicative repos (pure infra/Helm/Terraform,
+  config-only, docs) are exempt from the language-specific targets (`typecheck`, `test-cov`) but
+  still expose `help lint pre-commit clean`.
+- **Docs must match** — every `make <target>` cited in `CLAUDE.md` or `README.md` MUST exist in
+  the Makefile (no `make type-check` when the target is `typecheck`).
+- **Recipe style** — prefix every recipe line with `@`; add `## Description` after each target so
+  it appears in `make help`.
+
+## Shared skills (load on demand from shared-standards/.claude/skills/)
+
+- `testing-pytest` — pytest DDD + pytest-mock + constants (writing tests)
+- `dockerfile-multistage` — 4-stage Python 3.14 containers (editing Dockerfile)
+- `api-design` — REST standards + FastAPI patterns (designing endpoints)
+- `async-patterns` — async FastAPI + SQLAlchemy async sessions (async code)
+- `clean-architecture` — FastAPI module/layer structure (adding a feature)
+- `error-handling` — FastAPI errors + Sentry + logging (handling errors)
+- `contract-testing` — library contract / breaking-change tests (@chrysa/* releases)
+- `agent-patterns` — LangGraph + PydanticAI + Claude API (building agents)
+- `ui-ux` — UX/UI/ergonomics + WCAG 2.1 AA + dark mode + i18n (human-facing surfaces)
+
+## Error handling pattern (all automations)
+
+```text
+try:    fn()
+except: gh issue create --title "[chrysa] failure" --label "chrysa-error"
+```
+
+## Observability — Sentry → GitHub issues (norm)
+
+Every status:dev repo ships a Sentry project, and **a new Sentry issue automatically opens a
+GitHub issue** via Sentry's native GitHub integration. No relay, no PAT in the repo — the
+integration owns the link, so a Sentry issue maps to exactly one GitHub issue (no duplicates).
+
+Mechanism: a per-project Sentry **issue alert rule** with
+condition `FirstSeenEventCondition` (a new issue is created) and action
+`GitHubCreateTicketAction` targeting `chrysa/<repo>`, labels `sentry`, `bug`.
+Provision it across all projects with
+`shared-standards/scripts/sentry-github-issues.sh` (idempotent, `--dry-run` first).
+
+Per-project activation checklist:
+
+1. Org GitHub integration installed once in Sentry (Settings → Integrations → GitHub) with
+   access to the chrysa repos.
+2. The repo has a Sentry project whose slug matches the repo name.
+3. The auto-issue alert rule exists (run the provisioning script, or add it in
+   Alerts → Create Alert → Issues → action "Create a GitHub issue").
+4. The GitHub repo has a `sentry` label (CI label sync provides it).
+<!-- chrysa:standards:end -->

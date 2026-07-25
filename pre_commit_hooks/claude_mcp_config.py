@@ -21,7 +21,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-ENV_REF_RE = re.compile(r'^\$\{[A-Za-z_][A-Za-z0-9_]*(:-[^}]*)?\}$')
+ENV_REF_RE = re.compile(r'^\$\{[A-Za-z_]\w*(:-[^}]*)?\}$')
 MIN_SECRET_LENGTH = 12
 REMOTE_TRANSPORTS = frozenset({'http', 'sse', 'http-stream', 'streamable-http'})
 SECRET_KEY_RE = re.compile(r'(api[_-]?key|auth|credential|password|secret|token)', re.IGNORECASE)

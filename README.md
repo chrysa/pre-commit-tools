@@ -55,6 +55,9 @@
     - [ts-hardcoded-secret-detection](#ts-hardcoded-secret-detection)
     - [helm-lint](#helm-lint)
     - [makefile-check](#makefile-check)
+    - [claude-skill-frontmatter](#claude-skill-frontmatter)
+    - [claude-agent-frontmatter](#claude-agent-frontmatter)
+    - [claude-mcp-config](#claude-mcp-config)
     - [generate-changelog](#generate-changelog)
 
 <!--TOC-->
@@ -617,6 +620,66 @@ lint/test/format rule that references a directory which does not exist. Targets 
 ```yaml
 - id: makefile-check
   files: (^|/)Makefile$
+```
+
+### claude-skill-frontmatter
+
+Validate the YAML front matter of Claude Code skills. A `SKILL.md` without front matter is
+silently invisible to the model — the file looks fine to a human reviewer but the skill is
+never offered. Legacy skills written as a plain `# Skill: <title>` heading get an explicit
+migration hint.
+
+Fails on: a missing, unclosed, or invalid front matter block; a missing `name`/`description`;
+a `name` that is not lower-case kebab-case or does not match the containing directory; a
+`description` too short to act as a trigger. Unknown keys and an over-long `description` are
+warnings.
+
+```yaml
+- id: claude-skill-frontmatter
+  files: (^|/)SKILL\.md$
+```
+
+| Option | Default | Description |
+|---|---|---|
+| `--min-description` | `20` | Minimum `description` length, in characters |
+| `--max-description` | `1024` | Length above which `description` is warned about |
+| `--allow-key` | — | Extra front matter key tolerated without warning (repeatable) — use it for a repo-local metadata convention such as `origin`/`category` |
+
+### claude-agent-frontmatter
+
+Validate the YAML front matter of Claude Code subagents (`agents/*.md`). An agent whose front
+matter is missing or malformed is never registered, so the Agent tool silently cannot dispatch
+to it.
+
+Fails on: a missing, unclosed, or invalid front matter block; a missing `name`/`description`;
+a `name` that is not kebab-case or does not match the file stem; a `tools` value that is
+neither a list nor a comma-separated string; an empty prompt body. Unknown keys and an
+unrecognised `model` alias are warnings.
+
+```yaml
+- id: claude-agent-frontmatter
+  files: (^|/)agents/[^/]+\.md$
+```
+
+| Option | Default | Description |
+|---|---|---|
+| `--allow-key` | — | Extra front matter key tolerated without warning (repeatable) |
+
+### claude-mcp-config
+
+Validate Claude Code MCP server configuration (`.mcp.json`). An entry is either *stdio*
+(`command` + optional `args`) or remote (`url` with an `http`/`sse` transport); mixing both or
+declaring a contradictory transport yields a server that fails to connect at session start
+with no actionable message.
+
+Fails on: invalid JSON; a missing or malformed `mcpServers` mapping; a server declaring
+neither or both of `command`/`url`; a transport contradicting the declared keys; malformed
+`args`/`env`/`headers`; any credential-looking value inlined instead of referenced as
+`${VAR}`.
+
+```yaml
+- id: claude-mcp-config
+  files: (^|/)\.?mcp(_servers)?\.json$
 ```
 
 ### generate-changelog

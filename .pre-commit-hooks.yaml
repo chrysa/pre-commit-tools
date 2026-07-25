@@ -570,3 +570,34 @@
   minimum_pre_commit_version: '4.1.0'
   name: dependabot dependency classification
   pass_filenames: false
+- id: claude-skill-frontmatter
+  additional_dependencies:
+    - PyYAML
+  description: validate Claude Code skill front matter (name/description, kebab-case, directory match, trigger length)
+  entry: claude-skill-frontmatter
+  files: '(^|/)SKILL\.md$'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: claude skill front matter validation
+  pass_filenames: true
+  types: [markdown]
+- id: claude-agent-frontmatter
+  additional_dependencies:
+    - PyYAML
+  description: validate Claude Code subagent front matter (name/description, file-stem match, tools, model, prompt body)
+  entry: claude-agent-frontmatter
+  files: '(^|/)agents/[^/]+\.md$'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: claude subagent front matter validation
+  pass_filenames: true
+  types: [markdown]
+- id: claude-mcp-config
+  description: validate Claude Code MCP server configuration (transport coherence, args/env shape, no inlined credentials)
+  entry: claude-mcp-config
+  files: '(^|/)\.?mcp(_servers)?\.json$'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: claude mcp configuration validation
+  pass_filenames: true
+  types: [json]

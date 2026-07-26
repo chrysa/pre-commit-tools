@@ -276,5 +276,8 @@ repos:
     id: fastapi-missing-response-model
   - exclude: ^tests/
     id: fastapi-missing-links
+  - id: claude-skill-frontmatter
+  - id: claude-agent-frontmatter
+  - id: claude-mcp-config
   repo: https://github.com/chrysa/pre-commit-tools
-  rev: v0.1.1-97
+  rev: v0.1.1-98

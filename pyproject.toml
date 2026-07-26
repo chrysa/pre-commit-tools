@@ -86,6 +86,9 @@ django-cookie-security = "pre_commit_hooks.django_cookie_security:main"
 fastapi-cookie-insecure = "pre_commit_hooks.fastapi_cookie_insecure:main"
 pii-hardcoded = "pre_commit_hooks.pii_hardcoded:main"
 dependabot-classified-deps = "pre_commit_hooks.dependabot_classified_deps:main"
+claude-skill-frontmatter = "pre_commit_hooks.claude_skill_frontmatter:main"
+claude-agent-frontmatter = "pre_commit_hooks.claude_agent_frontmatter:main"
+claude-mcp-config = "pre_commit_hooks.claude_mcp_config:main"
 
 [project.optional-dependencies]
 dead_code = ["vulture>=2.0"]

@@ -455,6 +455,13 @@
   name: detect forbidden setup packaging files
   pass_filenames: true
   files: '(^|/)setup\.(py|cfg)$'
+- id: python-no-unittest-import
+  description: detect stdlib unittest imports (chrysa standard mandates pytest + pytest-mock)
+  entry: no-unittest-import
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect forbidden unittest imports
+  types: ["python"]
 - id: python-cors-allow-all
   description: detect wildcard CORS (allow_origins=['*'] / CORS_ALLOW_ALL_ORIGINS=True)
   entry: cors-allow-all-detection

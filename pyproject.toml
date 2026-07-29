@@ -98,7 +98,7 @@ format_dockerfile = ["dockerfile-parse==2.0.1"]
 lint = ["ruff"]
 pylint_report = ["pylint>=4.0.5", "pylint-report>=2.4.2"]
 screenshot = ["requests"]
-test = ["pytest", "pytest-cov", "ruamel.yaml"]
+test = ["pytest", "pytest-cov", "pytest-mock", "ruamel.yaml"]
 ts_unreachable_code = [
     "tree-sitter>=0.23,<0.27",
     "tree-sitter-typescript>=0.23,<0.24",

@@ -465,6 +465,14 @@
   name: detect forbidden setup packaging files
   pass_filenames: true
   files: '(^|/)setup\.(py|cfg)$'
+- id: claude-assets-present
+  description: detect a fleet repo whose .claude/ mirror is missing (no skill loads)
+  entry: claude-assets-present
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect a missing .claude/ mirror
+  pass_filenames: false
+  always_run: true
 - id: python-no-unittest-import
   description: detect stdlib unittest imports (chrysa standard mandates pytest + pytest-mock)
   entry: no-unittest-import

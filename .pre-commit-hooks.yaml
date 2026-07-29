@@ -367,6 +367,16 @@
   minimum_pre_commit_version: '4.1.0'
   name: detect missing multi-stage build in Dockerfiles
   types_or: ["dockerfile", "file"]
+- id: compose-dev-hot-reload
+  additional_dependencies:
+    - ruamel.yaml
+  description: detect compose dev services with no bind mount and no develop.watch sync, which cannot hot-reload
+  entry: compose-dev-hot-reload
+  files: '(^|/)(docker-)?compose[^/]*\.ya?ml$'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect dev services that cannot hot-reload
+  types_or: ["yaml", "file"]
 - id: dockerfile-healthcheck
   description: detect Dockerfiles missing a HEALTHCHECK instruction in the final stage
   entry: dockerfile-healthcheck

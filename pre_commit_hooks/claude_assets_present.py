@@ -56,7 +56,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         'chrysa:standards block.\n'
         '  The agent loads .claude/ at session start: an empty mirror means no skill is active, '
         'and nothing else reports it.\n'
-        '  Restore it with: shared-standards/scripts/distribute-standards.sh <repo>'
+        '  Restore it with: shared-standards/scripts/distribute-standards.sh <repo>',
     )
     return 1
 

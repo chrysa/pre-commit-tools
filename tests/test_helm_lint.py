@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pytest_mock import MockerFixture
 
 from pre_commit_hooks.helm_lint import _find_charts, main
 
@@ -30,43 +33,40 @@ class TestFindCharts:
 
 
 class TestHelmLintMain:
-    def test_no_helm_in_path_returns_0(self, tmp_path: Path) -> None:
+    def test_no_helm_in_path_returns_0(self, tmp_path: Path, mocker: MockerFixture) -> None:
         _make_chart(tmp_path, 'dev', 'my-app')
-        with patch('pre_commit_hooks.helm_lint.shutil.which', return_value=None):
-            assert main(['--charts-dir', str(tmp_path)]) == 0
+        mocker.patch('pre_commit_hooks.helm_lint.shutil.which', return_value=None)
+        assert main(['--charts-dir', str(tmp_path)]) == 0
 
-    def test_missing_charts_dir_returns_0(self, tmp_path: Path) -> None:
-        with patch('pre_commit_hooks.helm_lint.shutil.which', return_value='/usr/bin/helm'):
-            assert main(['--charts-dir', str(tmp_path / 'nonexistent')]) == 0
+    def test_missing_charts_dir_returns_0(self, tmp_path: Path, mocker: MockerFixture) -> None:
+        mocker.patch('pre_commit_hooks.helm_lint.shutil.which', return_value='/usr/bin/helm')
+        assert main(['--charts-dir', str(tmp_path / 'nonexistent')]) == 0
 
-    def test_helm_success_returns_0(self, tmp_path: Path) -> None:
+    def test_helm_success_returns_0(self, tmp_path: Path, mocker: MockerFixture) -> None:
         _make_chart(tmp_path, 'dev', 'my-app')
-        mock_result = MagicMock()
+        mock_result = mocker.MagicMock()
         mock_result.returncode = 0
-        with (
-            patch('pre_commit_hooks.helm_lint.shutil.which', return_value='/usr/bin/helm'),
-            patch('pre_commit_hooks.helm_lint.subprocess.run', return_value=mock_result),
-        ):
-            assert main(['--charts-dir', str(tmp_path)]) == 0
+        mocker.patch('pre_commit_hooks.helm_lint.shutil.which', return_value='/usr/bin/helm')
+        mocker.patch('pre_commit_hooks.helm_lint.subprocess.run', return_value=mock_result)
+        assert main(['--charts-dir', str(tmp_path)]) == 0
 
-    def test_helm_failure_returns_1(self, tmp_path: Path) -> None:
+    def test_helm_failure_returns_1(self, tmp_path: Path, mocker: MockerFixture) -> None:
         _make_chart(tmp_path, 'dev', 'bad-chart')
-        mock_result = MagicMock()
+        mock_result = mocker.MagicMock()
         mock_result.returncode = 1
         mock_result.stdout = 'Error: lint failed\n'
         mock_result.stderr = ''
-        with (
-            patch('pre_commit_hooks.helm_lint.shutil.which', return_value='/usr/bin/helm'),
-            patch('pre_commit_hooks.helm_lint.subprocess.run', return_value=mock_result),
-        ):
-            assert main(['--charts-dir', str(tmp_path)]) == 1
+        mocker.patch('pre_commit_hooks.helm_lint.shutil.which', return_value='/usr/bin/helm')
+        mocker.patch('pre_commit_hooks.helm_lint.subprocess.run', return_value=mock_result)
+        assert main(['--charts-dir', str(tmp_path)]) == 1
 
-    def test_multiple_charts_one_fails_returns_1(self, tmp_path: Path) -> None:
+    def test_multiple_charts_one_fails_returns_1(self, tmp_path: Path, mocker: MockerFixture) -> None:
         _make_chart(tmp_path, 'dev', 'good')
         _make_chart(tmp_path, 'dev', 'bad')
-        results = [MagicMock(returncode=0, stdout='', stderr=''), MagicMock(returncode=1, stdout='fail\n', stderr='')]
-        with (
-            patch('pre_commit_hooks.helm_lint.shutil.which', return_value='/usr/bin/helm'),
-            patch('pre_commit_hooks.helm_lint.subprocess.run', side_effect=results),
-        ):
-            assert main(['--charts-dir', str(tmp_path)]) == 1
+        results = [
+            mocker.MagicMock(returncode=0, stdout='', stderr=''),
+            mocker.MagicMock(returncode=1, stdout='fail\n', stderr=''),
+        ]
+        mocker.patch('pre_commit_hooks.helm_lint.shutil.which', return_value='/usr/bin/helm')
+        mocker.patch('pre_commit_hooks.helm_lint.subprocess.run', side_effect=results)
+        assert main(['--charts-dir', str(tmp_path)]) == 1

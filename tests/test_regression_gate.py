@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from unittest.mock import patch
+from typing import TYPE_CHECKING
 
 from pre_commit_hooks.regression_gate import (
     _check,
@@ -14,6 +14,9 @@ from pre_commit_hooks.regression_gate import (
     _write_baseline,
     main,
 )
+
+if TYPE_CHECKING:
+    from pytest_mock import MockerFixture
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Fixtures / helpers
@@ -162,27 +165,27 @@ class TestLoadBaseline:
 
 
 class TestWriteBaseline:
-    def test_creates_file_with_metrics(self, tmp_path: Path) -> None:
+    def test_creates_file_with_metrics(self, tmp_path: Path, mocker: MockerFixture) -> None:
         f = tmp_path / '.quality-baseline.json'
-        with patch('pre_commit_hooks.regression_gate._git_sha', return_value='deadbeef'):
-            _write_baseline(f, 87.5, 42)
+        mocker.patch('pre_commit_hooks.regression_gate._git_sha', return_value='deadbeef')
+        _write_baseline(f, 87.5, 42)
         data = json.loads(f.read_text())
         assert data['metrics']['coverage_pct'] == 87.5
         assert data['metrics']['tests_passed'] == 42
         assert data['git_sha'] == 'deadbeef'
 
-    def test_none_values_default_to_zero(self, tmp_path: Path) -> None:
+    def test_none_values_default_to_zero(self, tmp_path: Path, mocker: MockerFixture) -> None:
         f = tmp_path / '.quality-baseline.json'
-        with patch('pre_commit_hooks.regression_gate._git_sha', return_value='abc'):
-            _write_baseline(f, None, None)
+        mocker.patch('pre_commit_hooks.regression_gate._git_sha', return_value='abc')
+        _write_baseline(f, None, None)
         data = json.loads(f.read_text())
         assert data['metrics']['coverage_pct'] == 0.0
         assert data['metrics']['tests_passed'] == 0
 
-    def test_file_ends_with_newline(self, tmp_path: Path) -> None:
+    def test_file_ends_with_newline(self, tmp_path: Path, mocker: MockerFixture) -> None:
         f = tmp_path / '.quality-baseline.json'
-        with patch('pre_commit_hooks.regression_gate._git_sha', return_value='abc'):
-            _write_baseline(f, 80.0, 5)
+        mocker.patch('pre_commit_hooks.regression_gate._git_sha', return_value='abc')
+        _write_baseline(f, 80.0, 5)
         assert f.read_text().endswith('\n')
 
 
@@ -266,25 +269,25 @@ class TestCheck:
 
 
 class TestMain:
-    def test_write_baseline_mode(self, tmp_path: Path) -> None:
+    def test_write_baseline_mode(self, tmp_path: Path, mocker: MockerFixture) -> None:
         cov = tmp_path / 'coverage.xml'
         cov.write_text(COVERAGE_XML_85)
         junit = tmp_path / 'results.xml'
         junit.write_text(JUNIT_XML_10_OK)
         baseline = tmp_path / '.quality-baseline.json'
 
-        with patch('pre_commit_hooks.regression_gate._git_sha', return_value='abc'):
-            ret = main(
-                [
-                    '--write-baseline',
-                    '--baseline',
-                    str(baseline),
-                    '--coverage-report',
-                    str(cov),
-                    '--test-report',
-                    str(junit),
-                ],
-            )
+        mocker.patch('pre_commit_hooks.regression_gate._git_sha', return_value='abc')
+        ret = main(
+            [
+                '--write-baseline',
+                '--baseline',
+                str(baseline),
+                '--coverage-report',
+                str(cov),
+                '--test-report',
+                str(junit),
+            ],
+        )
         assert ret == 0
         data = json.loads(baseline.read_text())
         assert data['metrics']['coverage_pct'] == 85.0

@@ -40,7 +40,7 @@ class TestReadSource:
         target.write_bytes(b'\xff\xfe\x00binary')
         assert read_source(str(target), root=tmp_path) is None
 
-    def test_root_defaults_to_cwd(self, tmp_path: Path, monkeypatch) -> None:  # noqa: ANN001 — pytest fixture
+    def test_root_defaults_to_cwd(self, tmp_path: Path, monkeypatch) -> None:
         target = tmp_path / 'mod.py'
         target.write_text('z = 3\n', encoding='utf-8')
         monkeypatch.chdir(tmp_path)

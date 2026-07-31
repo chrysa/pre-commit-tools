@@ -96,7 +96,7 @@ claude-mcp-config = "pre_commit_hooks.claude_mcp_config:main"
 [project.optional-dependencies]
 dead_code = ["vulture>=2.0"]
 format_dockerfile = ["dockerfile-parse==2.0.1"]
-lint = ["ruff"]
+lint = ["ruff==0.15.21"]  # keep in sync with the ruff-pre-commit rev
 pylint_report = ["pylint>=4.0.5", "pylint-report>=2.4.2"]
 screenshot = ["requests"]
 test = ["pytest", "pytest-cov", "pytest-mock", "ruamel.yaml"]
@@ -106,6 +106,12 @@ ts_unreachable_code = [
 ]
 typecheck = ["mypy", "types-PyYAML"]
 yaml = ["PyYAML==6.0.3"]
+# Everything a quality gate needs: every runtime extra (so the whole suite collects)
+# plus the build backend. Consumed by CI as `pip install -e ".[dev]"`.
+dev = [
+    "build",
+    "pre_commit_hooks_tools[dead_code,format_dockerfile,lint,screenshot,test,ts_unreachable_code,typecheck,yaml]",
+]
 
 [tool.setuptools.packages.find]
 exclude = ["tests*", "testing*"]

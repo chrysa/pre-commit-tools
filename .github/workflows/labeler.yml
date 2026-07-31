@@ -7,4 +7,4 @@ on:
 
 jobs:
     call:
-        uses: chrysa/github-actions/.github/workflows/labeler.yml@v1.4.25
+        uses: chrysa/github-actions/.github/workflows/labeler.yml@v1.4.26

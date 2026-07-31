@@ -12,4 +12,4 @@ on:
 
 jobs:
     call:
-        uses: chrysa/github-actions/.github/workflows/sync-labels.yml@v1.4.25
+        uses: chrysa/github-actions/.github/workflows/sync-labels.yml@v1.4.26

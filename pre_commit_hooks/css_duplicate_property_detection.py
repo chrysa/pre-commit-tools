@@ -85,8 +85,7 @@ def detect_duplicate_properties(content: str, filename: str) -> list[Violation]:
         open_count = stripped.count('{')
         close_count = stripped.count('}')
 
-        for _ in range(open_count):
-            scope_stack.append({})
+        scope_stack.extend({} for _ in range(open_count))
 
         _check_property_line(
             stripped,

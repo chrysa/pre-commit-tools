@@ -6,4 +6,4 @@ on:
 
 jobs:
     call:
-        uses: chrysa/github-actions/.github/workflows/pull-request-size.yml@v1.3.0
+        uses: chrysa/github-actions/.github/workflows/pull-request-size.yml@v1.4.4

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from pre_commit_hooks.python_dispatch_ladder import detect_dispatch_ladder, main
 
 
@@ -11,6 +13,12 @@ def _write(tmp_path: Path, name: str, content: str) -> str:
     p = tmp_path / name
     p.write_text(content, encoding='utf-8')
     return str(p)
+
+
+@pytest.fixture(autouse=True)
+def _cwd_is_tmp(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Hooks only read inside the working tree, so run mains from tmp_path."""
+    monkeypatch.chdir(tmp_path)
 
 
 _LOOKUP_TABLE = """\

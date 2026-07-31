@@ -418,6 +418,30 @@
   minimum_pre_commit_version: '4.1.0'
   name: 'detect bare # type: ignore without justification'
   types: ["python"]
+- id: python-untyped-raise
+  description: detect raises of generic builtin exceptions (Exception, RuntimeError) instead of a domain exception class
+  entry: python-untyped-raise
+  files: \.py$
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect untyped raises in Python
+  types: ["python"]
+- id: python-mutable-default
+  description: detect mutable default arguments ([], {}, set(), dict()) in Python signatures
+  entry: python-mutable-default
+  files: \.py$
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect mutable default arguments
+  types: ["python"]
+- id: python-dispatch-ladder
+  description: detect if/elif ladders dispatching one value against constants — use a lookup table
+  entry: python-dispatch-ladder
+  files: \.py$
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect dispatch ladders that should be lookup tables
+  types: ["python"]
 - id: docs-drift-gate
   description: regenerate code-derived docs via a make target and block push when they drift from the committed copy
   entry: docs-drift-gate

@@ -82,22 +82,47 @@ class QualityGate:
                 return int(match.group(1))
         return 0
 
-    def _parse_coverage(self, output: str) -> float:
-        """Return the total coverage percentage reported by the coverage run.
+    # Coverage summary lines, in order of trust. Anchored on purpose: a loose
+    # 'any line mentioning coverage' scan matches pytest's own verbose progress
+    # (`… ::test_service_named_dev_is_covered PASSED [ 13%]`) and reports the
+    # progress percentage as the coverage figure.
+    COVERAGE_PATTERNS = (
+        # Prefer the precise `--cov-fail-under` summary line over the truncated
+        # `TOTAL` term-report row (e.g. 91.71% vs a rounded 92%) when both appear.
+        r'Total coverage:\s*(\d+(?:\.\d+)?)%',  # --cov-fail-under summary line
+        r'^TOTAL\s+.*?(\d+(?:\.\d+)?)%',  # pytest-cov / coverage term report
+        r'All files\s*\|\s*(\d+(?:\.\d+)?)',  # jest / istanbul text summary
+        r'^Statements\s*:\s*(\d+(?:\.\d+)?)%',  # nyc text-summary
+    )
 
-        Anchored patterns only. A substring scan for 'total'/'coverage'/'covered'
-        also matches pytest's own progress output — a test *named* ``…_is_covered``
-        prints ``[ 13%]``, which the scan read as 13% coverage.
-        """
-        for pattern in (
-            r'^\s*Required test coverage of [\d.]+% reached\.\s*Total coverage:\s*(\d+(?:\.\d+)?)%',
-            r'^\s*Total coverage:\s*(\d+(?:\.\d+)?)%',
-            r'^TOTAL\b.*?(\d+(?:\.\d+)?)%\s*$',
-            r'^\s*Coverage(?:\s+report)?\s*:?\s*(\d+(?:\.\d+)?)%',
-        ):
+    def _parse_coverage(self, output: str) -> float:
+        for pattern in self.COVERAGE_PATTERNS:
             match = re.search(pattern, output, flags=re.IGNORECASE | re.MULTILINE)
             if match:
-                return float(match.group(1))
+                try:
+                    return float(match.group(1))
+                except ValueError:
+                    continue
+        return self._parse_coverage_report()
+
+    def _parse_coverage_report(self) -> float:
+        """Read the coverage percentage from a written XML report.
+
+        `make test-cov` may emit only `--cov-report=xml`, in which case stdout
+        carries no summary at all and the textual patterns above find nothing.
+        """
+        for candidate in (Path('reports/coverage.xml'), Path('coverage.xml')):
+            if not candidate.is_file():
+                continue
+            match = re.search(
+                r'<coverage[^>]*\bline-rate="([0-9.]+)"',
+                candidate.read_text(encoding='utf-8', errors='replace'),
+            )
+            if match:
+                try:
+                    return round(float(match.group(1)) * 100, 2)
+                except ValueError:
+                    continue
         return -1.0
 
     def _parse_warning_count(self, output: str) -> int:

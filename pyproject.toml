@@ -66,6 +66,9 @@ dockerfile-non-root-user = "pre_commit_hooks.dockerfile_non_root_user:main"
 ts-no-any = "pre_commit_hooks.ts_no_any:main"
 react-no-inline-styles = "pre_commit_hooks.react_no_inline_styles:main"
 python-no-type-ignore = "pre_commit_hooks.python_no_type_ignore:main"
+python-untyped-raise = "pre_commit_hooks.python_untyped_raise:main"
+python-mutable-default = "pre_commit_hooks.python_mutable_default:main"
+python-dispatch-ladder = "pre_commit_hooks.python_dispatch_ladder:main"
 
 [project.optional-dependencies]
 dead_code = ["vulture>=2.0"]

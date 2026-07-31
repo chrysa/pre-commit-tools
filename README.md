@@ -54,6 +54,9 @@
     - [helm-lint](#helm-lint)
     - [makefile-check](#makefile-check)
     - [generate-changelog](#generate-changelog)
+    - [python-untyped-raise](#python-untyped-raise)
+    - [python-mutable-default](#python-mutable-default)
+    - [python-dispatch-ladder](#python-dispatch-ladder)
 
 <!--TOC-->
 
@@ -106,6 +109,9 @@ Add this to your `.pre-commit-config.yaml`
           # generate-changelog uses git-cliff; run manually or on CI
           - id: generate-changelog
             stages: [manual]
+          - id: python-untyped-raise
+          - id: python-mutable-default
+          - id: python-dispatch-ladder
 
 # Optional — guideline-checker (structural coding guidelines)
 # Validates project structure, naming conventions, and coding standards.
@@ -570,3 +576,49 @@ pre-commit run generate-changelog --hook-stage manual
 - id: generate-changelog
   stages: [manual]
 ```
+
+### python-untyped-raise
+
+Detect `raise` of a generic builtin exception (`Exception`, `BaseException`,
+`RuntimeError`) instead of a domain-specific exception class. A bare builtin gives
+callers nothing to catch narrowly and carries no stable machine-readable code
+(chrysa standard: *Raised errors are typed*).
+
+A bare `raise` (re-raising the active exception) is never flagged.
+
+Use `# python-untyped-raise: disable` to suppress a specific line.
+
+```yaml
+- id: python-untyped-raise
+```
+
+### python-mutable-default
+
+Detect mutable default arguments — `[]`, `{}`, `set()`, `list()`, `dict()`,
+`deque()`, `defaultdict()`, `Counter()` — in function and method signatures,
+positional and keyword-only alike. The default is evaluated once at definition
+time and shared by every call. Default to `None` and build the value in the body.
+
+Use `# python-mutable-default: disable` to suppress a specific line.
+
+```yaml
+- id: python-mutable-default
+```
+
+### python-dispatch-ladder
+
+Detect `if/elif` ladders that dispatch **one** value against constant literals
+(`kind == 'a' / elif kind == 'b' / …`, or `in` against constant tuples) — the shape
+the chrysa standard *Prefer a lookup table to a state machine* requires to be a
+`dict` from key to handler or value, so a new case is a new row instead of an edit
+to control flow.
+
+Chains of unrelated conditions are not flagged; only ladders whose every branch
+tests the same subject. The default threshold is 3 branches, tunable:
+
+```yaml
+- id: python-dispatch-ladder
+  args: [--max-branches=5]
+```
+
+Use `# python-dispatch-ladder: disable` on the opening `if` to suppress a ladder.

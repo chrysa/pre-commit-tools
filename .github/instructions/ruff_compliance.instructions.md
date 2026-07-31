@@ -7,7 +7,7 @@ applyTo: "**/*.py"
 ## Ruff is the Sole Linting Authority
 
 No flake8, pylint (for linting), black, or isort. Ruff replaces all of them.
-Configuration: `config-tools/ruff.toml`
+Configuration: `pyproject.toml` (`[tool.ruff]`)
 
 ---
 
@@ -15,16 +15,16 @@ Configuration: `config-tools/ruff.toml`
 
 ```bash
 # Check for violations
-ruff check --config=config-tools/ruff.toml pre_commit_hooks tests
+ruff check pre_commit_hooks tests
 
 # Auto-fix safe violations
-ruff check --config=config-tools/ruff.toml --fix pre_commit_hooks tests
+ruff check --fix pre_commit_hooks tests
 
 # Format check (equivalent to black)
-ruff format --check --config=config-tools/ruff.toml pre_commit_hooks
+ruff format --check pre_commit_hooks
 
 # Apply formatting
-ruff format --config=config-tools/ruff.toml pre_commit_hooks
+ruff format pre_commit_hooks
 ```
 
 **All violations must be fixed before any commit. Zero tolerance.**
@@ -107,7 +107,6 @@ Ruff runs automatically via pre-commit:
   rev: v0.15.8
   hooks:
     - id: ruff
-      args: [--config=config-tools/ruff.toml, --fix]
+      args: [--fix]
     - id: ruff-format
-      args: [--config=config-tools/ruff.toml]
 ```

@@ -7,7 +7,7 @@ applyTo: "pre_commit_hooks/**/*.py"
 ## Tech Stack
 
 - **Python**: 3.12+ (target 3.14, retrocompatible 3.12)
-- **Linting/Formatting**: Ruff (`config-tools/ruff.toml`) — replaces flake8, Black, isort
+- **Linting/Formatting**: Ruff (`[tool.ruff]` in `pyproject.toml`) — replaces flake8, Black, isort
 - **Type Checking**: mypy (`setup.cfg [mypy]`)
 - **Testing**: pytest + pytest-cov
 
@@ -16,8 +16,8 @@ applyTo: "pre_commit_hooks/**/*.py"
 Ruff is the source of truth. If it fails, fix it. No exceptions.
 
 ```bash
-ruff check --config=config-tools/ruff.toml pre_commit_hooks tests
-ruff format --check --config=config-tools/ruff.toml pre_commit_hooks
+ruff check pre_commit_hooks tests
+ruff format --check pre_commit_hooks
 mypy --config-file=setup.cfg pre_commit_hooks
 ```
 

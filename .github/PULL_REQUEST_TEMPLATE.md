@@ -20,8 +20,8 @@ Closes #
 ## Checklist
 
 - [ ] Tests added or updated (all 267 tests pass)
-- [ ] `ruff check --config=config-tools/ruff.toml pre_commit_hooks tests` passes
-- [ ] `ruff format --config=config-tools/ruff.toml pre_commit_hooks` applied
+- [ ] `ruff check pre_commit_hooks tests` passes
+- [ ] `ruff format pre_commit_hooks` applied
 - [ ] Type annotations complete on all public functions
 - [ ] README updated if the change adds or modifies a hook
 - [ ] `.pre-commit-hooks.yaml` updated if a new hook was added
@@ -33,5 +33,5 @@ Closes #
 
 ```bash
 python3 -m pytest tests/ -q
-ruff check --config=config-tools/ruff.toml pre_commit_hooks tests
+ruff check pre_commit_hooks tests
 ```

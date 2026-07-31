@@ -140,4 +140,4 @@ from __future__ import annotations
 | `ANN202` | Missing return type annotation (private) |
 | `ANN204` | Missing return type on `__init__` |
 
-All are enabled in `config-tools/ruff.toml`.
+All are enabled in `pyproject.toml` (`[tool.ruff.lint]`).

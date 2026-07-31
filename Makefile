@@ -65,13 +65,13 @@ install-pre-commit: ## Install and configure git pre-commit hooks
 # ── Quality ──────────────────────────────────────────────────────────────────
 
 lint: ## Run ruff linting
-	ruff check --config=config-tools/ruff.toml $(PACKAGE_DIR)
+	ruff check $(PACKAGE_DIR)
 
 format: ## Run ruff formatter
-	ruff format --config=config-tools/ruff.toml $(PACKAGE_DIR)
+	ruff format $(PACKAGE_DIR)
 
 format-check: ## Check ruff formatting (no changes)
-	ruff format --check --config=config-tools/ruff.toml $(PACKAGE_DIR)
+	ruff format --check $(PACKAGE_DIR)
 
 typecheck: ## Run mypy type checking
 	mypy --config-file=pyproject.toml $(PACKAGE_DIR)

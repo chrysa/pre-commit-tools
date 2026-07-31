@@ -87,8 +87,10 @@ class QualityGate:
     # (`… ::test_service_named_dev_is_covered PASSED [ 13%]`) and reports the
     # progress percentage as the coverage figure.
     COVERAGE_PATTERNS = (
-        r'^TOTAL\s+.*?(\d+(?:\.\d+)?)%',  # pytest-cov / coverage term report
+        # Prefer the precise `--cov-fail-under` summary line over the truncated
+        # `TOTAL` term-report row (e.g. 91.71% vs a rounded 92%) when both appear.
         r'Total coverage:\s*(\d+(?:\.\d+)?)%',  # --cov-fail-under summary line
+        r'^TOTAL\s+.*?(\d+(?:\.\d+)?)%',  # pytest-cov / coverage term report
         r'All files\s*\|\s*(\d+(?:\.\d+)?)',  # jest / istanbul text summary
         r'^Statements\s*:\s*(\d+(?:\.\d+)?)%',  # nyc text-summary
     )

@@ -11,9 +11,9 @@ from __future__ import annotations
 import ast
 import sys
 from collections.abc import Sequence
-from pathlib import Path
 
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
+from pre_commit_hooks.tools.source_reader import read_source
 
 Violation = tuple[str, int, str]
 
@@ -80,17 +80,15 @@ class _MutableDefaultVisitor(ast.NodeVisitor):
         self._source_lines = source_lines
         self.violations: list[Violation] = []
 
-    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+    def visit_FunctionDef(self, node: ast.AsyncFunctionDef | ast.FunctionDef) -> None:
         self.violations.extend(
             _check_signature(node, self._filename, self._source_lines),
         )
         self.generic_visit(node)
 
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        self.violations.extend(
-            _check_signature(node, self._filename, self._source_lines),
-        )
-        self.generic_visit(node)
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+        # A default argument traps identically in sync and async signatures.
+        self.visit_FunctionDef(node)
 
 
 def detect_mutable_default(source: str, filename: str) -> list[Violation]:
@@ -111,9 +109,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     args, _ = tools.get_args(argv=argv)
     retval = 0
     for filename in args.filenames:
-        try:
-            source = Path(filename).read_text(encoding='utf-8')
-        except (OSError, UnicodeDecodeError):
+        source = read_source(filename)
+        if source is None:
             continue
         for fname, lineno, msg in detect_mutable_default(source, filename):
             print(f'{fname}:{lineno}: {msg}', file=sys.stderr)

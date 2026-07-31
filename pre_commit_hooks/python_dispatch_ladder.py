@@ -14,7 +14,8 @@ import argparse
 import ast
 import sys
 from collections.abc import Sequence
-from pathlib import Path
+
+from pre_commit_hooks.tools.source_reader import read_source
 
 Violation = tuple[str, int, str]
 
@@ -111,9 +112,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     retval = 0
     for filename in args.filenames:
-        try:
-            source = Path(filename).read_text(encoding='utf-8')
-        except (OSError, UnicodeDecodeError):
+        source = read_source(filename)
+        if source is None:
             continue
         for fname, lineno, msg in detect_dispatch_ladder(source, filename, args.max_branches):
             print(f'{fname}:{lineno}: {msg}', file=sys.stderr)

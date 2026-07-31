@@ -65,16 +65,16 @@ def detect_missing_multi_stage(
 
     if require_targets:
         present = _stage_names(source)
-        for target in require_targets:
-            if target.lower() not in present:
-                violations.append(
-                    (
-                        filename,
-                        1,
-                        f"Dockerfile is missing the required '{target}' build stage "
-                        f'(FROM … AS {target}); a production and a dev stage are mandatory',
-                    ),
-                )
+        violations.extend(
+            (
+                filename,
+                1,
+                f"Dockerfile is missing the required '{target}' build stage "
+                f'(FROM … AS {target}); a production and a dev stage are mandatory',
+            )
+            for target in require_targets
+            if target.lower() not in present
+        )
     return violations
 
 

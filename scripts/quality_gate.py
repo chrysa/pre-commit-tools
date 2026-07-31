@@ -12,6 +12,7 @@ import json
 import re
 import subprocess
 import sys
+from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -159,21 +160,17 @@ class QualityGate:
         return 0
 
     def _parse_metric(self, gate_name: str, exit_code: int, output: str) -> Any:
-        if gate_name == 'Tests':
-            return self._parse_passed_tests(output)
-        if gate_name == 'Coverage':
-            return self._parse_coverage(output)
-        if gate_name == 'Lint':
-            return self._parse_warning_count(output)
-        if gate_name == 'Types':
-            return self._parse_error_count(output)
-        if gate_name == 'Build':
-            return 0 if exit_code == 0 else 1
-        if gate_name == 'Secrets':
-            return self._parse_secret_count(output)
-        if gate_name == 'VulnDeps':
-            return self._parse_vuln_count(output)
-        return None
+        parsers: dict[str, Callable[[], Any]] = {
+            'Tests': lambda: self._parse_passed_tests(output),
+            'Coverage': lambda: self._parse_coverage(output),
+            'Lint': lambda: self._parse_warning_count(output),
+            'Types': lambda: self._parse_error_count(output),
+            'Build': lambda: 0 if exit_code == 0 else 1,
+            'Secrets': lambda: self._parse_secret_count(output),
+            'VulnDeps': lambda: self._parse_vuln_count(output),
+        }
+        parser = parsers.get(gate_name)
+        return parser() if parser is not None else None
 
     def _compare(self, current: Any, target: Any, operator: str) -> bool:
         if operator == '=':

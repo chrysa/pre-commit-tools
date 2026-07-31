@@ -16,10 +16,9 @@ Wire in .claude/settings.json:
 The hook reads the prompt on stdin (Claude Code passes the user prompt) and writes
 context to stdout, which Claude Code injects before the turn.
 """
-import sys
-import re
-import json
 import argparse
+import re
+import sys
 
 # --- fast triage: is this prompt worth optimizing at all? ---
 

@@ -18,9 +18,7 @@ def _find_charts(search_root: Path) -> list[Path]:
     for ns_dir in search_root.iterdir():
         if not ns_dir.is_dir():
             continue
-        for svc_dir in ns_dir.iterdir():
-            if svc_dir.is_dir() and (svc_dir / 'Chart.yaml').exists():
-                charts.append(svc_dir)
+        charts.extend(svc_dir for svc_dir in ns_dir.iterdir() if svc_dir.is_dir() and (svc_dir / 'Chart.yaml').exists())
     return charts
 
 

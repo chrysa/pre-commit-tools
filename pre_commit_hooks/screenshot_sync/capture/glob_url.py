@@ -9,14 +9,12 @@ from pre_commit_hooks.screenshot_sync.config import Config
 
 def resolve_targets(config: Config, changed_files: list[str]) -> list[CaptureTarget]:
     base = config.base_url.rstrip('/')
-    targets: list[CaptureTarget] = []
-    for route in config.routes:
-        if any(matches(path, route.match) for path in changed_files):
-            targets.append(
-                CaptureTarget(
-                    name=route.name,
-                    url=route.url,
-                    full_url=f'{base}{route.url}',
-                ),
-            )
-    return targets
+    return [
+        CaptureTarget(
+            name=route.name,
+            url=route.url,
+            full_url=f'{base}{route.url}',
+        )
+        for route in config.routes
+        if any(matches(path, route.match) for path in changed_files)
+    ]

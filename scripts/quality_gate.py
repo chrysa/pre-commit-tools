@@ -83,13 +83,21 @@ class QualityGate:
         return 0
 
     def _parse_coverage(self, output: str) -> float:
-        for line in output.splitlines():
-            if any(token in line.lower() for token in ['total', 'coverage', 'covered']):
-                for value in re.findall(r'(\d+(?:\.\d+)?)%', line):
-                    try:
-                        return float(value)
-                    except ValueError:
-                        continue
+        """Return the total coverage percentage reported by the coverage run.
+
+        Anchored patterns only. A substring scan for 'total'/'coverage'/'covered'
+        also matches pytest's own progress output — a test *named* ``…_is_covered``
+        prints ``[ 13%]``, which the scan read as 13% coverage.
+        """
+        for pattern in (
+            r'^\s*Required test coverage of [\d.]+% reached\.\s*Total coverage:\s*(\d+(?:\.\d+)?)%',
+            r'^\s*Total coverage:\s*(\d+(?:\.\d+)?)%',
+            r'^TOTAL\b.*?(\d+(?:\.\d+)?)%\s*$',
+            r'^\s*Coverage(?:\s+report)?\s*:?\s*(\d+(?:\.\d+)?)%',
+        ):
+            match = re.search(pattern, output, flags=re.IGNORECASE | re.MULTILINE)
+            if match:
+                return float(match.group(1))
         return -1.0
 
     def _parse_warning_count(self, output: str) -> int:

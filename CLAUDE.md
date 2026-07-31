@@ -15,8 +15,8 @@ pip install -e ".[format_dockerfile,yaml,dead_code]"
 pip install ruff mypy pylint pytest pytest-cov build twine
 
 # Linting / formatting
-ruff check --config=config-tools/ruff.toml pre_commit_hooks tests
-ruff format --config=config-tools/ruff.toml pre_commit_hooks
+ruff check pre_commit_hooks tests
+ruff format pre_commit_hooks
 
 # Type-checking
 mypy --config-file=pyproject.toml pre_commit_hooks
@@ -125,8 +125,8 @@ setup.cfg                  # entry points + dependencies + mypy/pytest config
 ## Ruff — zero tolerance
 
 ```bash
-ruff check --config=config-tools/ruff.toml pre_commit_hooks tests
-ruff format --check --config=config-tools/ruff.toml pre_commit_hooks
+ruff check pre_commit_hooks tests
+ruff format --check pre_commit_hooks
 ```
 
 Every `# noqa` must include the rule code and a justification:

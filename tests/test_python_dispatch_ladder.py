@@ -62,43 +62,33 @@ class TestDetectDispatchLadder:
         assert detect_dispatch_ladder(_UNRELATED_CONDITIONS, 'f.py') == []
 
     def test_short_ladder_returns_empty(self) -> None:
-        src = (
-            "def f(k):\n"
-            "    if k == 'a':\n        return 1\n"
-            "    elif k == 'b':\n        return 2\n"
-            "    return 0\n"
-        )
+        src = "def f(k):\n    if k == 'a':\n        return 1\n    elif k == 'b':\n        return 2\n    return 0\n"
         assert detect_dispatch_ladder(src, 'f.py') == []
 
     def test_attribute_subject_returns_violation(self) -> None:
         src = (
-            "def f(self):\n"
+            'def f(self):\n'
             "    if self.status == 'a':\n        return 1\n"
             "    elif self.status == 'b':\n        return 2\n"
             "    elif self.status == 'c':\n        return 3\n"
             "    elif self.status == 'd':\n        return 4\n"
-            "    return 0\n"
+            '    return 0\n'
         )
         assert len(detect_dispatch_ladder(src, 'f.py')) == 1
 
     def test_in_membership_ladder_returns_violation(self) -> None:
         src = (
-            "def f(k):\n"
+            'def f(k):\n'
             "    if k in ('a', 'b'):\n        return 1\n"
             "    elif k in ('c',):\n        return 2\n"
             "    elif k in ('d',):\n        return 3\n"
             "    elif k in ('e',):\n        return 4\n"
-            "    return 0\n"
+            '    return 0\n'
         )
         assert len(detect_dispatch_ladder(src, 'f.py')) == 1
 
     def test_custom_threshold_flags_shorter_ladder(self) -> None:
-        src = (
-            "def f(k):\n"
-            "    if k == 'a':\n        return 1\n"
-            "    elif k == 'b':\n        return 2\n"
-            "    return 0\n"
-        )
+        src = "def f(k):\n    if k == 'a':\n        return 1\n    elif k == 'b':\n        return 2\n    return 0\n"
         assert len(detect_dispatch_ladder(src, 'f.py', max_branches=1)) == 1
 
     def test_ladder_counted_once_not_per_elif(self) -> None:

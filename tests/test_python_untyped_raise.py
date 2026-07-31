@@ -60,10 +60,7 @@ class TestDetectUntypedRaise:
         assert detect_untyped_raise(src, 'f.py') == []
 
     def test_disable_comment_returns_empty(self) -> None:
-        src = (
-            'def f() -> None:\n'
-            '    raise Exception("boom")  # python-untyped-raise: disable\n'
-        )
+        src = 'def f() -> None:\n    raise Exception("boom")  # python-untyped-raise: disable\n'
         assert detect_untyped_raise(src, 'f.py') == []
 
     def test_syntax_error_returns_empty(self) -> None:

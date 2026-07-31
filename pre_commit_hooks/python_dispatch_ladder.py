@@ -74,8 +74,13 @@ def detect_dispatch_ladder(
     source_lines = source.splitlines()
     violations: list[Violation] = []
     # Only the head of each chain is inspected; nested `elif` nodes are part of it.
-    heads = {id(orelse) for node in ast.walk(tree) if isinstance(node, ast.If)
-             for orelse in node.orelse if isinstance(orelse, ast.If)}
+    heads = {
+        id(orelse)
+        for node in ast.walk(tree)
+        if isinstance(node, ast.If)
+        for orelse in node.orelse
+        if isinstance(orelse, ast.If)
+    }
     for node in ast.walk(tree):
         if not isinstance(node, ast.If) or id(node) in heads:
             continue

@@ -58,16 +58,12 @@ class _UntypedRaiseVisitor(ast.NodeVisitor):
 
     def visit_Raise(self, node: ast.Raise) -> None:
         name = _raised_name(node)
-        if (
-            name in _UNTYPED_EXCEPTIONS
-            and not _is_disable_comment(self._source_lines, node.lineno)
-        ):
+        if name in _UNTYPED_EXCEPTIONS and not _is_disable_comment(self._source_lines, node.lineno):
             self.violations.append(
                 (
                     self._filename,
                     node.lineno,
-                    f'raise of untyped builtin {name!r} — '
-                    'raise a domain-specific exception class instead',
+                    f'raise of untyped builtin {name!r} — raise a domain-specific exception class instead',
                 ),
             )
         self.generic_visit(node)

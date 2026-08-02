@@ -5,6 +5,10 @@ on:
     pull_request:
         types: [opened, synchronize]
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
 jobs:
     call:
         uses: chrysa/github-actions/.github/workflows/update-pr-body.yml@v1.6.0

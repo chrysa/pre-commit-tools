@@ -112,6 +112,7 @@ yaml = ["PyYAML==6.0.3"]
 # Everything a quality gate needs: every runtime extra (so the whole suite collects)
 # plus the build backend. Consumed by CI as `pip install -e ".[dev]"`.
 dev = [
+    "chrysa-quality-gate @ git+ssh://git@github.com/chrysa/chrysa-lib.git@v0.3.1#subdirectory=packages/python/quality-gate",
     "build",
     "pre_commit_hooks_tools[dead_code,format_dockerfile,lint,screenshot,test,ts_unreachable_code,typecheck,yaml]",
 ]

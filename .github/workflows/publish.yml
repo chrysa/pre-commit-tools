@@ -82,7 +82,7 @@ jobs:
               with:
                   name: dist
                   path: dist/
-            - uses: pypa/gh-action-pypi-publish@release/v1
+            - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
 
     release:
         name: Create GitHub Release
@@ -101,7 +101,7 @@ jobs:
 
             - name: Generate changelog
               id: cliff
-              uses: orhun/git-cliff-action@v4.8.0
+              uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4.8.0
               with:
                   config: cliff.toml
                   args: --unreleased --tag v${{ needs.version.outputs.majorMinorPatch }} --strip header
@@ -120,7 +120,7 @@ jobs:
                   git push origin HEAD:main "v${{ needs.version.outputs.majorMinorPatch }}"
 
             - name: Create GitHub Release
-              uses: softprops/action-gh-release@v3.0.2
+              uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
               with:
                   tag_name: v${{ needs.version.outputs.majorMinorPatch }}
                   name: v${{ needs.version.outputs.majorMinorPatch }}

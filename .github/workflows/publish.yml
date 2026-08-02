@@ -24,7 +24,7 @@ jobs:
                   fetch-depth: 0
             - name: Determine version
               id: gitversion
-              uses: chrysa/github-actions/gitversion@v1.4.4
+              uses: chrysa/github-actions/gitversion@v1.6.0
             - name: Check if version tag already exists
               id: tag-check
               shell: bash

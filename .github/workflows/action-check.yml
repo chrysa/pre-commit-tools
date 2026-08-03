@@ -11,6 +11,10 @@ on:
         paths:
             - .github/workflows/**
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
 jobs:
     call:
         uses: chrysa/github-actions/.github/workflows/action-check.yml@v1.6.0

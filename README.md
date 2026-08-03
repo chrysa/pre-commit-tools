@@ -761,6 +761,7 @@ binaries are not auto-installed — run `playwright install chromium` once per r
 | `python-file-too-long` | Detect Python files exceeding 500 lines (split the module) | — |
 | `python-function-too-long` | Detect Python functions exceeding 50 lines (extract helpers) | — |
 | `docker-compose-missing-restart` | Detect Docker Compose services missing `restart: unless-stopped` | _no inline escape; suppress via repo `exclude:` or `SKIP=docker-compose-missing-restart`_ |
+| `docker-run-host-user` | Detect `docker run` invocations that bind-mount the repository without `--user` — the container runs as root and writes root-owned files into the tree | `# docker-run-host-user: disable` |
 | `compose-dev-hot-reload` | Detect Compose `dev` services with neither a bind mount nor a `develop.watch` sync — a source edit would need a rebuild, so the service cannot hot-reload | `# compose-dev-hot-reload: disable` |
 | `react-useeffect-fetch` | Detect `fetch`/`axios` calls inside a React `useEffect` callback (use a query library instead) | `// react-useeffect-fetch: disable` |
 

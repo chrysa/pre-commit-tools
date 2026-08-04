@@ -18,7 +18,7 @@ permissions:
 
 jobs:
     call:
-        uses: chrysa/github-actions/.github/workflows/release.yml@v1.6.0
+        uses: chrysa/github-actions/.github/workflows/release.yml@v1.7.0
         # The called workflow declares a bare `workflow_call:` with no `secrets:`
         # block, so naming RELEASE_TOKEN explicitly is a startup error — inherit.
         secrets: inherit  # pragma: allowlist secret

@@ -259,19 +259,19 @@ repos:
   - id: env-file-check
   - id: env-example-sync
   - id: debugger-detection
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
+    exclude: (^|/)tests?/|^(README\.md|docs/)
   - id: python-print-detection
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
-  - exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
+    exclude: (^|/)tests?/|^(README\.md|docs/)
+  - exclude: (^|/)tests?/|^(README\.md|docs/)
     id: python-pprint-detection
   - id: python-logger-detection
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
+    exclude: (^|/)tests?/|^(README\.md|docs/)
   - id: python-unreachable-code
   - exclude: tests?/|\.test\.|\.spec\.
     id: no-hardcoded-localhost
-  - exclude: ^tests/
+  - exclude: (^|/)tests/
     id: fastapi-missing-response-model
-  - exclude: ^tests/
+  - exclude: (^|/)tests/
     id: fastapi-missing-links
   - id: claude-skill-frontmatter
   - id: claude-agent-frontmatter
@@ -279,7 +279,7 @@ repos:
   - id: python-no-unittest-import
   - id: claude-assets-present
   - id: python-untyped-raise
-    exclude: ^tests/
+    exclude: (^|/)tests?/
   - id: python-mutable-default
   - id: python-dispatch-ladder
   repo: https://github.com/chrysa/pre-commit-tools

@@ -282,5 +282,6 @@ repos:
     exclude: (^|/)tests?/
   - id: python-mutable-default
   - id: python-dispatch-ladder
+  - id: dockerfile-no-latest
   repo: https://github.com/chrysa/pre-commit-tools
   rev: v0.2.0-247

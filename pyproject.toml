@@ -100,7 +100,7 @@ python-dispatch-ladder = "pre_commit_hooks.python_dispatch_ladder:main"
 [project.optional-dependencies]
 dead_code = ["vulture>=2.0"]
 format_dockerfile = ["dockerfile-parse==2.0.1"]
-lint = ["ruff==0.15.21"]  # keep in sync with the ruff-pre-commit rev
+lint = ["ruff==0.16.1"]  # keep in sync with the ruff-pre-commit rev
 pylint_report = ["pylint>=4.0.5", "pylint-report>=2.4.2"]
 screenshot = ["requests"]
 test = ["pytest", "pytest-cov", "pytest-mock", "ruamel.yaml"]

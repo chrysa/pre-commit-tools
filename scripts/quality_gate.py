@@ -254,7 +254,10 @@ class QualityGate:
             match = re.search(pattern, output, flags=re.IGNORECASE | re.MULTILINE)
             if match:
                 return float(match.group(1))
-        for line in output.splitlines():
+        for raw_line in output.splitlines():
+            # Drop pytest's own progress marker (``... PASSED [ 42%]``): it is not
+            # coverage, yet a test named ``..._is_covered`` would match the token scan.
+            line = re.sub(r"\[\s*\d+%\]", "", raw_line)
             if any(token in line.lower() for token in ["total", "coverage", "covered"]):
                 # The pattern captures digits only, so float() cannot raise here —
                 # the try/except this replaces was dead defensive code (PERF203).

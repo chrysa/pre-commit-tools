@@ -53,6 +53,12 @@
             "name": "circuit-breaker",
             "timeout": 5000,
             "type": "command"
+          },
+          {
+            "command": "sh -c 'f=\"$CLAUDE_PROJECT_DIR/.claude/hooks/check-no-env-files.cjs\"; [ ! -f \"$f\" ] || node \"$f\"'",
+            "name": "check-no-env-files",
+            "timeout": 5000,
+            "type": "command"
           }
         ],
         "matcher": "Bash"

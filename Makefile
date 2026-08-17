@@ -134,3 +134,6 @@ quality-gate-verify: ## Verify no regression since baseline
 
 dev: ## Start development environment (install package in editable mode)
 	pip install -e .[dev]
+
+.PHONY: ci
+ci: lint typecheck test  ## CI: run all checks (lint + typecheck + test)

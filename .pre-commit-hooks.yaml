@@ -81,10 +81,15 @@
     - PyYAML
   description: sort yaml files keys alphabetically
   entry: yaml-sorter
-  # GitHub Actions workflows must never be sorted: PyYAML is a YAML 1.1 loader,
-  # so the top-level `on:` key parses as the boolean True and is re-serialized
-  # as `true:`, silently stripping the workflow's triggers (see issue #215).
-  exclude: '\.github/workflows/'
+  # Two files must never be key-sorted:
+  # - GitHub Actions workflows: PyYAML is a YAML 1.1 loader, so the top-level
+  #   `on:` key parses as the boolean True and is re-serialized as `true:`,
+  #   silently stripping the workflow's triggers (see issue #215).
+  # - `.pre-commit-config.yaml` itself: its key order is authored, not
+  #   alphabetical (repo → rev → hooks), and a hook must not reorder the file
+  #   that configures it — sorting rewrites the whole config on first run and
+  #   fights the distributed canonical form.
+  exclude: '(\.github/workflows/|(^|/)\.pre-commit-config\.yaml$)'
   language: python
   minimum_pre_commit_version: '4.1.0'
   name: sort yaml files

@@ -17,4 +17,4 @@ concurrency:
 
 jobs:
     call:
-        uses: chrysa/github-actions/.github/workflows/action-check.yml@v1.8.0
+        uses: chrysa/github-actions/.github/workflows/action-check.yml@v1.8.1

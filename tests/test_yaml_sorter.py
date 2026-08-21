@@ -124,3 +124,10 @@ class TestWorkflowCorruptionGuard:
         assert re.search(sorter['exclude'], '.github/workflows/ci.yml'), (
             f'exclude {sorter["exclude"]!r} must match GitHub workflow paths'
         )
+        # A hook must not reorder the file that configures it.
+        assert re.search(sorter['exclude'], '.pre-commit-config.yaml'), (
+            f'exclude {sorter["exclude"]!r} must match .pre-commit-config.yaml'
+        )
+        assert re.search(sorter['exclude'], 'nested/.pre-commit-config.yaml'), (
+            f'exclude {sorter["exclude"]!r} must match a nested .pre-commit-config.yaml'
+        )

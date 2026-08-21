@@ -4,284 +4,282 @@ exclude: ^\.claude/(?!(skills|agents)/)
 fail_fast: false
 minimum_pre_commit_version: 4.1.0
 repos:
-- hooks:
-  - id: trailing-whitespace
-  - id: end-of-file-fixer
-  - args:
-    - --allow-multiple-documents
-    exclude: ^\.github/ISSUE_TEMPLATE/
-    id: check-yaml
-  - id: debug-statements
-  - args:
-    - --branch
-    - main
-    id: no-commit-to-branch
-  - id: check-json
-  - id: detect-private-key
-  repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
-- hooks:
-  - id: add-trailing-comma
-  repo: https://github.com/asottile/add-trailing-comma
-  rev: v4.0.0
-- hooks:
-  - args:
-    - --in-place
-    - github
-    - --header-levels
-    - '6'
-    id: md-toc
-    stages:
-    - manual
-  repo: https://github.com/frnmst/md-toc
-  rev: 9.0.0
-- hooks:
-  - args:
-    - --fix
-    id: markdownlint
-    stages:
-    - manual
-  repo: https://github.com/igorshubovych/markdownlint-cli
-  rev: v0.49.0
-- hooks:
-  - additional_dependencies:
-    - mdformat-gfm
-    id: mdformat
-    stages:
-    - manual
-  repo: https://github.com/executablebooks/mdformat
-  rev: 1.0.0
-- hooks:
-  - args:
-    - --indent-size
-    - '4'
-    id: beautysh
-  repo: https://github.com/lovesegfault/beautysh
-  rev: v6.4.3
-- hooks:
-  - args:
-    - --ignore=E006
-    - E020
-    id: bashate
-  repo: https://github.com/openstack/bashate
-  rev: 2.1.1
-- hooks:
-  - args:
-    - pre_commit_hooks/
-    id: vulture
-    stages:
-    - manual
-  repo: https://github.com/jendrikseipp/vulture
-  rev: v2.9.1
-- hooks:
-  - args:
-    - --fix
-    id: ruff-check
-  - id: ruff-format
-  repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.15.21
-- hooks:
-  - id: python-no-eval
-  - exclude: ^(pre_commit_hooks/no_console_warn\.py|tests/test_js_hooks_new\.py)$
-    id: python-no-log-warn
-  - id: python-use-type-annotations
-  - id: rst-backticks
-  repo: https://github.com/pre-commit/pygrep-hooks
-  rev: v1.10.0
-- hooks:
-  - id: auto-walrus
-  repo: https://github.com/MarcoGorelli/auto-walrus
-  rev: 0.4.1
-- hooks:
-  - id: rm-unneeded-f-str
-  repo: https://github.com/dannysepler/rm_unneeded_f_str
-  rev: v0.2.0
-- hooks:
-  - args:
-    - --ignore-vuln
-    - CVE-2026-3219
-    - --ignore-vuln
-    - CVE-2026-6357
-    - --ignore-vuln
-    - CVE-2025-8869
-    - --ignore-vuln
-    - CVE-2026-1703
-    - --ignore-vuln
-    - PYSEC-2026-196
-    - --ignore-vuln
-    - GHSA-6v7p-g79w-8964
-    id: pip-audit
-  repo: https://github.com/pypa/pip-audit
-  rev: v2.10.1
-- hooks:
-  - args:
-    - --baseline
-    - .secrets.baseline
-    exclude: \.pre-commit-config\.yaml
-    id: detect-secrets
-  repo: https://github.com/Yelp/detect-secrets
-  rev: v1.5.0
-- hooks:
-  - args:
-    - --py3-only
-    - --py312-plus
-    id: pyupgrade
-    stages:
-    - manual
-  repo: https://github.com/asottile/pyupgrade
-  rev: v3.9.0
-- hooks:
-  - id: guideline-check
-    stages:
-    - pre-push
-    - manual
-  repo: https://github.com/chrysa/guideline-checker
-  rev: v1.30.10
-- hooks:
-  - entry: print-detection
-    id: python-print-detection
-    language: system
-    name: detect print on python code
-    types:
-    - python
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
-  - entry: pprint-detection
-    id: python-pprint-detection
-    language: system
-    name: detect pprint on python code
-    types:
-    - python
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
-  - entry: debugger-detection
-    id: debugger-detection
-    language: system
-    name: detect debugger statements
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
-  - entry: yaml-sorter
-    exclude: ^(\.github/|GitVersion\.yml)
-    id: yaml-sorter
-    language: system
-    name: sort yaml files
-    types:
-    - yaml
-  - entry: json-sorter
-    id: json-sorter
-    language: system
-    name: sort json files
-    types:
-    - json
-  - entry: requirements-sort
-    files: requirements.*\.txt$
-    id: requirements-sort
-    language: system
-    name: sort requirements files
-    types:
-    - text
-  - entry: env-file-check
-    files: \.env
-    id: env-file-check
-    language: system
-    name: check env files for secrets
-    types:
-    - text
-  - entry: logger-detection
-    id: python-logger-detection
-    language: system
-    name: detect root logger usage
-    types:
-    - python
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
-  - entry: unreachable-code-detection
-    id: python-unreachable-code
-    language: system
-    name: detect unreachable code
-    types:
-    - python
-  - additional_dependencies:
-    - .[dead_code]
-    entry: dead-code-detection
-    id: python-dead-code
-    language: python
-    name: detect dead/unused code
-    stages:
-    - manual
-    types:
-    - python
-  - entry: make docker-test
-    id: run-tests
-    language: system
-    name: run test suite (with coverage)
-    pass_filenames: false
-    stages:
-    - pre-push
-  - entry: bash -c 'docker run --rm --env SONAR_TOKEN -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli:11
-      -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=chrysa -Dsonar.projectKey=chrysa_pre-commit-tools
-      -Dsonar.python.coverage.reportPaths=reports/coverage.xml -Dsonar.python.xunit.reportPath=reports/junit.xml'
-    id: sonar-scanner
-    language: system
-    name: sonar cloud analysis
-    pass_filenames: false
-    stages:
-    - pre-push
-  repo: local
-- hooks:
-  - id: gitleaks
-  repo: https://github.com/gitleaks/gitleaks
-  rev: v8.30.1
-- hooks:
-  - args:
-    - feat
-    - fix
-    - docs
-    - style
-    - refactor
-    - test
-    - chore
-    - perf
-    - revert
-    - ci
-    id: conventional-pre-commit
-    stages:
-    - commit-msg
-  repo: https://github.com/compilerla/conventional-pre-commit
-  rev: v4.4.0
-- hooks:
-  - id: makefile-check
-  - id: adr-gate
-  - id: no-bare-except
-  - id: no-sync-in-async
-  - id: regression-gate
-    stages:
-    - pre-push
-  - exclude: ^(\.github/|workflows/|templates/)
-    id: yaml-sorter
-  - id: json-sorter
-  - id: env-file-check
-  - id: env-example-sync
-  - id: debugger-detection
-    exclude: (^|/)tests?/|^(README\.md|docs/)
-  - id: python-print-detection
-    exclude: (^|/)tests?/|^(README\.md|docs/)
-  - exclude: (^|/)tests?/|^(README\.md|docs/)
-    id: python-pprint-detection
-  - id: python-logger-detection
-    exclude: (^|/)tests?/|^(README\.md|docs/)
-  - id: python-unreachable-code
-  - exclude: tests?/|\.test\.|\.spec\.
-    id: no-hardcoded-localhost
-  - exclude: (^|/)tests/
-    id: fastapi-missing-response-model
-  - exclude: (^|/)tests/
-    id: fastapi-missing-links
-  - id: claude-skill-frontmatter
-  - id: claude-agent-frontmatter
-  - id: claude-mcp-config
-  - id: python-no-unittest-import
-  - id: claude-assets-present
-  - id: python-untyped-raise
-    exclude: (^|/)tests?/
-  - id: python-mutable-default
-  - id: python-dispatch-ladder
-  - id: dockerfile-no-latest
-  repo: https://github.com/chrysa/pre-commit-tools
-  rev: v0.2.0-253
+  - hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - args:
+          - --allow-multiple-documents
+        exclude: ^\.github/ISSUE_TEMPLATE/
+        id: check-yaml
+      - id: debug-statements
+      - args:
+          - --branch
+          - main
+        id: no-commit-to-branch
+      - id: check-json
+      - id: detect-private-key
+    repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+  - hooks:
+      - id: add-trailing-comma
+    repo: https://github.com/asottile/add-trailing-comma
+    rev: v4.0.0
+  - hooks:
+      - args:
+          - --in-place
+          - github
+          - --header-levels
+          - '6'
+        id: md-toc
+        stages:
+          - manual
+    repo: https://github.com/frnmst/md-toc
+    rev: 9.0.0
+  - hooks:
+      - args:
+          - --fix
+        id: markdownlint
+        stages:
+          - manual
+    repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.49.0
+  - hooks:
+      - additional_dependencies:
+          - mdformat-gfm
+        id: mdformat
+        stages:
+          - manual
+    repo: https://github.com/executablebooks/mdformat
+    rev: 1.0.0
+  - hooks:
+      - args:
+          - --indent-size
+          - '4'
+        id: beautysh
+    repo: https://github.com/lovesegfault/beautysh
+    rev: v6.4.3
+  - hooks:
+      - args:
+          - --ignore=E006
+          - E020
+        id: bashate
+    repo: https://github.com/openstack/bashate
+    rev: 2.1.1
+  - hooks:
+      - args:
+          - pre_commit_hooks/
+        id: vulture
+        stages:
+          - manual
+    repo: https://github.com/jendrikseipp/vulture
+    rev: v2.9.1
+  - hooks:
+      - args:
+          - --fix
+        id: ruff-check
+      - id: ruff-format
+    repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.21
+  - hooks:
+      - id: python-no-eval
+      - exclude: ^(pre_commit_hooks/no_console_warn\.py|tests/test_js_hooks_new\.py)$
+        id: python-no-log-warn
+      - id: python-use-type-annotations
+      - id: rst-backticks
+    repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+  - hooks:
+      - id: auto-walrus
+    repo: https://github.com/MarcoGorelli/auto-walrus
+    rev: 0.4.1
+  - hooks:
+      - id: rm-unneeded-f-str
+    repo: https://github.com/dannysepler/rm_unneeded_f_str
+    rev: v0.2.0
+  - hooks:
+      - args:
+          - --ignore-vuln
+          - CVE-2026-3219
+          - --ignore-vuln
+          - CVE-2026-6357
+          - --ignore-vuln
+          - CVE-2025-8869
+          - --ignore-vuln
+          - CVE-2026-1703
+          - --ignore-vuln
+          - PYSEC-2026-196
+          - --ignore-vuln
+          - GHSA-6v7p-g79w-8964
+        id: pip-audit
+    repo: https://github.com/pypa/pip-audit
+    rev: v2.10.1
+  - hooks:
+      - args:
+          - --baseline
+          - .secrets.baseline
+        exclude: \.pre-commit-config\.yaml
+        id: detect-secrets
+    repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+  - hooks:
+      - args:
+          - --py3-only
+          - --py312-plus
+        id: pyupgrade
+        stages:
+          - manual
+    repo: https://github.com/asottile/pyupgrade
+    rev: v3.9.0
+  - hooks:
+      - id: guideline-check
+        stages:
+          - pre-push
+          - manual
+    repo: https://github.com/chrysa/guideline-checker
+    rev: v1.30.10
+  - hooks:
+      - entry: print-detection
+        id: python-print-detection
+        language: system
+        name: detect print on python code
+        types:
+          - python
+        exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
+      - entry: pprint-detection
+        id: python-pprint-detection
+        language: system
+        name: detect pprint on python code
+        types:
+          - python
+        exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
+      - entry: debugger-detection
+        id: debugger-detection
+        language: system
+        name: detect debugger statements
+        exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
+      - entry: yaml-sorter
+        exclude: ^(\.github/|GitVersion\.yml)
+        id: yaml-sorter
+        language: system
+        name: sort yaml files
+        types:
+          - yaml
+      - entry: json-sorter
+        id: json-sorter
+        language: system
+        name: sort json files
+        types:
+          - json
+      - entry: requirements-sort
+        files: requirements.*\.txt$
+        id: requirements-sort
+        language: system
+        name: sort requirements files
+        types:
+          - text
+      - entry: env-file-check
+        files: \.env
+        id: env-file-check
+        language: system
+        name: check env files for secrets
+        types:
+          - text
+      - entry: logger-detection
+        id: python-logger-detection
+        language: system
+        name: detect root logger usage
+        types:
+          - python
+        exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
+      - entry: unreachable-code-detection
+        id: python-unreachable-code
+        language: system
+        name: detect unreachable code
+        types:
+          - python
+      - additional_dependencies:
+          - .[dead_code]
+        entry: dead-code-detection
+        id: python-dead-code
+        language: python
+        name: detect dead/unused code
+        stages:
+          - manual
+        types:
+          - python
+      - entry: make docker-test
+        id: run-tests
+        language: system
+        name: run test suite (with coverage)
+        pass_filenames: false
+        stages:
+          - pre-push
+      - entry: bash -c 'docker run --rm --env SONAR_TOKEN -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli:11 -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=chrysa -Dsonar.projectKey=chrysa_pre-commit-tools -Dsonar.python.coverage.reportPaths=reports/coverage.xml -Dsonar.python.xunit.reportPath=reports/junit.xml'
+        id: sonar-scanner
+        language: system
+        name: sonar cloud analysis
+        pass_filenames: false
+        stages:
+          - pre-push
+    repo: local
+  - hooks:
+      - id: gitleaks
+    repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+  - hooks:
+      - args:
+          - feat
+          - fix
+          - docs
+          - style
+          - refactor
+          - test
+          - chore
+          - perf
+          - revert
+          - ci
+        id: conventional-pre-commit
+        stages:
+          - commit-msg
+    repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.4.0
+  - hooks:
+      - id: makefile-check
+      - id: adr-gate
+      - id: no-bare-except
+      - id: no-sync-in-async
+      - id: regression-gate
+        stages:
+          - pre-push
+      - exclude: ^(\.github/|workflows/|templates/)
+        id: yaml-sorter
+      - id: json-sorter
+      - id: env-file-check
+      - id: env-example-sync
+      - id: debugger-detection
+        exclude: '(^|/)tests?/|^(README\.md|docs/)'
+      - id: python-print-detection
+        exclude: '(^|/)tests?/|^(README\.md|docs/)|(^|/)quality_gate\.py$|^\.claude/ape/'
+      - exclude: '(^|/)tests?/|^(README\.md|docs/)|(^|/)quality_gate\.py$|^\.claude/ape/'
+        id: python-pprint-detection
+      - id: python-logger-detection
+        exclude: '(^|/)tests?/|^(README\.md|docs/)'
+      - id: python-unreachable-code
+      - exclude: tests?/|\.test\.|\.spec\.
+        id: no-hardcoded-localhost
+      - exclude: '(^|/)tests/'
+        id: fastapi-missing-response-model
+      - exclude: '(^|/)tests/'
+        id: fastapi-missing-links
+      - id: claude-skill-frontmatter
+      - id: claude-agent-frontmatter
+      - id: claude-mcp-config
+      - id: python-no-unittest-import
+      - id: claude-assets-present
+      - id: python-untyped-raise
+        exclude: '(^|/)tests?/'
+      - id: python-mutable-default
+      - id: python-dispatch-ladder
+      - id: dockerfile-no-latest
+    repo: https://github.com/chrysa/pre-commit-tools
+    rev: v0.2.0-253

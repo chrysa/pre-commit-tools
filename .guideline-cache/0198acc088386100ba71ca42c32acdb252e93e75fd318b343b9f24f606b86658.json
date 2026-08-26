@@ -1,0 +1,1 @@
+{"forbid": [": any", "as any"], "forbid_regex": [], "file_regex": [], "require_regex": [], "ast_checks": [], "scan_checks": [], "cross_reference": null, "stale_after_days": null, "numeric_threshold": null, "exclude": [], "match_in_comments": false}

@@ -248,8 +248,13 @@ Where an annexe and this file disagree, **this file wins**.
 | `AGENTIC-CAPABILITIES.md` | agent actions: manifests, risk R0–R5, sandboxing, audit trail   |
 | `PROJECT-DECOUPLING.md`   | inter-project contracts, forbidden linkages, degradation        |
 | `CONTAINERS-K3S.md`       | reference stage shape · container responsibility · k3s workload baseline |
+| `DATA-MIGRATIONS.md`      | data ownership & classification · versioned schemas · safe migrations · rollback · retention/export |
+| `OBSERVABILITY-OPS.md`    | probes · OpenTelemetry (replaceable backend) · alerts+runbooks · SLI/SLO · resource envelope · `/version` · production-ready gate |
+| `API-CONTRACTS.md`        | machine-readable contract · versioning & deprecation · typed errors · cursor pagination · idempotency · contract tests · events/webhooks |
 | `TESTING.md`              | common test levels and rules across languages                   |
 | `CI-CD.md`                | pipeline architecture · action pinning · least privilege · cost · what the gate proves |
+| `SCM.md`                  | type-driven issues & pull requests · taxonomy & labels · per-type templates · shape gates |
+| `EVENTING.md`             | real-time channels · typed channel contracts · non-blocking bounded buffers · fail-safe external access · delivery semantics · transport-as-adapter |
 | `GOVERNANCE.md`           | rule identity, maturity ladder, enforcement rollout, sources of truth |
 
 **Source of truth:** the canon lives in this repo. Notion is a governance and decision view
@@ -315,6 +320,14 @@ deprecated and archived — nothing is added to it, nothing reads from it.
   with a merge commit) · force push forbidden · auto-merge requires CI + owner.
 - **One PR per issue**, scoped tight. Every PR references an issue (`Closes/Fixes/Refs #N`).
   Exception: label `hotfix`. The `enforce-issue-link` workflow is a blocking status check.
+- **Issues and PRs are type-driven.** Every issue declares exactly one **type** from a fixed
+  taxonomy (bug · feature · enhancement · chore · docs · ci · security · research · epic),
+  carried as a canonical label and backed by a committed per-type issue form; every PR's type is
+  its Conventional Commit type, and its body carries the fields that type needs (a `fix` shows the
+  root cause + a regression test, a `feat` its acceptance criteria + a UI proof, a `refactor` a
+  no-behaviour-change attestation, a `perf` a before/after measurement). Templates and labels are
+  socle-distributed, not per-repo inventions, and the shape is machine-checked (info-first). A
+  free-text issue or a one-line PR is a defect. Detail: annexe `SCM.md` (`SC-nnn`).
 - **Repo provenance — every code repo depends on `project-init`.** A repository is
   **created by** the `project-init` / `chrysa-init` CLI (shared-standards) at birth **and
   kept in sync** with it thereafter: the scaffolded socle (Makefile contract, docs skeleton,
@@ -340,6 +353,19 @@ deprecated and archived — nothing is added to it, nothing reads from it.
   boundaries; external data validated at **runtime** even when typed; contract types
   generated from OpenAPI/AsyncAPI, never hand-copied. One committed lockfile, frozen CI
   installs, no `latest` dependency. Detail: annexe `FRONTEND.md` §1.
+- **The JS/TS package manager is `pnpm` — `npm` and `yarn` are forbidden.** Every
+  Node/TypeScript repo (app, library, workspace, tooling) installs, runs scripts, and
+  resolves dependencies with **pnpm**. Concretely: the committed lockfile is
+  **`pnpm-lock.yaml`** (a `package-lock.json` or `yarn.lock` in the tree is a defect — delete
+  it and regenerate with pnpm), workspaces are pnpm workspaces (`pnpm-workspace.yaml`) under
+  Turborepo, CI installs with **`pnpm install --frozen-lockfile`** (never `npm ci`), images
+  install with pnpm in the builder stage, and scripts run as `pnpm <script>` / `pnpm dlx`
+  (never `npm run` / `npx`). The version is pinned via `packageManager` in `package.json` and
+  provisioned by Corepack, so every machine and runner resolves the same pnpm. This makes
+  *one committed lockfile* and *no host installs* concrete for the JS side: the lockfile is
+  `pnpm-lock.yaml`, `node_modules` stays a pnpm-managed build output (see *dependency
+  directories are a build output*), never materialised on the host. The only `npm` left
+  anywhere is the registry it talks to; the command is always `pnpm`.
 - **React is a presentation layer, not the domain.** `domain/` and `application/` never
   import React; no `fetch`, browser storage, or vendor SDK in `domain/`. Components and hooks
   stay pure, props/state immutable, derived state computed rather than duplicated;
@@ -379,12 +405,47 @@ deprecated and archived — nothing is added to it, nothing reads from it.
   losing the live channel degrades to the last known state with the API-down banner (FE-050), never
   to a frozen or lying screen. A surface that shows data a refresh would change is a defect. Detail:
   annexe `FRONTEND.md` FE-080.
+- **A real-time backend has channel contracts and never blocks.** The producer/consumer side of a
+  real-time system is governed too: every channel carries a **name and a typed, versioned
+  contract**; **subscription is decoupled from processing by a bounded buffer** so the receiver
+  never blocks on I/O and a slow consumer cannot stall the transport (backlog is a metric with an
+  alert); **every call to external infra is guarded** and degrades safely when the dependency is
+  down (dependency health is probed on-demand and cached, not hot-polled); **delivery semantics are
+  declared** and at-least-once consumers are idempotent; and the **transport is an adapter behind
+  the domain's port** (WebSocket/SSE/broker chosen by config, not wired into business code). This is
+  the backend twin of the reactive-frontend rule above. Detail: annexe `EVENTING.md` (`EV-nnn`).
 - **Every repo declares its profile and DDD level** (`project_profile`, `ddd_level`,
   `bounded_context`, `standards_version`) — architecture is proportionate to business
   complexity, and small tools are not over-architected. Detail: annexe `ARCHITECTURE-DDD.md`.
 - **Dark mode** mandatory from V1. **Accessibility** WCAG 2.1 AA — Lighthouse a11y score **≥ 90**,
   full keyboard navigation (Tab/Esc/visible focus), contrast ≥ 4.5:1 (3:1 large text), screen-reader
   tested on critical flows (signup, login, checkout).
+- **Every site is usable by the majority of disabilities — not only the screen-reader case.**
+  WCAG 2.1 AA is the floor; the obligation is that a real person from each major disability
+  category can actually complete the product's core tasks. The categories are named and each
+  carries a concrete, testable requirement:
+  1. **Visual** (blind, low-vision, colour-blind) — screen-reader operable end to end (semantic
+     markup + labels + live regions), reflows to 400% zoom and 320 px with no loss of content or
+     function, honours `prefers-contrast`, and **never encodes meaning by colour alone** (icon,
+     text, or pattern too).
+  2. **Motor** (limited dexterity, no pointer, switch/voice control) — fully keyboard-operable
+     with a visible focus order and no keyboard trap, touch targets **≥ 44 px**, no action that
+     requires a drag, a precise gesture, or a hover-only reveal, and no timeout the user cannot
+     extend.
+  3. **Auditory** (deaf, hard-of-hearing) — captions on every video, transcript for audio, and
+     no information conveyed by sound alone (a visual equivalent for every audio cue).
+  4. **Cognitive** (attention, memory, literacy, dyslexia) — plain language, consistent and
+     predictable navigation, errors that say what to fix (see *every form is a hostile input
+     surface*), no unavoidable time pressure, and progress that survives reload (see *UI state
+     survives reload & focus*).
+  5. **Vestibular / photosensitivity** — honours `prefers-reduced-motion`, no auto-playing or
+     looping motion the user cannot stop, and nothing that flashes more than three times a second.
+  A public micro-site or generated page is held to the same bar as the app — accessibility is not
+  waived because a surface is small, auto-generated, or "just a showcase". The Definition of Done
+  for any human-facing surface includes exercising these five paths, mechanised by the a11y gates
+  already required (Lighthouse ≥ 90, axe/keyboard/contrast) plus manual screen-reader and
+  keyboard-only passes on the core flow. Detail: annexe `FRONTEND.md`, the `accessibility` skill
+  (per-category contract + testable DoD), and the `ui-ux` skill.
 - **UI state survives reload & focus** — human-facing surfaces persist their navigation
   and view state (active tab/section, selected sub-view, active context/filters) so a
   **manual reload keeps the current page** — the user lands exactly where they were, never
@@ -653,6 +714,27 @@ deprecated and archived — nothing is added to it, nothing reads from it.
   to reach one attribute through it. Imports sit at module top level (never inside a function
   except to break a cycle, and that is commented), and are ordered/deduplicated by Ruff
   (`I` rules) — the linter owns the ordering, no hand-sorting.
+- **Functions and methods are called with named arguments — positional call sites are the
+  exception, not the rule.** A call reads `create_user(name="Ada", role=Role.ADMIN,
+  active=True)`, never `create_user("Ada", Role.ADMIN, True)`: the argument names are part of
+  what the reader needs, and a bare positional value (especially a bool, a number, or a `None`)
+  is a *boolean trap* / magic value the reader has to jump to the signature to decode. So:
+  1. **Definitions force it where it matters.** Any function/method taking more than one
+     parameter, or **any** boolean/optional/`None`-defaulted parameter, declares them
+     **keyword-only** with a bare `*` (`def build(*, source: Source, strict: bool = False)`),
+     so callers *must* name them and arguments cannot be silently reordered. Adding a parameter
+     then never shifts an existing positional meaning.
+  2. **Call sites name their arguments.** Even when a signature still allows positional passing,
+     call sites pass by keyword. The narrow, allowed exceptions where positional is clearer:
+     a single obvious argument (`len(items)`, `Path(raw)`, `str(value)`), the receiver of a
+     dunder, and genuine `*args`/`**kwargs` pass-through.
+  3. **Not a substitute for value objects.** Naming four primitives at the call site is better
+     than four bare positionals, but a signature that needs many named primitives is still
+     *primitive obsession* — the fix is a value object / Pydantic model, then one named argument
+     carries it.
+  Mechanisation: Ruff `FBT001`/`FBT002` (boolean-positional) already flag the worst case; the
+  keyword-only `*` in definitions is the enforcement mechanism the reviewer checks. A public
+  API added with a multi-parameter positional signature is a defect.
 - **Everything is machine-agnostic and portable — no rule, repo, or script is bound to one
   machine.** A standard, a Makefile target, a script, a hook, a compose file, or a CI job must
   behave identically on any developer machine, any runner, and the server, with nothing but a
@@ -683,6 +765,32 @@ deprecated and archived — nothing is added to it, nothing reads from it.
   still resolves to a versioned contract, not a private address (*projects talk through versioned
   contracts only*). Secrets travel by env or a secrets manager, never committed (see the `.env`
   rules) — the variable holds the value, the repo holds only the documented key.
+- **Data, persistence & migrations follow the `STD-DATA-001` contract.** Every data category
+  declares its owner, system of record and classification; schemas and events are versioned and
+  migrations are reproducible, ordered, tested, and safe (`expand → migrate → contract`, snapshot
+  before destructive change, a rollback or documented restore per migration); backups are
+  restore-tested, and data is exportable to an open format with no vendor lock-in. Full rules and
+  gates: annexe [`DATA-MIGRATIONS.md`](https://github.com/chrysa/shared-standards/blob/main/standards/annexes/DATA-MIGRATIONS.md)
+  (`DA-nnn`).
+- **Observability & production readiness follow the `STD-OPS-001` contract.** A deployable
+  service exposes startup/liveness/readiness probes, emits structured logs + metrics + traces
+  correlated through a common id via **OpenTelemetry with a replaceable backend**, and ships an
+  actionable alert + owner + runbook per principal incident. Resource limits and saturation
+  behaviour are explicit; graceful shutdown, restart recovery and dependency-loss are tested;
+  backup/restore/rollback/degraded mode are documented before the first prod deploy; and the
+  service publishes `/version`. Full rules and the Production-Ready gate: annexe
+  [`OBSERVABILITY-OPS.md`](https://github.com/chrysa/shared-standards/blob/main/standards/annexes/OBSERVABILITY-OPS.md)
+  (`OP-nnn`).
+- **APIs, SDKs & public contracts follow the `STD-API-001` contract.** A machine-readable
+  contract (OpenAPI/AsyncAPI/JSON Schema) is the canonical interface; public versions are
+  explicit with a backward-compatibility guarantee and a dated deprecation policy; errors are
+  typed with a machine code + correlation id; collections paginate by cursor; critical writes
+  are idempotent; guards (timeouts, sizes, authz) live in the contract; inter-project contracts
+  are tested provider **and** consumer side; SDKs track the public contract, never internal
+  models; and events/webhooks are identified, versioned, signed, replay-protected, with bounded
+  retry + dead-letter. Full rules and gates: annexe
+  [`API-CONTRACTS.md`](https://github.com/chrysa/shared-standards/blob/main/standards/annexes/API-CONTRACTS.md)
+  (`AP-nnn`) and the `api-design` skill.
 - **External dependencies are installed in containers, never on the host.** A project's
   runtime dependencies — language packages (pip/npm/cargo/nuget), databases, brokers, caches,
   system libraries, compilers, CLIs a service shells out to — are declared in the image
@@ -1073,13 +1181,19 @@ deprecated and archived — nothing is added to it, nothing reads from it.
      a single pass instead of repeated traversals of the same collection.
   2. **No work in a loop that is loop-invariant** — hoist the constant computation, the compiled
      regex, the config read, the connection setup.
-  3. **No N+1** — database queries and network/API calls are batched or eager-loaded
-     (`selectinload`/`joinedload`, bulk endpoints); a query inside a `for` over rows is a defect.
-     Frontend equivalent: no request per list item, no re-render per keystroke without debounce,
-     no unmemoised derived state recomputed on every render.
+  3. **No N+1, and query the store efficiently** — database queries and network/API calls are
+     batched or eager-loaded (`selectinload`/`joinedload`, bulk endpoints); a query inside a `for`
+     over rows is a defect. In the same spirit: an **existence check** uses a dedicated exists-query,
+     never a full fetch then a length; **writes are batched** (bulk create/update) instead of a loop
+     of single-row writes; only the **columns/fields actually used** are selected (projection, not
+     `SELECT *` into an object graph); and **aggregation runs in the store**, not a Python/JS loop
+     summing rows the app just pulled over the wire. Frontend equivalent: no request per list item,
+     no re-render per keystroke without debounce, no unmemoised derived state recomputed on every
+     render.
   4. **Bounded resources** — no unbounded `SELECT *` / unpaginated list endpoint, no full-file read
      of arbitrary-size input (stream it), explicit timeouts on every outbound call, connections and
-     file handles closed via context managers.
+     file handles closed via context managers. Every column used to **filter or sort a large table
+     is indexed** — an unindexed predicate on a growing table is a latent full scan.
   5. **Known anti-patterns are named and rejected**: god object/function, copy-paste duplication
      (factor into `chrysa-lib` — see *no code duplication*), boolean trap parameters, primitive
      obsession over a value object, deep nesting (guard clauses instead), mutable default arguments,
@@ -1099,6 +1213,31 @@ deprecated and archived — nothing is added to it, nothing reads from it.
     them French user-facing copy using typographic characters (apostrophes, non-breaking spaces).
     The rule is right about the codepoints and wrong about the intent. A repo that wants it may
     arm it locally together with `lint.allowed-confusables`.
+- **A cache is a correctness contract, not a sprinkle of speed.** The moment a value is cached,
+  three questions must have answers, or the cache is a bug: **how it expires**, **how it is
+  invalidated**, and **what it may not hold**. Concretely: caching is **read-through / cache-aside**
+  behind the data-access layer, never scattered `get`/`set` calls in business code; every entry has
+  a **TTL taken from the per-repo contract** (*no hardcoded constants* — a literal `3600` in a
+  decorator is the defect), and the store is **bounded** (a max size / eviction policy — an
+  unbounded cache is a memory leak with latency). A **write invalidates or updates** the entries it
+  affects in the same path (a read-your-writes guarantee — a stale cache after a mutation is the
+  same defect as FE-080's stale screen), and a cache miss under load is **stampede-protected**
+  (single-flight / lock / jittered TTL) so an expiry does not turn one slow query into a thousand.
+  What is **never cached** is as governed as what is: an **authorization decision** is not cached
+  across principals, and **personal/secret data** is cached only within its classification
+  (`DA-001`, `GV-040`) with an owner. Cache keys are namespaced and versioned so a shape change
+  cannot serve a poisoned old value. A cache nobody can explain the invalidation of is removed.
+- **Deferred work is a governed job, not a fire-and-forget.** Any work pushed to a background
+  queue / worker / scheduler is, by contract: **idempotent** (safe to run twice — a redelivered or
+  retried job produces no double effect, mirroring `EV-030`); **bounded** — an explicit **timeout**,
+  a **bounded retry** with backoff, and a **dead-letter / failure sink** so a poison job neither
+  retries forever nor vanishes; and **observable** — a failed or stuck job **surfaces** (a metric,
+  an alert, an admin-visible state), it is never swallowed silently. A **scheduled** task has a
+  named **owner** and a runbook like any incident source (`OP-020`). No **business capability is
+  reachable only through a job with no manual/admin trigger** — an operator must be able to inspect,
+  retry, and cancel it from the backoffice (*every product ships a management backoffice*). Jobs are
+  deferred *work*; a real-time *stream* is `EVENTING.md` — related, not the same. The queue/broker
+  is reached through an adapter (pillar 5), its endpoint from the environment.
 
 ## Quality gates
 
@@ -1356,6 +1495,7 @@ and CI invokes `pre-commit`, not `make`.
 - `contract-testing` — library contract / breaking-change tests (@chrysa/* releases)
 - `agent-patterns` — LangGraph + PydanticAI + Claude API (building agents)
 - `ui-ux` — UX/UI/ergonomics + WCAG 2.1 AA + dark mode + i18n (human-facing surfaces)
+- `accessibility` — per-disability-category contract + testable DoD (any surface, incl. public micro-sites)
 
 ## Error handling pattern (all automations)
 
@@ -1387,15 +1527,22 @@ Per-project activation checklist:
 
 ## Session lifecycle (primer + memory + hindsight)
 
-Every repo ships a session lifecycle so an AI agent keeps context across sessions. Bootstrap with
-`make memory-init`; scripts live in `shared-standards/scripts/`.
+A repo **may** carry a session lifecycle so an AI agent keeps context across sessions. The
+substance is a set of **committed files**, not a required Make target — the convention below is
+what matters; any `make`/slash-command wrappers are an **optional convenience** provided where a
+repo has them, not a universal socle target every Makefile must expose.
 
 - `primer.md` (committed) — current state, what to do NOW; read **before** `CLAUDE.md`.
 - `.claude/memory/session.md` — volatile session notes, **not** committed (reset each session).
 - `.claude/memory/decisions.md`, `known-issues.md`, `progress.md` (append-only history) — committed.
-- **Session start**: `make prepare` (`/prepare`) — shows primer + git context + open PRs.
-- **Session end**: `make hindsight` (`/hindsight`) — updates `primer.md` + `progress.md`, clears
-  `session.md`, optional Obsidian export (`OBSIDIAN=<path>`).
+- **Session start** — surface the primer + git context + open PRs (a `prepare` wrapper where present).
+- **Session end** — update `primer.md` + `progress.md`, clear `session.md` (a `hindsight` wrapper
+  where present), optional Obsidian export.
+
+> **Not a mandated Make target.** `memory-init` / `prepare` / `hindsight` are convenience
+> wrappers, not part of the canonical Makefile socle contract (*Makefile targets*), and are not
+> assumed to exist in every repo. A repo governs its session state through the committed files
+> above; the wrappers and their scripts are added per repo when useful.
 
 ## Compliance targets
 
@@ -1429,7 +1576,23 @@ requires an ADR with a kill-test, not a shrug.
    the machine or self-hosted** — an interpreter/weights the owner runs (Ollama, llama.cpp, a
    vLLM/TGI server on chrysa infrastructure), never a third-party hosted API dressed up as
    "local". The independence is only proven when one of the tested adapters needs no external
-   provider to answer.
+   provider to answer. **Every LLM call — internal or external — goes through the `chrysa-LLM`
+   gateway**, never a vendor SDK or raw provider endpoint called directly from a product's
+   business code. `chrysa-LLM` *is* the local port of this pillar made concrete across the
+   fleet: it owns provider selection and the ≥2 tested adapters, and it is the one place where
+   routing, fallback, prompt/model/version pinning, evaluation, cost and token budgets, caching,
+   rate limiting and observability live (satisfying the *AI feature is evaluated* and *agent
+   actions are governed* obligations once, not per repo). A product calls it as a **versioned
+   contract** through a thin local adapter (*projects talk through versioned contracts only*)
+   and degrades to a documented no-AI / fallback mode when it is unreachable — it never reaches
+   a model by any other path. A direct call to Claude, OpenAI, Ollama, or any inference endpoint
+   that bypasses `chrysa-LLM` is a defect, not a shortcut; the single documented exception is
+   `chrysa-LLM` itself, which owns the real adapters. Products built *on top of* the gateway —
+   e.g. `ai-aggregator`, a showcase/front consuming `chrysa-LLM` — are consumers of this
+   contract, not alternative gateways: they route through `chrysa-LLM` like everything else and
+   never re-implement provider access. This is the transport-level application of *no code
+   duplication* and *external servers addressed through the environment*: the gateway's endpoint
+   arrives by env, and the adapters exist once, there.
 2. **GAFAM independence** — every managed-cloud dependency has a documented self-hosted exit
    path; the cloud SDK stays confined to an adapter (`BlobStore`, not `S3Client`).
 3. **Portable personalisation data** — all user/personal data is exportable to an open format

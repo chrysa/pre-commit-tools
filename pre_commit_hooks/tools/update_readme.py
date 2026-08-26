@@ -1,3 +1,4 @@
+import shlex
 import subprocess  # nosec
 from pathlib import Path
 
@@ -15,11 +16,12 @@ def define_section(*, name: str, level: int = 1) -> str:
 
 
 def run_command(*, command: str) -> str:
-    with subprocess.Popen(  # noqa: S602
-        command,
+    # Split into an argv vector and run without a shell: the command is a
+    # README-generation invocation (e.g. `mytool --help`), not a shell pipeline.
+    with subprocess.Popen(
+        shlex.split(command),
         stdout=subprocess.PIPE,
-        shell=True,
-    ) as cmd_process_stream:  # nosec
+    ) as cmd_process_stream:
         output, _ = cmd_process_stream.communicate()
         cmd_process_stream.wait()
         return bytes.decode(output, 'utf-8')

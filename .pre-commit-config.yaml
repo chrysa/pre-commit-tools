@@ -251,7 +251,7 @@ repos:
       - id: regression-gate
         stages:
           - pre-push
-      - exclude: ^(\.github/|workflows/|templates/)
+      - exclude: ^(\.github/|workflows/|templates/|docker-compose)|(^|/)(pnpm-lock|yarn|uv|poetry)\.(yaml|lock)$|(^|/)\.pre-commit-config\.yaml$
         id: yaml-sorter
       - id: json-sorter
       - id: env-file-check

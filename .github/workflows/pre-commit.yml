@@ -7,6 +7,10 @@ on:
     push:
         branches: [main, develop, "feat/**", "feature/**", "fix/**"]
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
 jobs:
     call:
         name: Run pre-commit hooks

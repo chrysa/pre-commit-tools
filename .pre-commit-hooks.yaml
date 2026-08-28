@@ -367,6 +367,13 @@
   minimum_pre_commit_version: '4.1.0'
   name: detect missing multi-stage build in Dockerfiles
   types_or: ["dockerfile", "file"]
+- id: docker-run-host-user
+  description: detect docker run invocations that bind-mount the repository without --user, which write root-owned files into the tree
+  entry: docker-run-host-user
+  files: '(^|/)(Makefile|makefile|GNUmakefile|.*\.mk|.*\.sh|.*\.bash)$'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: detect docker run mounting the repo as root
 - id: compose-dev-hot-reload
   additional_dependencies:
     - ruamel.yaml

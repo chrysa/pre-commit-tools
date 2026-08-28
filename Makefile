@@ -125,12 +125,15 @@ publish-test: build ## Upload distribution to TestPyPI
 # ── Quality Gates ──────────────────────────────────────────────────────────────
 
 quality-gate-baseline: ## Record baseline metrics for regression detection
-	@python3 scripts/quality_gate.py baseline
+	@quality-gate-baseline
 
 quality-gate-verify: ## Verify no regression since baseline
-	@python3 scripts/quality_gate.py verify
+	@quality-gate-verify
 
 # ─── Compat aliases ───────────────────────────────────────────────────────────
 
 dev: ## Start development environment (install package in editable mode)
 	pip install -e .[dev]
+
+.PHONY: ci
+ci: lint typecheck test  ## CI: run all checks (lint + typecheck + test)

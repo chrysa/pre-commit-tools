@@ -504,6 +504,14 @@
   name: detect a missing .claude/ mirror
   pass_filenames: false
   always_run: true
+- id: managed-asset-drift
+  description: block a managed skill/agent copy that drifted from its canonical source
+  entry: managed-asset-drift
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: managed skill/agent copies match their canonical source
+  pass_filenames: false
+  files: ^(\.claude/skills/|\.claude/agents/|templates/claude/agents/)
 - id: python-no-unittest-import
   description: detect stdlib unittest imports (chrysa standard mandates pytest + pytest-mock)
   entry: no-unittest-import

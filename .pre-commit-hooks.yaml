@@ -98,6 +98,14 @@
   minimum_pre_commit_version: '4.1.0'
   name: sort json files
   types: ["json"]
+- id: makefile-sorter
+  description: sort makefile rules alphabetically by target name
+  entry: makefile-sorter
+  files: '(^|/)(Makefile|makefile|GNUmakefile|.*\.mk)$'
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: sort makefile rules
+  types: ["text"]
 - id: requirements-sort
   description: sort requirements files and setup.cfg dependencies alphabetically
   entry: requirements-sort

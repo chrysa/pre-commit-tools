@@ -29,6 +29,7 @@
     - [yaml-sorter](#yaml-sorter)
     - [debugger-detection](#debugger-detection)
     - [json-sorter](#json-sorter)
+    - [makefile-sorter](#makefile-sorter)
     - [requirements-sort](#requirements-sort)
     - [ignore-file-sorter](#ignore-file-sorter)
     - [env-file-check](#env-file-check)
@@ -89,6 +90,7 @@ Add this to your `.pre-commit-config.yaml`
           - id: yaml-sorter
           - id: debugger-detection
           - id: json-sorter
+          - id: makefile-sorter
           - id: requirements-sort
           - id: ignore-file-sorter
           - id: env-file-check
@@ -212,6 +214,16 @@ Use `# debugger-detection: disable` to ignore a specific line.
 ### json-sorter
 
 Sort JSON file keys alphabetically (recursive). Modifies files in-place and returns 1 if any file was changed.
+
+### makefile-sorter
+
+Sort Makefile rules alphabetically by target name. Modifies files in-place and returns 1 if any file was changed.
+
+Each rule block (its leading adjacent comments, target line, prerequisite continuations and recipe) moves as a unit. Variable assignments, `include` directives and special targets (`.PHONY`, `.DEFAULT`, ...) keep their position — only rule blocks are reordered within the slots they occupy.
+
+**Supported files:** `Makefile`, `makefile`, `GNUmakefile`, `*.mk`.
+
+> **Note:** sorting can change the file's first rule, which `make` treats as the default target. If you rely on the default target, declare it explicitly with `.DEFAULT_GOAL := <target>`.
 
 ### requirements-sort
 

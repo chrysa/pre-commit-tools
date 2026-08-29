@@ -1,0 +1,16 @@
+{
+  "ast_checks": [],
+  "cross_reference": null,
+  "exclude": [],
+  "file_regex": [],
+  "forbid": [
+    ": any",
+    "as any"
+  ],
+  "forbid_regex": [],
+  "match_in_comments": false,
+  "numeric_threshold": null,
+  "require_regex": [],
+  "scan_checks": [],
+  "stale_after_days": null
+}

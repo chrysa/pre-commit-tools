@@ -163,6 +163,7 @@ select = [
     "PLR1714",
     "PLR1730",
     "PLR5501",
+    "PLR2004",
 ]
 ignore = [
     "E203", # whitespace before ':'
@@ -178,7 +179,9 @@ split-on-trailing-comma = true
 # Test fixtures use names that look like passwords and call partial-path binaries.
 "tests/**" = ["S101", "N802", "S105", "S106", "S603", "S607"]
 "pre_commit_hooks/pylint_report_html.py" = ["S101"]
-
+"**/tests/**" = ["PLR2004"]
+"**/test_*.py" = ["PLR2004"]
+"**/conftest.py" = ["PLR2004"]
 [tool.ruff.lint.mccabe]
 max-complexity = 15
 

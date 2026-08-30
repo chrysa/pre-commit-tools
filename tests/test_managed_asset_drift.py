@@ -45,6 +45,26 @@ class TestManagedAssetDrift:
         monkeypatch.setenv('STD_ROOT', str(src))
         assert main(['--root', str(repo)]) == 1
 
+    def test_content_drift_with_matching_stat_signature_is_flagged(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        # Same size + mtime but different bytes: a shallow (stat-based) dircmp
+        # would call these identical and miss the drift. Deep content compare
+        # must catch it.
+        import os
+
+        src = tmp_path / 'shared-standards'
+        repo = tmp_path / 'consumer'
+        _skill(src, 'api-design', 'AAAA\n')
+        _skill(repo, 'api-design', 'BBBB\n')  # equal length, different content
+        srcf = src / '.claude' / 'skills' / 'api-design' / 'SKILL.md'
+        repof = repo / '.claude' / 'skills' / 'api-design' / 'SKILL.md'
+        stamp = 1_600_000_000
+        os.utime(srcf, (stamp, stamp))
+        os.utime(repof, (stamp, stamp))  # equalise mtime -> matching stat signature
+        monkeypatch.setenv('STD_ROOT', str(src))
+        assert main(['--root', str(repo)]) == 1  # drift detected despite matching stat
+
     def test_extra_file_in_copy_is_flagged(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         src = tmp_path / 'shared-standards'
         repo = tmp_path / 'consumer'

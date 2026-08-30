@@ -47,8 +47,14 @@ def _resolve(repo_root: Path, name: str, override: str | None) -> Path | None:
 
 def _dir_identical(a: Path, b: Path) -> bool:
     cmp = filecmp.dircmp(a, b)
-    if cmp.left_only or cmp.right_only or cmp.funny_files or cmp.diff_files:
+    if cmp.left_only or cmp.right_only or cmp.funny_files:
         return False
+    # dircmp.diff_files is shallow (os.stat size+mtime); a drifted copy whose
+    # signature happens to match would be missed. Compare content explicitly,
+    # consistent with _drifted_agents' filecmp.cmp(..., shallow=False).
+    for name in cmp.common_files:
+        if not filecmp.cmp(a / name, b / name, shallow=False):
+            return False
     return all(_dir_identical(a / sub, b / sub) for sub in cmp.common_dirs)
 
 

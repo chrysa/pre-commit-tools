@@ -66,6 +66,21 @@ def _parse_chunks(lines: list[str]) -> list[_Chunk]:
 
     while index < total:
         line = lines[index]
+        # A `define NAME ... endef` multiline variable: its body lines may look
+        # like rules (``name: ...``) but must never be parsed or reordered as
+        # such. Pin the whole block as one non-rule chunk.
+        if line.lstrip().split(' ', 1)[0] == 'define':
+            flush_comments()
+            block = [line]
+            index += 1
+            while index < total and lines[index].strip() != 'endef':
+                block.append(lines[index])
+                index += 1
+            if index < total:  # the `endef` line itself
+                block.append(lines[index])
+                index += 1
+            chunks.append(_Chunk(block))
+            continue
         name = _target_name(line)
         if line.startswith('#'):
             comment_buffer.append(line)
@@ -100,11 +115,26 @@ def _parse_chunks(lines: list[str]) -> list[_Chunk]:
     return chunks
 
 
+# Conditional/define directives that scope which rules `make` sees. Rules must
+# never be reordered across them, or a rule can silently move into/out of a
+# conditional and change what gets built.
+_BARRIER_PREFIXES = ('ifeq', 'ifneq', 'ifdef', 'ifndef', 'else', 'endif', 'define', 'endef')
+
+
+def _is_barrier(chunk: _Chunk) -> bool:
+    """True if a non-rule chunk carries a conditional/define directive."""
+    if chunk.key is not None:
+        return False
+    return any(line.lstrip().split(' ', 1)[0] in _BARRIER_PREFIXES for line in chunk.lines)
+
+
 def sort_makefile(content: str) -> str:
     """Return content with its make rules sorted alphabetically by target name.
 
     Non-rule content (preamble, variables, ``.PHONY`` declarations, includes) keeps
-    its position; only rule blocks are reordered within the slots they occupy.
+    its position; rule blocks are reordered within the slots they occupy, but never
+    across a conditional (``ifeq``/``else``/``endif``) or ``define`` boundary — so a
+    rule cannot be moved into or out of a conditional block.
     """
     trailing_newline = content.endswith('\n')
     lines = content.split('\n')
@@ -112,13 +142,26 @@ def sort_makefile(content: str) -> str:
         lines.pop()
 
     chunks = _parse_chunks(lines)
-    rule_positions = [i for i, chunk in enumerate(chunks) if chunk.key is not None]
-    sorted_rules = sorted(
-        (chunks[i] for i in rule_positions),
-        key=lambda chunk: (str(chunk.key).lower(), str(chunk.key)),
-    )
-    for position, target_index in enumerate(rule_positions):
-        chunks[target_index] = sorted_rules[position]
+    # Sort rule slots independently within each run delimited by barrier chunks.
+    groups: list[list[int]] = []
+    current: list[int] = []
+    for i, chunk in enumerate(chunks):
+        if _is_barrier(chunk):
+            if current:
+                groups.append(current)
+                current = []
+        elif chunk.key is not None:
+            current.append(i)
+    if current:
+        groups.append(current)
+
+    for positions in groups:
+        sorted_rules = sorted(
+            (chunks[i] for i in positions),
+            key=lambda chunk: (str(chunk.key).lower(), str(chunk.key)),
+        )
+        for position, target_index in enumerate(positions):
+            chunks[target_index] = sorted_rules[position]
 
     out_lines: list[str] = []
     for chunk in chunks:

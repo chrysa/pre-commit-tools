@@ -23,6 +23,28 @@ class TestSortMakefile:
         content = 'b:\n\techo B\n\na:\n\techo A\n'
         assert sort_makefile(content) == 'a:\n\techo A\n\nb:\n\techo B\n'
 
+    def test_rules_not_reordered_across_conditional(self) -> None:
+        # `zzz` inside the ifeq must stay inside; `aaa` outside must stay outside.
+        # A global sort would move aaa into the ifeq and zzz out of it.
+        content = 'ifeq ($(X),1)\nzzz:\n\techo z\nendif\n\naaa:\n\techo a\n'
+        result = sort_makefile(content)
+        assert result.index('ifeq') < result.index('zzz:') < result.index('endif') < result.index('aaa:')
+
+    def test_rules_still_sorted_within_a_conditional(self) -> None:
+        content = 'ifeq ($(X),1)\nzeta:\n\techo z\n\nalpha:\n\techo a\nendif\n'
+        result = sort_makefile(content)
+        assert result.index('alpha:') < result.index('zeta:')
+        assert result.index('ifeq') < result.index('alpha:') < result.index('endif')
+
+    def test_define_body_not_parsed_as_rule(self) -> None:
+        # `bar: baz` inside the define is a body line, not a rule; it must not be
+        # extracted or reordered, and the block must stay intact.
+        content = 'define FOO\nbar: baz\n\techo x\nendef\n\nzeta:\n\techo z\n\nalpha:\n\techo a\n'
+        result = sort_makefile(content)
+        assert 'define FOO\nbar: baz\n\techo x\nendef' in result  # block untouched
+        assert result.index('alpha:') < result.index('zeta:')  # real rules still sorted
+        assert result.index('define FOO') < result.index('alpha:')  # define pinned above
+
     def test_leading_comment_moves_with_rule(self) -> None:
         content = '# builds it\nbuild:\n\techo build\n\n# always clean\napple:\n\techo apple\n'
         result = sort_makefile(content)

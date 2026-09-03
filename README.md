@@ -7,7 +7,7 @@
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=chrysa_pre-commit-tools&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=chrysa_pre-commit-tools)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=chrysa_pre-commit-tools&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=chrysa_pre-commit-tools)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=chrysa_pre-commit-tools&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=chrysa_pre-commit-tools)
-[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org)
+[![Python 3.14+](https://img.shields.io/badge/python-3.14%2B-blue)](https://www.python.org)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/pre-commit-hooks-tools)](https://pypi.org/project/pre-commit-hooks-tools/)

@@ -116,7 +116,6 @@ Pre-commit hooks collection for chrysa projects
     action-check.yml
     approved-label.yml
     auto-assign.yml
-    auto-update-pre-commit.yml
     ci.yml
     dependabot-auto-merge.yml
     dependencies.yml
@@ -295,6 +294,7 @@ pre_commit_hooks/
   yaml_sorter.py
 pyproject.toml
 scripts/
+  gen_context_files.py
   quality_gate.py
 sonar-project.properties
 standards/

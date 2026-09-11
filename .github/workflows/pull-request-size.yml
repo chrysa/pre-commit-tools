@@ -10,4 +10,4 @@ concurrency:
 
 jobs:
     call:
-        uses: chrysa/github-actions/.github/workflows/pull-request-size.yml@v1.8.2
+        uses: chrysa/github-actions/.github/workflows/pull-request-size.yml@v1.9.0

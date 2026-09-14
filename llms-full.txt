@@ -121,6 +121,7 @@ Pre-commit hooks collection for chrysa projects
     dependencies.yml
     detect-conflicts.yml
     enforce-feature-branch.yml
+    enforce-shortcut-link.yml
     labeler.yml
     mutation-testing.yml
     pr-dependencies.yml

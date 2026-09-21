@@ -36,6 +36,10 @@ from pathlib import Path
 
 _DISABLE_COMMENT = 'claude-md-facts-check: disable'
 
+# Vendored / hidden directories never contain a repo's own targets or sources; pruned
+# from every tree walk for both speed and correctness.
+_MAKEFILE_PRUNE_DIRS = frozenset({'.git', 'node_modules', '.venv', 'venv', '__pycache__'})
+
 _PYTHON_MANIFESTS = ('pyproject.toml', 'setup.py')
 _JS_MANIFESTS = ('package.json',)
 _PYTHON_SUFFIXES = ('.py',)
@@ -98,10 +102,16 @@ def _has_manifest(repo_root: Path, manifests: Sequence[str]) -> bool:
 
 
 def _has_sources(repo_root: Path, suffixes: Sequence[str]) -> bool:
-    for suffix in suffixes:
-        for candidate in repo_root.rglob(f'*{suffix}'):
-            if candidate.is_file():
-                return True
+    """True if any file with one of *suffixes* exists, ignoring vendored/hidden trees.
+
+    Uses os.walk with in-place dir pruning (rather than rglob) so a large repo with a
+    heavy .git / node_modules / .venv is not walked in full, and stops at the first hit.
+    """
+    wanted = tuple(suffixes)
+    for _dirpath, dirnames, filenames in os.walk(repo_root):
+        dirnames[:] = [d for d in dirnames if d not in _MAKEFILE_PRUNE_DIRS and not d.startswith('.')]
+        if any(name.endswith(wanted) for name in filenames):
+            return True
     return False
 
 
@@ -144,9 +154,6 @@ def check_python_version(text: str, repo_root: Path) -> Finding | None:
     return Finding(
         f'doc states Python 3.{doc_minor} but pyproject requires-python is 3.{pyproject_minor}',
     )
-
-
-_MAKEFILE_PRUNE_DIRS = frozenset({'.git', 'node_modules', '.venv', 'venv', '__pycache__'})
 
 
 def _iter_makefile_sources(repo_root: Path) -> list[Path]:

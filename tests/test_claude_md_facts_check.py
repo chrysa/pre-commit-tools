@@ -97,6 +97,19 @@ class TestCheckMakeTargets:
     def test_no_makefile_is_skipped(self, tmp_path: Path) -> None:
         assert check_make_targets('Run `make lint`.', tmp_path) == []
 
+    def test_target_in_dot_makefile_fragment_passes(self, tmp_path: Path) -> None:
+        # chrysa Makefiles include `*.Makefile` fragments via a shell/wildcard glob.
+        _write(tmp_path / 'Makefile', 'include $(wildcard *.Makefile)\n')
+        _write(tmp_path / 'tools.Makefile', 'pre-commit-run:\n\techo hi\n')
+        assert check_make_targets('Run `make pre-commit-run`.', tmp_path) == []
+
+    def test_target_in_nested_makefile_fragment_passes(self, tmp_path: Path) -> None:
+        _write(tmp_path / 'Makefile', 'include $(shell find . -name "*.Makefile")\n')
+        sub = tmp_path / 'lib' / 'python'
+        sub.mkdir(parents=True)
+        _write(sub / 'quality.Makefile', 'typecheck:\n\tmypy\n')
+        assert check_make_targets('Run `make typecheck`.', tmp_path) == []
+
     def test_duplicate_reference_reported_once(self, tmp_path: Path) -> None:
         _write(tmp_path / 'Makefile', 'test:\n\tpytest\n')
         findings = check_make_targets('`make lint` and again `make lint`.', tmp_path)

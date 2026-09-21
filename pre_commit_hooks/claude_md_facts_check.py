@@ -14,7 +14,8 @@ ambiguous is skipped rather than invented as a violation.  Checked claims:
 2. Python version — a stated ``Python 3.x`` that disagrees with pyproject's
    ``requires-python`` minor.
 3. Make targets — a documented ``make <target>`` absent from the repo Makefile
-   (and its included ``makefiles/*.mk``).
+   and every included ``*.Makefile`` / ``*.makefile`` / ``*.mk`` fragment. A
+   target named only as a negated counter-example ("never ``make X``") is ignored.
 4. Project name — a code-span package name that differs from pyproject /
    package.json (WARN, promoted to FAIL only with ``--strict``).
 
@@ -28,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 from collections.abc import Sequence
 from pathlib import Path
@@ -144,11 +146,34 @@ def check_python_version(text: str, repo_root: Path) -> Finding | None:
     )
 
 
+_MAKEFILE_PRUNE_DIRS = frozenset({'.git', 'node_modules', '.venv', 'venv', '__pycache__'})
+
+
+def _iter_makefile_sources(repo_root: Path) -> list[Path]:
+    """Return every file whose targets count as reachable from ``Makefile``.
+
+    Covers the root ``Makefile``, ``makefiles/*.mk``, and — because chrysa Makefiles
+    routinely pull them in via ``include $(shell find … -name '*.[Mm]akefile')`` or
+    ``include $(wildcard *.Makefile)`` — every ``*.Makefile`` / ``*.makefile`` /
+    ``*.mk`` in the tree (hidden and vendored directories pruned). Rather than parse
+    the ``include`` directive, resolve the same file set the glob would, so targets
+    living in an included fragment are not reported as missing.
+    """
+    sources = [repo_root / 'Makefile']
+    # os.walk with in-place dir pruning skips vendored/hidden trees before descending
+    # (rglob would still walk into them), which keeps this fast on large repos.
+    for dirpath, dirnames, filenames in os.walk(repo_root):
+        dirnames[:] = [d for d in dirnames if d not in _MAKEFILE_PRUNE_DIRS and not d.startswith('.')]
+        sources.extend(
+            Path(dirpath) / filename for filename in filenames if filename.endswith(('.Makefile', '.makefile', '.mk'))
+        )
+    return sources
+
+
 def _makefile_targets(repo_root: Path) -> set[str]:
-    """Return every target declared in the Makefile and included makefiles/*.mk."""
+    """Return every target declared in the Makefile and its included fragments."""
     targets: set[str] = set()
-    sources = [repo_root / 'Makefile', *sorted((repo_root / 'makefiles').glob('*.mk'))]
-    for source in sources:
+    for source in _iter_makefile_sources(repo_root):
         if not source.exists():
             continue
         targets.update(_MAKEFILE_TARGET_RE.findall(source.read_text(encoding='utf-8')))

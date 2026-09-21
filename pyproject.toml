@@ -98,6 +98,7 @@ claude-mcp-config = "pre_commit_hooks.claude_mcp_config:main"
 python-untyped-raise = "pre_commit_hooks.python_untyped_raise:main"
 python-mutable-default = "pre_commit_hooks.python_mutable_default:main"
 python-dispatch-ladder = "pre_commit_hooks.python_dispatch_ladder:main"
+claude-md-facts-check = "pre_commit_hooks.claude_md_facts_check:main"
 
 [project.optional-dependencies]
 dead_code = ["vulture>=2.0"]

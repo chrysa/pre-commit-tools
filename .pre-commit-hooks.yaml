@@ -512,6 +512,14 @@
   name: detect a missing .claude/ mirror
   pass_filenames: false
   always_run: true
+- id: claude-md-facts-check
+  description: validate a CLAUDE.md/AGENTS.md's verifiable factual claims (stack, python version, make targets, project name) against the repo on disk
+  entry: claude-md-facts-check
+  language: python
+  minimum_pre_commit_version: '4.1.0'
+  name: validate CLAUDE.md/AGENTS.md factual claims against the repo
+  pass_filenames: true
+  files: '(^|/)(CLAUDE|AGENTS)\.md$'
 - id: managed-asset-drift
   description: block a managed skill/agent copy that drifted from its canonical source
   entry: managed-asset-drift

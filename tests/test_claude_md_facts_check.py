@@ -109,6 +109,24 @@ class TestCheckMakeTargets:
         text = 'Please make sure to run make targets and make it green.'
         assert check_make_targets(text, tmp_path) == []
 
+    def test_negated_counterexample_is_not_flagged(self, tmp_path: Path) -> None:
+        # A make target named only to say it is WRONG must not be reported.
+        _write(tmp_path / 'Makefile', 'typecheck:\n\tmypy\n')
+        text = 'Use `make typecheck`, never `make type-check`.'
+        assert check_make_targets(text, tmp_path) == []
+
+    def test_negated_line_with_correct_target_named(self, tmp_path: Path) -> None:
+        _write(tmp_path / 'Makefile', 'typecheck:\n\tmypy\n')
+        text = 'the Makefile (no `make type-check` when the target is `typecheck`).'
+        assert check_make_targets(text, tmp_path) == []
+
+    def test_real_missing_target_still_flagged_despite_negation_elsewhere(self, tmp_path: Path) -> None:
+        _write(tmp_path / 'Makefile', 'test:\n\tpytest\n')
+        text = 'Never `make type-check`.\nRun `make deploy` to ship.'
+        findings = check_make_targets(text, tmp_path)
+        assert len(findings) == 1
+        assert 'make deploy' in findings[0].message
+
 
 class TestCheckProjectName:
     def test_name_drift_warns(self, tmp_path: Path) -> None:

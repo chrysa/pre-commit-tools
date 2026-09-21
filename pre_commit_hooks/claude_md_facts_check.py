@@ -58,6 +58,14 @@ _REQUIRES_PYTHON_RE = re.compile(r'requires-python\s*=\s*["\'][^"\']*?3\.(\d+)')
 # ``make target`` — code span REQUIRED on both sides so English prose
 # ("make sure", "make targets") is never mistaken for a real target.
 _MAKE_TARGET_RE = re.compile(r'`make\s+([A-Za-z0-9][A-Za-z0-9_.-]*)`')
+# A line that names ``make X`` only to say it is *wrong* (a counter-example) must
+# not be read as documenting that target. Cue words appearing on the same line
+# suppress the finding, e.g. "no `make type-check` when the target is `typecheck`"
+# or "use `make typecheck`, never `make type-check`".
+_NEGATION_CUE_RE = re.compile(
+    r'\b(?:no|not|never|instead of|rather than|avoid|don\'?t|wrong|incorrect|mistake|typo)\b',
+    re.IGNORECASE,
+)
 _MAKEFILE_TARGET_RE = re.compile(r'^([A-Za-z0-9][A-Za-z0-9_.-]*)\s*:(?!=)', re.MULTILINE)
 # A code-spanned project name, e.g. `my-package`.
 _CODE_SPAN_RE = re.compile(r'`([A-Za-z0-9][A-Za-z0-9_.-]{1,63})`')
@@ -148,17 +156,28 @@ def _makefile_targets(repo_root: Path) -> set[str]:
 
 
 def check_make_targets(text: str, repo_root: Path) -> list[Finding]:
-    """Flag documented ``make <target>`` calls absent from the Makefile."""
+    """Flag documented ``make <target>`` calls absent from the Makefile.
+
+    A ``make X`` code-span whose line also carries a negation cue (e.g. "never
+    ``make type-check``", "no ``make foo`` — the target is ``bar``") names the
+    target only as a counter-example, so it is not treated as documenting it.
+    """
     if not (repo_root / 'Makefile').exists():
         return []
     known = _makefile_targets(repo_root)
     findings: list[Finding] = []
     seen: set[str] = set()
-    for target in _MAKE_TARGET_RE.findall(text):
-        if target in seen:
-            continue
-        seen.add(target)
-        if target not in known:
+    for line in text.splitlines():
+        negated = _NEGATION_CUE_RE.search(line) is not None
+        for target in _MAKE_TARGET_RE.findall(line):
+            if target in seen:
+                continue
+            if target in known:
+                seen.add(target)  # real target: never report, and don't let a later
+                continue  # negated-only line resurrect it
+            if negated:
+                continue  # counter-example mention, not documentation
+            seen.add(target)
             findings.append(Finding(f'documented `make {target}` not found in Makefile'))
     return findings
 

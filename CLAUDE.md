@@ -104,7 +104,7 @@ setup.cfg                  # entry points + dependencies + mypy/pytest config
 ## Python conventions (non-negotiable)
 
 - **`from __future__ import annotations`** — at the top of every Python file
-- **Python 3.12+** — `list[str]`, `str | None`, `dict[str, int]` (PEP 585/604), never `List`, `Optional`, `Union`
+- **Python 3.14+** — `list[str]`, `str | None`, `dict[str, int]` (PEP 585/604), never `List`, `Optional`, `Union`
 - **Full annotations** — all public functions must be typed (Ruff `ANN` rules)
 - **Mandatory `main()` signature**:
   ```python
@@ -151,7 +151,7 @@ result: Any = ext.call()  # noqa: ANN401 — third-party untyped API
 ## CI/CD
 
 - **GitHub Actions**: `.github/workflows/ci.yml` — jobs `version`, `lint`, `test`, `sonar`
-- **Matrix**: Python 3.12, 3.13, 3.14
+- **Matrix**: Python 3.14
 - **Pre-commit workflow**: `.github/workflows/pre-commit.yml` — must have `pip install -e .` before `pre-commit/action@v3.0.1`
 - **SonarCloud**: `sonar-project.properties` — requires secret `SONAR_TOKEN`
 - **detect-secrets**: baseline in `.secrets.baseline` — regenerate with `detect-secrets scan > .secrets.baseline` if real test secrets are added

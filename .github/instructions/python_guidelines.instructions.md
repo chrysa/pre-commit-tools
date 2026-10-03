@@ -27,9 +27,9 @@ mypy --config-file=setup.cfg pre_commit_hooks
 
 ```python
 # Use modern syntax — works on 3.12+
-x: list[str]           # PEP 585 — not List[str]
-x: str | None          # PEP 604 — not Optional[str]
-x: dict[str, int]      # PEP 585 — not Dict[str, int]
+x: list[str]  # PEP 585 — not List[str]
+x: str | None  # PEP 604 — not Optional[str]
+x: dict[str, int]  # PEP 585 — not Dict[str, int]
 ```
 
 No `from __future__ import annotations` needed for 3.12+, but keep it for
@@ -43,15 +43,14 @@ All public functions and methods must have complete type annotations:
 
 ```python
 # CORRECT
-def detect_issues(source: str, filename: str) -> list[tuple[str, int, str]]:
-    ...
+def detect_issues(source: str, filename: str) -> list[tuple[str, int, str]]: ...
 
-def main(argv: Sequence[str] | None = None) -> int:
-    ...
+
+def main(argv: Sequence[str] | None = None) -> int: ...
+
 
 # WRONG — no return type, no parameter types
-def detect_issues(source, filename):
-    ...
+def detect_issues(source, filename): ...
 ```
 
 ### Violation tuple convention
@@ -102,6 +101,7 @@ For simple regex-based detection, inherit `PatternDetection`:
 
 ```python
 from pre_commit_hooks.tools.pattern_detection import PatternDetection
+
 
 def main(argv: Sequence[str] | None = None) -> int:
     return PatternDetection(

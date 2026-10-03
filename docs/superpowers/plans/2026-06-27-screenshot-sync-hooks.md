@@ -295,9 +295,7 @@ def load_config(path: str | Path = CONFIG_FILENAME) -> Config | None:
 
     strategy = raw.get('strategy')
     if strategy not in _STRATEGIES:
-        raise ConfigError(
-            f'strategy must be one of {sorted(_STRATEGIES)}, got {strategy!r}'
-        )
+        raise ConfigError(f'strategy must be one of {sorted(_STRATEGIES)}, got {strategy!r}')
 
     viewport_raw = _as_dict(raw.get('viewport'), 'viewport')
     viewport = Viewport(
@@ -305,19 +303,10 @@ def load_config(path: str | Path = CONFIG_FILENAME) -> Config | None:
         height=int(viewport_raw.get('height', 800)),
     )
 
-    routes = [
-        Route(match=r['match'], url=r['url'], name=r['name'])
-        for r in raw.get('routes', []) or []
-    ]
-    fixed_routes = [
-        FixedRoute(url=r['url'], name=r['name'])
-        for r in raw.get('fixed_routes', []) or []
-    ]
+    routes = [Route(match=r['match'], url=r['url'], name=r['name']) for r in raw.get('routes', []) or []]
+    fixed_routes = [FixedRoute(url=r['url'], name=r['name']) for r in raw.get('fixed_routes', []) or []]
     storybook_raw = _as_dict(raw.get('storybook'), 'storybook')
-    stories = [
-        StoryEntry(match=s['match'], id=s['id'], name=s['name'])
-        for s in storybook_raw.get('stories', []) or []
-    ]
+    stories = [StoryEntry(match=s['match'], id=s['id'], name=s['name']) for s in storybook_raw.get('stories', []) or []]
 
     publish_raw = _as_dict(raw.get('publish'), 'publish')
     readme_raw = _as_dict(publish_raw.get('readme'), 'publish.readme')
@@ -689,8 +678,7 @@ def resolve_targets(config: Config, changed_files: list[str]) -> list[CaptureTar
         return []
     base = config.base_url.rstrip('/')
     return [
-        CaptureTarget(name=route.name, url=route.url, full_url=f'{base}{route.url}')
-        for route in config.fixed_routes
+        CaptureTarget(name=route.name, url=route.url, full_url=f'{base}{route.url}') for route in config.fixed_routes
     ]
 ```
 
@@ -712,9 +700,7 @@ def resolve_targets(config: Config, changed_files: list[str]) -> list[CaptureTar
     for story in config.stories:
         if any(matches(path, story.match) for path in changed_files):
             ref = f'iframe.html?id={story.id}'
-            targets.append(
-                CaptureTarget(name=story.name, url=ref, full_url=f'{base}/{ref}')
-            )
+            targets.append(CaptureTarget(name=story.name, url=ref, full_url=f'{base}/{ref}'))
     return targets
 ```
 
@@ -854,9 +840,7 @@ def _fake_sync_playwright(recorder: list[tuple[str, object]]):
 
 
 class TestCaptureTargets:
-    def test_writes_png_and_returns_shots(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_writes_png_and_returns_shots(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         recorder: list[tuple[str, object]] = []
         monkeypatch.setattr(runner, 'sync_playwright', _fake_sync_playwright(recorder))
         out = tmp_path / 'shots'
@@ -869,9 +853,7 @@ class TestCaptureTargets:
         assert ('goto', 'http://x/') in recorder
         assert ('viewport', {'width': 800, 'height': 600}) in recorder
 
-    def test_missing_playwright_raises_browser_unavailable(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_missing_playwright_raises_browser_unavailable(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(runner, 'sync_playwright', None)
         with pytest.raises(runner.BrowserUnavailableError):
             runner.capture_targets(
@@ -940,9 +922,7 @@ def capture_targets(
                         page.goto(target.full_url, wait_until='networkidle', timeout=15000)
                         page.screenshot(path=str(png), full_page=True)
                     except Exception as exc:
-                        raise CaptureFailedError(
-                            f'failed to capture {target.full_url}: {exc}'
-                        ) from exc
+                        raise CaptureFailedError(f'failed to capture {target.full_url}: {exc}') from exc
                     shots.append(Shot(name=target.name, path=str(png), url=target.url))
             finally:
                 browser.close()
@@ -997,17 +977,13 @@ from pre_commit_hooks.screenshot_sync import gitutil, reporting
 class TestGitAdd:
     def test_calls_git_add_with_paths(self, monkeypatch: pytest.MonkeyPatch) -> None:
         calls: list[list[str]] = []
-        monkeypatch.setattr(
-            gitutil.subprocess, 'run', lambda cmd, **kw: calls.append(cmd)
-        )
+        monkeypatch.setattr(gitutil.subprocess, 'run', lambda cmd, **kw: calls.append(cmd))
         gitutil.git_add(['docs/screenshots', 'README.md'])
         assert calls == [['git', 'add', '--', 'docs/screenshots', 'README.md']]
 
     def test_empty_paths_is_noop(self, monkeypatch: pytest.MonkeyPatch) -> None:
         calls: list[list[str]] = []
-        monkeypatch.setattr(
-            gitutil.subprocess, 'run', lambda cmd, **kw: calls.append(cmd)
-        )
+        monkeypatch.setattr(gitutil.subprocess, 'run', lambda cmd, **kw: calls.append(cmd))
         gitutil.git_add([])
         assert calls == []
 
@@ -1123,12 +1099,7 @@ class TestRenderSection:
 
 class TestInject:
     def test_replaces_between_existing_markers(self) -> None:
-        text = (
-            '# Title\n\n'
-            '<!-- shots:start -->\n'
-            'OLD\n'
-            '<!-- shots:end -->\n'
-        )
+        text = '# Title\n\n<!-- shots:start -->\nOLD\n<!-- shots:end -->\n'
         result = readme.inject(text, 'NEW', 'shots')
         assert 'OLD' not in result
         assert 'NEW' in result
@@ -1276,10 +1247,7 @@ class TestBuildBlocks:
     def test_external_image_when_base_url(self) -> None:
         blocks = notion.build_blocks(_SHOTS, 'https://cdn.example/repo')
         assert blocks[0]['type'] == 'image'
-        assert (
-            blocks[0]['image']['external']['url']
-            == 'https://cdn.example/repo/docs/screenshots/login.png'
-        )
+        assert blocks[0]['image']['external']['url'] == 'https://cdn.example/repo/docs/screenshots/login.png'
 
     def test_paragraph_fallback_without_base_url(self) -> None:
         blocks = notion.build_blocks(_SHOTS, '')
@@ -1306,9 +1274,7 @@ class TestPublish:
         assert captured['json']['children'][0]['type'] == 'image'
 
     def test_non_2xx_raises(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        monkeypatch.setattr(
-            notion.requests, 'patch', lambda *a, **k: _FakeResponse(401)
-        )
+        monkeypatch.setattr(notion.requests, 'patch', lambda *a, **k: _FakeResponse(401))
         with pytest.raises(notion.NotionError):
             notion.publish('page123', _SHOTS, 'bad', '')
 ```
@@ -1387,9 +1353,7 @@ def publish(page_id: str, shots: list[Shot], token: str, image_base_url: str) ->
     except requests.RequestException as exc:
         raise NotionError(f'Notion request failed: {exc}') from exc
     if not 200 <= response.status_code < 300:
-        raise NotionError(
-            f'Notion API returned {response.status_code}: {response.text}'
-        )
+        raise NotionError(f'Notion API returned {response.status_code}: {response.text}')
 ```
 
 - [ ] **Step 4: Run tests to verify they pass**
@@ -1450,30 +1414,23 @@ _GLOB_CONFIG = (
 
 
 class TestCaptureHook:
-    def test_no_config_returns_zero(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_no_config_returns_zero(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.chdir(tmp_path)
         assert screenshot_capture.main(['src/pages/Login.tsx']) == 0
 
-    def test_no_matching_target_returns_zero(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_no_matching_target_returns_zero(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.chdir(tmp_path)
         _write_config(tmp_path, _GLOB_CONFIG)
         assert screenshot_capture.main(['src/util.ts']) == 0
 
-    def test_happy_path_writes_manifest_and_stages(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_happy_path_writes_manifest_and_stages(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.chdir(tmp_path)
         _write_config(tmp_path, _GLOB_CONFIG)
         monkeypatch.setattr(
             screenshot_capture,
             'capture_targets',
             lambda targets, out, vp: [
-                Shot(name=t.name, path=f'docs/screenshots/{t.name}.png', url=t.url)
-                for t in targets
+                Shot(name=t.name, path=f'docs/screenshots/{t.name}.png', url=t.url) for t in targets
             ],
         )
         staged: list[list[str]] = []
@@ -1483,9 +1440,7 @@ class TestCaptureHook:
         assert [s.name for s in shots] == ['login']
         assert staged == [['docs/screenshots']]
 
-    def test_browser_unavailable_skips_when_not_strict(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_browser_unavailable_skips_when_not_strict(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.chdir(tmp_path)
         _write_config(tmp_path, _GLOB_CONFIG)
 
@@ -1495,9 +1450,7 @@ class TestCaptureHook:
         monkeypatch.setattr(screenshot_capture, 'capture_targets', boom)
         assert screenshot_capture.main(['src/pages/Login.tsx']) == 0
 
-    def test_browser_unavailable_fails_when_strict(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_browser_unavailable_fails_when_strict(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.chdir(tmp_path)
         _write_config(tmp_path, _GLOB_CONFIG + 'strict: true\n')
 
@@ -1624,22 +1577,16 @@ _README_ONLY = (
 
 
 class TestPublishHook:
-    def test_no_config_returns_zero(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_no_config_returns_zero(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.chdir(tmp_path)
         assert screenshot_publish.main([]) == 0
 
-    def test_empty_manifest_returns_zero(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_empty_manifest_returns_zero(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.chdir(tmp_path)
         _config(tmp_path, _README_ONLY)
         assert screenshot_publish.main([]) == 0
 
-    def test_readme_updated_and_staged(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_readme_updated_and_staged(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.chdir(tmp_path)
         _config(tmp_path, _README_ONLY)
         (tmp_path / 'README.md').write_text('# Project\n', encoding='utf-8')
@@ -1653,9 +1600,7 @@ class TestPublishHook:
         assert '![login](docs/screenshots/login.png)' in (tmp_path / 'README.md').read_text()
         assert staged == [['README.md']]
 
-    def test_notion_missing_key_skips_when_not_strict(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_notion_missing_key_skips_when_not_strict(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.chdir(tmp_path)
         _config(
             tmp_path,
@@ -1669,9 +1614,7 @@ class TestPublishHook:
         monkeypatch.setattr(screenshot_publish, 'git_add', lambda paths: None)
         assert screenshot_publish.main([]) == 0
 
-    def test_notion_published_when_key_present(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_notion_published_when_key_present(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.chdir(tmp_path)
         _config(
             tmp_path,
@@ -1686,9 +1629,7 @@ class TestPublishHook:
         monkeypatch.setattr(
             notion,
             'publish',
-            lambda page_id, shots, token, image_base_url: calls.update(
-                {'page_id': page_id, 'token': token}
-            ),
+            lambda page_id, shots, token, image_base_url: calls.update({'page_id': page_id, 'token': token}),
         )
         assert screenshot_publish.main([]) == 0
         assert calls == {'page_id': 'p1', 'token': 'tok'}

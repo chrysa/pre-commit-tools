@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from http import HTTPStatus
+
 import requests
 
 from pre_commit_hooks.screenshot_sync.manifest import Shot
@@ -61,5 +63,5 @@ def publish(page_id: str, shots: list[Shot], token: str, image_base_url: str) ->
         response = requests.patch(url, headers=headers, json=payload, timeout=15)
     except requests.RequestException as exc:
         raise NotionError(f'Notion request failed: {exc}') from exc
-    if not 200 <= response.status_code < 300:
+    if not HTTPStatus.OK <= response.status_code < HTTPStatus.MULTIPLE_CHOICES:
         raise NotionError(f'Notion API returned {response.status_code}: {response.text}')

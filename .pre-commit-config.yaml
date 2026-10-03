@@ -1,3 +1,7 @@
+default_install_hook_types:
+- pre-commit
+- post-merge
+- post-checkout
 default_language_version:
   python: python3.14
 exclude: ^(\.claude/(?!(skills|agents)/)|scripts/quality_gate\.py$)|(^|/)quality_gate\.py$|^\.claude/ape/
@@ -60,8 +64,7 @@ repos:
   rev: v6.4.3
 - hooks:
   - args:
-    - --ignore=E006
-    - E020
+    - --ignore=E006,E020
     id: bashate
   repo: https://github.com/openstack/bashate
   rev: 2.1.1
@@ -139,24 +142,26 @@ repos:
   rev: v1.30.10
 - hooks:
   - entry: print-detection
+    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
     id: python-print-detection
     language: system
     name: detect print on python code
     types:
     - python
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
   - entry: pprint-detection
+    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
     id: python-pprint-detection
     language: system
     name: detect pprint on python code
     types:
     - python
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
   - entry: debugger-detection
+    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
     id: debugger-detection
     language: system
     name: detect debugger statements
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
+    types:
+    - python
   - entry: yaml-sorter
     exclude: ^(\.github/|GitVersion\.yml)
     id: yaml-sorter
@@ -185,12 +190,12 @@ repos:
     types:
     - text
   - entry: logger-detection
+    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
     id: python-logger-detection
     language: system
     name: detect root logger usage
     types:
     - python
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
   - entry: unreachable-code-detection
     id: python-unreachable-code
     language: system
@@ -214,7 +219,9 @@ repos:
     pass_filenames: false
     stages:
     - pre-push
-  - entry: bash -c 'docker run --rm --env SONAR_TOKEN -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli:11 -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=chrysa -Dsonar.projectKey=chrysa_pre-commit-tools -Dsonar.python.coverage.reportPaths=reports/coverage.xml -Dsonar.python.xunit.reportPath=reports/junit.xml'
+  - entry: bash -c 'docker run --rm --env SONAR_TOKEN -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli:11
+      -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=chrysa -Dsonar.projectKey=chrysa_pre-commit-tools
+      -Dsonar.python.coverage.reportPaths=reports/coverage.xml -Dsonar.python.xunit.reportPath=reports/junit.xml'
     id: sonar-scanner
     language: system
     name: sonar cloud analysis
@@ -256,14 +263,14 @@ repos:
   - id: json-sorter
   - id: env-file-check
   - id: env-example-sync
-  - id: debugger-detection
-    exclude: (^|/)tests?/|^(README\.md|docs/)
-  - id: python-print-detection
-    exclude: (^|/)tests?/|^(README\.md|docs/)|(^|/)quality_gate\.py$|^\.claude/ape/
-  - exclude: (^|/)tests?/|^(README\.md|docs/)|(^|/)quality_gate\.py$|^\.claude/ape/
+  - exclude: (^|/)tests?/|^(README\.md|docs/)
+    id: debugger-detection
+  - exclude: (^|/)tests?/|^(README\.md|docs/|pre_commit_hooks/|scripts/)|(^|/)quality_gate\.py$|^\.claude/ape/
+    id: python-print-detection
+  - exclude: (^|/)tests?/|^(README\.md|docs/|pre_commit_hooks/|scripts/)|(^|/)quality_gate\.py$|^\.claude/ape/
     id: python-pprint-detection
-  - id: python-logger-detection
-    exclude: (^|/)tests?/|^(README\.md|docs/)
+  - exclude: (^|/)tests?/|^(README\.md|docs/)
+    id: python-logger-detection
   - id: python-unreachable-code
   - exclude: tests?/|\.test\.|\.spec\.
     id: no-hardcoded-localhost
@@ -276,32 +283,28 @@ repos:
   - id: claude-mcp-config
   - id: python-no-unittest-import
   - id: claude-assets-present
-  - id: python-untyped-raise
-    exclude: (^|/)tests?/
+  - exclude: (^|/)tests?/
+    id: python-untyped-raise
   - id: python-mutable-default
   - id: python-dispatch-ladder
   - id: dockerfile-no-latest
   repo: https://github.com/chrysa/pre-commit-tools
   rev: v0.2.0-253
-- repo: local
-  hooks:
-  - id: claude-config-drift
-    name: claude config drift (advisory)
-    language: system
+- hooks:
+  - always_run: true
     entry: node .claude/hooks/claude-config-drift.cjs
-    always_run: true
+    id: claude-config-drift
+    language: system
+    name: claude config drift (advisory)
     pass_filenames: false
     verbose: true
-  - id: graphify-auto-update
-    name: graphify auto-update (post-merge/checkout)
-    language: system
+  - always_run: true
     entry: node .claude/hooks/graphify-auto-update.cjs
-    always_run: true
+    id: graphify-auto-update
+    language: system
+    name: graphify auto-update (post-merge/checkout)
     pass_filenames: false
     stages:
     - post-merge
     - post-checkout
-default_install_hook_types:
-- pre-commit
-- post-merge
-- post-checkout
+  repo: local

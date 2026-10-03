@@ -72,7 +72,7 @@ def detect_root_repo_mounts(source: str, filename: str) -> list[Violation]:
                 'docker run bind-mounts the repository without --user: it writes '
                 'root-owned files into the tree. Add '
                 '--user $(shell id -u):$(shell id -g) (Makefile) or --user "$(id -u):$(id -g)" (shell).',
-            )
+            ),
         )
     return violations
 

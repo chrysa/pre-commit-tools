@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 from collections.abc import Sequence
 
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description='...')
     parser.add_argument('filenames', nargs='*')
@@ -39,8 +40,8 @@ For hooks that detect disallowed patterns in source files, inherit from `Pattern
 ```python
 from pre_commit_hooks.tools.pattern_detection import PatternDetection
 
-class MyDetector(PatternDetection):
-    ...
+
+class MyDetector(PatternDetection): ...
 ```
 
 See `console_log_detection.py` for an example.

@@ -11,6 +11,8 @@ from pre_commit_hooks.logger_detection import main as logger_main
 from pre_commit_hooks.pprint_detection import main as pprint_main
 from pre_commit_hooks.print_detection import main as print_main
 
+pytestmark = pytest.mark.usefixtures('in_tmp_path')
+
 # ── helpers ──────────────────────────────────────────────────────────────────
 
 
@@ -35,6 +37,32 @@ class TestPrintDetection:
     def test_commented_print_returns_0(self, tmp_path: Path) -> None:
         f = _write(tmp_path, 'commented.py', '# print("hello")\n')
         assert print_main([f]) == 0
+
+    def test_print_in_one_line_docstring_returns_0(self, tmp_path: Path) -> None:
+        f = _write(tmp_path, 'doc.py', '"""Detect print() calls."""\n')
+        assert print_main([f]) == 0
+
+    def test_print_in_multiline_docstring_returns_0(self, tmp_path: Path) -> None:
+        content = 'def f():\n    """Example.\n\n    print(score.value)\n    """\n    return 1\n'
+        f = _write(tmp_path, 'doc.py', content)
+        assert print_main([f]) == 0
+
+    def test_print_after_docstring_closes_returns_1(self, tmp_path: Path) -> None:
+        content = "'''Doc with print() inside.'''\nprint('real')\n"
+        f = _write(tmp_path, 'mixed.py', content)
+        assert print_main([f]) == 1
+
+    def test_non_utf8_file_is_skipped_without_crashing(self, tmp_path: Path) -> None:
+        p = tmp_path / 'latin1.py'
+        p.write_bytes(b'# caf\xe9\nprint("x")\n')
+        assert print_main([str(p)]) == 0
+
+    def test_out_of_tree_path_is_not_read(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        outside = _write(tmp_path, 'outside.py', 'print("x")\n')
+        work = tmp_path / 'repo'
+        work.mkdir()
+        monkeypatch.chdir(work)
+        assert print_main([outside]) == 0
 
     def test_disable_comment_returns_0(self, tmp_path: Path) -> None:
         f = _write(tmp_path, 'disabled.py', 'print("x")  # print-detection: disable\n')

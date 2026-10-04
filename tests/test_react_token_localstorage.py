@@ -4,7 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from pre_commit_hooks.react_token_localstorage import main
+
+pytestmark = pytest.mark.usefixtures('in_tmp_path')
 
 
 def _ts(tmp_path: Path, body: str) -> str:

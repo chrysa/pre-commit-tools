@@ -265,9 +265,9 @@ repos:
   - id: env-example-sync
   - exclude: (^|/)tests?/|^(README\.md|docs/)
     id: debugger-detection
-  - exclude: (^|/)tests?/|^(README\.md|docs/|pre_commit_hooks/|scripts/)|(^|/)quality_gate\.py$|^\.claude/ape/
+  - exclude: (^|/)tests?/|^(README\.md|docs/)|(^|/)quality_gate\.py$|^\.claude/ape/
     id: python-print-detection
-  - exclude: (^|/)tests?/|^(README\.md|docs/|pre_commit_hooks/|scripts/)|(^|/)quality_gate\.py$|^\.claude/ape/
+  - exclude: (^|/)tests?/|^(README\.md|docs/)|(^|/)quality_gate\.py$|^\.claude/ape/
     id: python-pprint-detection
   - exclude: (^|/)tests?/|^(README\.md|docs/)
     id: python-logger-detection

@@ -80,6 +80,8 @@ Pre-commit hooks collection for chrysa projects
       SKILL.md
     plan/
       SKILL.md
+    rollout-status/
+      SKILL.md
     spec/
       SKILL.md
     standards-authoring/
@@ -91,6 +93,7 @@ Pre-commit hooks collection for chrysa projects
     verification-loop/
       SKILL.md
 .editorconfig
+.env.example
 .gitattributes
 .github/
   CODEOWNERS

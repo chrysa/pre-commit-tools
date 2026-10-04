@@ -107,6 +107,8 @@ This project is indexed by GitNexus as **pre-commit-tools** (1214 symbols, 2689 
 - Agent actions are governed
 - An AI feature is evaluated, not just shipped
 - An agent writes only where the owner owns
+- A retryable operation proves the retry has no external effects
+- A mass-mutation batch returns the explicit list of what it changed
 
 ### Security, identity & sessions · `standards/rules/security.md`
 - Per-person data implies a user account — no exceptions dressed up as simplicity

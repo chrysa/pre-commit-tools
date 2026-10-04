@@ -455,7 +455,7 @@ Use `# no-bare-except: disable` to suppress a specific line.
 # WRONG
 try:
     do_something()
-except:          # ← detected
+except:  # ← detected
     pass
 
 # OK

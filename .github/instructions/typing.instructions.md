@@ -19,11 +19,15 @@ Target Python 3.12+. Use built-in generics everywhere (PEP 585, PEP 604):
 # CORRECT — Python 3.12+
 from __future__ import annotations
 
+
 def process(items: list[str]) -> dict[str, int]: ...
 def lookup(key: str) -> str | None: ...
 
+
 # WRONG — legacy typing module
 from typing import Dict, List, Optional
+
+
 def process(items: List[str]) -> Dict[str, int]: ...
 def lookup(key: str) -> Optional[str]: ...
 ```
@@ -37,8 +41,11 @@ def lookup(key: str) -> Optional[str]: ...
 def find(name: str, default: str | None = None) -> str | None: ...
 def parse(value: str | int) -> float: ...
 
+
 # WRONG
 from typing import Optional, Union
+
+
 def find(name: str, default: Optional[str] = None) -> Optional[str]: ...
 def parse(value: Union[str, int]) -> float: ...
 ```
@@ -57,6 +64,7 @@ nested: list[dict[str, list[int]]]
 
 # WRONG — typing module generics
 from typing import Dict, List, Set, Tuple
+
 items: List[str]
 mapping: Dict[str, int]
 ```
@@ -71,8 +79,10 @@ Use `collections.abc` not `typing`:
 # CORRECT
 from collections.abc import Callable, Iterator, Mapping, Sequence
 
+
 def main(argv: Sequence[str] | None = None) -> int: ...
 def transform(fn: Callable[[str], str]) -> list[str]: ...
+
 
 # WRONG
 from typing import Callable, Iterator, Mapping, Sequence
@@ -87,13 +97,18 @@ Avoid `Any` unless absolutely unavoidable:
 ```python
 # WRONG
 from typing import Any
+
+
 def handle(data: Any) -> Any: ...
+
 
 # CORRECT — use specific types or overloads
 def handle(data: dict[str, str | int | bool]) -> dict[str, str]: ...
 
+
 # If Any is truly needed, document why
 from typing import Any  # noqa: ANN401 — third-party API returns untyped result
+
 result: Any = external_lib.get_result()
 ```
 
@@ -105,15 +120,15 @@ result: Any = external_lib.get_result()
 
 ```python
 # CORRECT
-def setup() -> None:
-    ...
+def setup() -> None: ...
+
 
 def count() -> int:
     return 42
 
+
 # WRONG
-def setup():
-    ...
+def setup(): ...
 ```
 
 ---

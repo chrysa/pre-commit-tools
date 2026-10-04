@@ -118,7 +118,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     ret = 0
     for filename in args.filenames:
         if Path(filename).name in _FORBIDDEN:
-            print(f'[{filename}] forbidden: move tool config into [tool.*] of pyproject.toml')  # print-detection: disable
+            print(
+                f'[{filename}] forbidden: move tool config into [tool.*] of pyproject.toml'
+            )  # print-detection: disable
             ret = 1
     return ret
 
@@ -708,7 +710,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef) and node.end_lineno is not None:
                 length = node.end_lineno - node.lineno + 1
                 if length > args.max_lines and not _disabled(source_lines, node.lineno):
-                    print(f'[{filename}:{node.lineno}] {node.name} is {length} lines (max {args.max_lines})')  # print-detection: disable
+                    print(
+                        f'[{filename}:{node.lineno}] {node.name} is {length} lines (max {args.max_lines})'
+                    )  # print-detection: disable
                     ret = 1
     return ret
 
@@ -941,7 +945,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             region = _effect_region(text, match.end() - 1)
             if _FETCH.search(region):
                 lineno = text.count('\n', 0, match.start()) + 1
-                print(f'[{filename}:{lineno}] data fetching inside useEffect — use useQuery/useMutation')  # print-detection: disable
+                print(
+                    f'[{filename}:{lineno}] data fetching inside useEffect — use useQuery/useMutation'
+                )  # print-detection: disable
                 ret = 1
     return ret
 
@@ -1117,7 +1123,9 @@ from collections.abc import Sequence
 
 from pre_commit_hooks.tools.pattern_detection import PatternDetection
 
-_PATTERN = re.compile(r'localStorage\.setItem\(\s*[\'"`][^\'"`]*(token|jwt|auth|access|refresh)[^\'"`]*[\'"`]', re.IGNORECASE)
+_PATTERN = re.compile(
+    r'localStorage\.setItem\(\s*[\'"`][^\'"`]*(token|jwt|auth|access|refresh)[^\'"`]*[\'"`]', re.IGNORECASE
+)
 _COMMENTED = re.compile(r'^\s*//.*localStorage\.setItem')
 _DISABLE = re.compile(r'token-localstorage\s*:\s*disable')
 
@@ -1465,7 +1473,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             region = _call_region(text, match.end() - 1)
             if not (_SECURE.search(region) and _HTTPONLY.search(region) and _SAMESITE.search(region)):
                 lineno = text.count('\n', 0, match.start()) + 1
-                print(f'[{filename}:{lineno}] set_cookie must set secure=True, httponly=True, samesite')  # print-detection: disable
+                print(
+                    f'[{filename}:{lineno}] set_cookie must set secure=True, httponly=True, samesite'
+                )  # print-detection: disable
                 ret = 1
     return ret
 

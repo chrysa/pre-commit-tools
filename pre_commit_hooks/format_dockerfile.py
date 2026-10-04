@@ -18,6 +18,8 @@ from typing import NewType
 
 from dockerfile_parse import DockerfileParser
 
+_VERSION_PARTS = 3
+
 Line = NewType('Line', dict[str, int | str])
 
 logger = logging.getLogger()
@@ -59,7 +61,7 @@ _TAGS_CACHE_TTL = 86400  # seconds (24h)
 def _version_tuple(version: str) -> tuple[int, int, int]:
     """Normalise a dotted version to a 3-tuple so X.Y and X.Y.Z compare fairly."""
     parts = [int(part) for part in version.split('.')]
-    while len(parts) < 3:
+    while len(parts) < _VERSION_PARTS:
         parts.append(0)
     return (parts[0], parts[1], parts[2])
 

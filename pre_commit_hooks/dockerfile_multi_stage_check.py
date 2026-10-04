@@ -6,6 +6,8 @@ from __future__ import annotations
 import re
 from collections.abc import Sequence
 
+_MIN_STAGES = 2
+
 _DISABLE_COMMENT = '# dockerfile-multi-stage-check: disable'
 _FROM_RE = re.compile(r'^\s*FROM\s+\S+', re.IGNORECASE)
 _STAGE_RE = re.compile(r'^\s*FROM\s+\S+\s+AS\s+(?P<name>\S+)', re.IGNORECASE)
@@ -52,7 +54,7 @@ def detect_missing_multi_stage(
             from_count += 1
 
     violations: list[Violation] = []
-    if from_count < 2:
+    if from_count < _MIN_STAGES:
         violations.append(
             (
                 filename,

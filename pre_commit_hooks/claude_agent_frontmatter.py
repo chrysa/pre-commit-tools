@@ -22,6 +22,8 @@ from typing import Any
 
 from pre_commit_hooks.tools.frontmatter import check_required, check_unknown_keys, is_kebab_case, parse
 
+_FRONT_MATTER_PARTS = 3  # leading text, front matter, body
+
 ALLOWED_KEYS = frozenset({'color', 'description', 'isolation', 'model', 'name', 'tools'})
 KNOWN_MODELS = frozenset({'fable', 'haiku', 'inherit', 'opus', 'sonnet'})
 MODEL_ID_PREFIX = 'claude-'
@@ -65,7 +67,7 @@ def _check_model(model: Any) -> list[str]:
 def _has_body(text: str) -> bool:
     """Return True when content follows the closing front matter fence."""
     parts = text.lstrip().split('---', 2)
-    return len(parts) == 3 and bool(parts[2].strip())
+    return len(parts) == _FRONT_MATTER_PARTS and bool(parts[2].strip())
 
 
 def check_agent(path: Path, extra_keys: frozenset[str] = frozenset()) -> tuple[list[str], list[str]]:

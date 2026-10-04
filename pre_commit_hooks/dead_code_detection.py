@@ -21,6 +21,8 @@ from collections.abc import Iterable, Sequence
 from pathlib import Path
 from typing import Any
 
+_ATTR_NAME_ARG_COUNT = 2  # getattr/setattr/hasattr(obj, name, ...)
+
 DEFAULT_TEST_PATTERNS = ('tests/', 'test_*.py', '*_test.py', 'conftest.py')
 
 
@@ -64,7 +66,7 @@ def _handle_call(node: ast.Call, names: set[str]) -> None:
         if node.args:
             _add_name(names, _const_str(node.args[0]))
     elif fname in {'getattr', 'setattr', 'hasattr'}:
-        if len(node.args) >= 2:
+        if len(node.args) >= _ATTR_NAME_ARG_COUNT:
             _add_name(names, _const_str(node.args[1]))
     elif fname == 'entry_points':
         for arg in node.args:

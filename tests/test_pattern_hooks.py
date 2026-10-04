@@ -36,6 +36,25 @@ class TestPrintDetection:
         f = _write(tmp_path, 'commented.py', '# print("hello")\n')
         assert print_main([f]) == 0
 
+    def test_print_in_one_line_docstring_returns_0(self, tmp_path: Path) -> None:
+        f = _write(tmp_path, 'doc.py', '"""Detect print() calls."""\n')
+        assert print_main([f]) == 0
+
+    def test_print_in_multiline_docstring_returns_0(self, tmp_path: Path) -> None:
+        content = 'def f():\n    """Example.\n\n    print(score.value)\n    """\n    return 1\n'
+        f = _write(tmp_path, 'doc.py', content)
+        assert print_main([f]) == 0
+
+    def test_print_after_docstring_closes_returns_1(self, tmp_path: Path) -> None:
+        content = "'''Doc with print() inside.'''\nprint('real')\n"
+        f = _write(tmp_path, 'mixed.py', content)
+        assert print_main([f]) == 1
+
+    def test_non_utf8_file_does_not_crash_and_still_detects(self, tmp_path: Path) -> None:
+        p = tmp_path / 'latin1.py'
+        p.write_bytes(b'# caf\xe9\nprint("x")\n')
+        assert print_main([str(p)]) == 1
+
     def test_disable_comment_returns_0(self, tmp_path: Path) -> None:
         f = _write(tmp_path, 'disabled.py', 'print("x")  # print-detection: disable\n')
         assert print_main([f]) == 0

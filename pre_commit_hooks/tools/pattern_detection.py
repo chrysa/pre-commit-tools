@@ -10,6 +10,7 @@ from pathlib import Path
 
 from pre_commit_hooks.tools.logger import logger
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
+from pre_commit_hooks.tools.source_reader import read_source
 
 _TRIPLE_QUOTE_RE = re.compile(r'"""|\'\'\'')
 
@@ -66,7 +67,11 @@ class PatternDetection:
         ret_val: int = 0
         for file in namespace_args.filenames:
             file_path = Path(file)
-            lines = file_path.read_bytes().decode('utf-8', errors='replace').splitlines(keepends=True)
+            source = read_source(file)
+            if source is None:
+                logger.debug(f'skip unreadable, non-UTF-8 or out-of-tree file {file_path}')
+                continue
+            lines = source.splitlines(keepends=True)
             logger.debug(f'process file {file_path}')
             open_quote: str | None = None
             for line_number, line_content in enumerate(lines):

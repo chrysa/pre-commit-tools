@@ -4,8 +4,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from pre_commit_hooks.django_no_raw_sql import main as main_raw_sql
 from pre_commit_hooks.no_debug_in_settings import main as main_debug
+
+pytestmark = pytest.mark.usefixtures('in_tmp_path')
 
 
 def _write(tmp_path: Path, name: str, content: str) -> str:

@@ -4,9 +4,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from pre_commit_hooks.import_no_relative_parent import main as main_import
 from pre_commit_hooks.no_console_warn import main as main_warn
 from pre_commit_hooks.react_direct_dom import main as main_dom
+
+pytestmark = pytest.mark.usefixtures('in_tmp_path')
 
 
 def _write(tmp_path: Path, name: str, content: str) -> str:

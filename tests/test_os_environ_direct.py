@@ -4,7 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from pre_commit_hooks.os_environ_direct import main
+
+pytestmark = pytest.mark.usefixtures('in_tmp_path')
 
 
 def _py(tmp_path: Path, body: str) -> str:

@@ -28,7 +28,7 @@
       "command": "detect-secrets scan || true",
       "exit_code": 0,
       "gate": "Secrets",
-      "metric": 25,
+      "metric": 16,
       "metric_name": "secret_count",
       "timestamp": "2026-07-16T09:29:26.861915"
     },

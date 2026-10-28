@@ -98,7 +98,7 @@ def _fetch_dockerfile_tags() -> list[str]:
     if (cached := _read_tags_cache()) is not None:
         return cached
     try:
-        request = urllib.request.Request(  # noqa: S310 — fixed HTTPS Docker Hub URL
+        request = urllib.request.Request(
             _DOCKERHUB_TAGS_URL,
             headers={'User-Agent': 'format-dockerfile-hook'},
         )

@@ -125,10 +125,10 @@ publish-test: build ## Upload distribution to TestPyPI
 # ── Quality Gates ──────────────────────────────────────────────────────────────
 
 quality-gate-baseline: ## Record baseline metrics for regression detection
-	@quality-gate-baseline
+	@$(PYTHON) scripts/quality_gate.py baseline
 
 quality-gate-verify: ## Verify no regression since baseline
-	@quality-gate-verify
+	@$(PYTHON) scripts/quality_gate.py verify
 
 # ─── Compat aliases ───────────────────────────────────────────────────────────
 

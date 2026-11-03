@@ -60,7 +60,7 @@
 - Branch model — `main` is production, `develop` is the workspace
 - Merge
 - One PR per issue
-- Every PR references a Shortcut story
+- Every PR references a Shortcut story — except in public open-source repos (DEC-V3-006), where a linked GitHub issue is enough; Shortcut stays the internal tracker
 - Issues and PRs are type-driven
 
 ### Architecture, decoupling & portability · `standards/rules/architecture.md`
@@ -105,6 +105,8 @@
 - Agent actions are governed
 - An AI feature is evaluated, not just shipped
 - An agent writes only where the owner owns
+- A retryable operation proves the retry has no external effects
+- A mass-mutation batch returns the explicit list of what it changed
 
 ### Security, identity & sessions · `standards/rules/security.md`
 - Per-person data implies a user account — no exceptions dressed up as simplicity
@@ -164,6 +166,7 @@
 - Local dev runs the code in-container, live, in debug mode — never the production server
 - Default to dev mode when starting an app locally — any other mode only when explicitly asked
 - `.dockerignore` mandatory & exhaustive
+- Healthchecks live in the Dockerfile, and are language-agnostic and native
 - Container-runtime policy
 
 ### Design system · `standards/rules/design.md`

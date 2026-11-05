@@ -21,10 +21,6 @@ repos:
   repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v5.0.0
 - hooks:
-  - id: add-trailing-comma
-  repo: https://github.com/asottile/add-trailing-comma
-  rev: v4.0.0
-- hooks:
   - args:
     - --in-place
     - github
@@ -67,19 +63,11 @@ repos:
   rev: 2.1.1
 - hooks:
   - args:
-    - pre_commit_hooks/
-    id: vulture
-    stages:
-    - manual
-  repo: https://github.com/jendrikseipp/vulture
-  rev: v2.9.1
-- hooks:
-  - args:
     - --fix
     id: ruff-check
   - id: ruff-format
   repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.15.21
+  rev: v0.16.7
 - hooks:
   - id: python-no-eval
   - exclude: ^(pre_commit_hooks/no_console_warn\.py|tests/test_js_hooks_new\.py)$
@@ -97,20 +85,7 @@ repos:
   repo: https://github.com/dannysepler/rm_unneeded_f_str
   rev: v0.2.0
 - hooks:
-  - args:
-    - --ignore-vuln
-    - CVE-2026-3219
-    - --ignore-vuln
-    - CVE-2026-6357
-    - --ignore-vuln
-    - CVE-2025-8869
-    - --ignore-vuln
-    - CVE-2026-1703
-    - --ignore-vuln
-    - PYSEC-2026-196
-    - --ignore-vuln
-    - GHSA-6v7p-g79w-8964
-    id: pip-audit
+  - id: pip-audit
   repo: https://github.com/pypa/pip-audit
   rev: v2.10.1
 - hooks:
@@ -122,15 +97,6 @@ repos:
   repo: https://github.com/Yelp/detect-secrets
   rev: v1.5.0
 - hooks:
-  - args:
-    - --py3-only
-    - --py312-plus
-    id: pyupgrade
-    stages:
-    - manual
-  repo: https://github.com/asottile/pyupgrade
-  rev: v3.9.0
-- hooks:
   - id: guideline-check
     stages:
     - pre-push
@@ -138,27 +104,8 @@ repos:
   repo: https://github.com/chrysa/guideline-checker
   rev: v1.30.10
 - hooks:
-  - entry: print-detection
-    id: python-print-detection
-    language: system
-    name: detect print on python code
-    types:
-    - python
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
-  - entry: pprint-detection
-    id: python-pprint-detection
-    language: system
-    name: detect pprint on python code
-    types:
-    - python
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
-  - entry: debugger-detection
-    id: debugger-detection
-    language: system
-    name: detect debugger statements
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
   - entry: yaml-sorter
-    exclude: ^(\.github/|GitVersion\.yml)
+    exclude: ^(\.github/|GitVersion\.yml|workflows/|templates/|docker-compose)|(^|/)(pnpm-lock|yarn|uv|poetry)\.(yaml|lock)$|(^|/)\.pre-commit-config\.yaml$
     id: yaml-sorter
     language: system
     name: sort yaml files
@@ -184,13 +131,6 @@ repos:
     name: check env files for secrets
     types:
     - text
-  - entry: logger-detection
-    id: python-logger-detection
-    language: system
-    name: detect root logger usage
-    types:
-    - python
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
   - entry: unreachable-code-detection
     id: python-unreachable-code
     language: system
@@ -223,6 +163,20 @@ repos:
     - pre-push
   repo: local
 - hooks:
+  - args:
+    - --error
+    - DL3006
+    - --error
+    - DL3007
+    - --failure-threshold
+    - error
+    files: (^|/)Dockerfile[^/]*$
+    id: hadolint-docker
+    types:
+    - file
+  repo: https://github.com/hadolint/hadolint
+  rev: v2.15.1
+- hooks:
   - id: gitleaks
   repo: https://github.com/gitleaks/gitleaks
   rev: v8.30.1
@@ -246,25 +200,10 @@ repos:
 - hooks:
   - id: makefile-check
   - id: adr-gate
-  - id: no-bare-except
-  - id: no-sync-in-async
   - id: regression-gate
     stages:
     - pre-push
-  - exclude: ^(\.github/|workflows/|templates/|docker-compose)|(^|/)(pnpm-lock|yarn|uv|poetry)\.(yaml|lock)$|(^|/)\.pre-commit-config\.yaml$
-    id: yaml-sorter
-  - id: json-sorter
-  - id: env-file-check
   - id: env-example-sync
-  - id: debugger-detection
-    exclude: (^|/)tests?/|^(README\.md|docs/)
-  - id: python-print-detection
-    exclude: (^|/)tests?/|^(README\.md|docs/)|(^|/)quality_gate\.py$|^\.claude/ape/
-  - exclude: (^|/)tests?/|^(README\.md|docs/)|(^|/)quality_gate\.py$|^\.claude/ape/
-    id: python-pprint-detection
-  - id: python-logger-detection
-    exclude: (^|/)tests?/|^(README\.md|docs/)
-  - id: python-unreachable-code
   - exclude: tests?/|\.test\.|\.spec\.
     id: no-hardcoded-localhost
   - exclude: (^|/)tests/
@@ -278,9 +217,7 @@ repos:
   - id: claude-assets-present
   - id: python-untyped-raise
     exclude: (^|/)tests?/
-  - id: python-mutable-default
   - id: python-dispatch-ladder
-  - id: dockerfile-no-latest
   repo: https://github.com/chrysa/pre-commit-tools
   rev: v0.2.0-253
 - repo: local

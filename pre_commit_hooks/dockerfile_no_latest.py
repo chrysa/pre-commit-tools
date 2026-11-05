@@ -5,6 +5,10 @@ from __future__ import annotations
 
 import re
 from collections.abc import Sequence
+from pathlib import Path
+
+from pre_commit_hooks.tools.deprecation import warn_deprecated
+from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 
 _DISABLE_COMMENT = '# dockerfile-no-latest: disable'
 _FROM_LATEST_RE = re.compile(r'^\s*FROM\s+\S+:latest(\s|$)', re.IGNORECASE)
@@ -31,17 +35,15 @@ def detect_from_latest(source: str, filename: str) -> list[Violation]:
 
 def main(argv: Sequence[str] | None = None) -> int:
     """Detect FROM :latest tags in Dockerfiles and return 1 if any are found."""
-    import argparse
-
-    parser = argparse.ArgumentParser(description='Detect FROM :latest in Dockerfiles')
-    parser.add_argument('filenames', nargs='*')
-    args = parser.parse_args(argv)
+    warn_deprecated(hook_id='dockerfile-no-latest')
+    tools = PreCommitTools()
+    tools.set_params(help_msg='Dockerfiles to check for FROM :latest')
+    args, _ = tools.get_args(argv=argv)
 
     retval = 0
     for filename in args.filenames:
         try:
-            with open(filename, encoding='utf-8') as f:
-                source = f.read()
+            source = Path(filename).read_text(encoding='utf-8')
         except (OSError, UnicodeDecodeError):
             continue
         for fname, lineno, msg in detect_from_latest(source, filename):

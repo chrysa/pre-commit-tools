@@ -43,16 +43,20 @@ class PatternDetection:
         ret_val: int = 0
         for file in namespace_args.filenames:
             file_path = Path(file)
-            with open(file_path, encoding='utf-8') as stream:
-                logger.debug(f'process file {file_path}')
-                for line_number, line_content in enumerate(stream.readlines()):
-                    if (
-                        self.as_pattern(line=line_content)
-                        and not self.is_disabled(line=line_content)
-                        and not self.is_commented(line=line_content)
-                    ):
-                        print(
-                            f'[{file_path}:{line_number}] {line_content.strip()}',
-                        )  # print-detection: disable
-                        ret_val = 1
+            try:
+                content = file_path.read_text(encoding='utf-8')
+            except (OSError, UnicodeDecodeError) as error:
+                logger.debug(f'skip unreadable file {file_path}: {error}')
+                continue
+            logger.debug(f'process file {file_path}')
+            for line_number, line_content in enumerate(content.splitlines(), start=1):
+                if (
+                    self.as_pattern(line=line_content)
+                    and not self.is_disabled(line=line_content)
+                    and not self.is_commented(line=line_content)
+                ):
+                    print(
+                        f'[{file_path}:{line_number}] {line_content.strip()}',
+                    )  # print-detection: disable
+                    ret_val = 1
         return ret_val

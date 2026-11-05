@@ -6,6 +6,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from pathlib import Path
 
+from pre_commit_hooks.tools.deprecation import warn_deprecated
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 
 Violation = tuple[str, int, str]
@@ -108,6 +109,7 @@ def _walk(node: object, filename: str, lines: list[str]) -> list[Violation]:
 
 def main(argv: Sequence[str] | None = None) -> int:
     """Detect unreachable code in TypeScript/TSX/JSX files; return 1 if any violation is found."""
+    warn_deprecated(hook_id='ts-unreachable-code')
     try:
         import tree_sitter_typescript as _tsts
         from tree_sitter import Language, Parser

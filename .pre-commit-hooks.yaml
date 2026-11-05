@@ -26,46 +26,46 @@
   name: format dockerfiles
   types: ["dockerfile"]
 - id: console-debug-detection
-  description: detect console.debug() calls in JavaScript/TypeScript/AppScript files
+  description: 'DEPRECATED - use ESLint core rule `no-console` (see DEPRECATIONS.md). detect console.debug() calls in JavaScript/TypeScript/AppScript files'
   entry: console-debug-detection
   files: \.(js|gs|ts|tsx)$
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect console.debug on javascript/typescript/appscript code
+  name: '[DEPRECATED] detect console.debug on javascript/typescript/appscript code'
   types_or: ["javascript", "ts", "tsx", "file"]
 - id: console-log-detection
-  description: detect console.log() calls in JavaScript/TypeScript/AppScript files
+  description: 'DEPRECATED - use ESLint core rule `no-console` (see DEPRECATIONS.md). detect console.log() calls in JavaScript/TypeScript/AppScript files'
   entry: console-log-detection
   files: \.(js|gs|ts|tsx)$
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect console.log on javascript/typescript/appscript code
+  name: '[DEPRECATED] detect console.log on javascript/typescript/appscript code'
   types_or: ["javascript", "ts", "tsx", "file"]
 - id: console-table-detection
-  description: detect console.table() calls in JavaScript/TypeScript/AppScript files
+  description: 'DEPRECATED - use ESLint core rule `no-console` (see DEPRECATIONS.md). detect console.table() calls in JavaScript/TypeScript/AppScript files'
   entry: console-table-detection
   files: \.(js|gs|ts|tsx)$
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect console.table on javascript/typescript/appscript code
+  name: '[DEPRECATED] detect console.table on javascript/typescript/appscript code'
   types_or: ["javascript", "ts", "tsx", "file"]
 - id: python-print-detection
-  description: detect print() calls in Python files
+  description: 'DEPRECATED - use ruff (astral-sh/ruff-pre-commit) rule T201 (see DEPRECATIONS.md). detect print() calls in Python files'
   entry: print-detection
   exclude: 'tests?/'
   files: .py$
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect print on python code
+  name: '[DEPRECATED] detect print on python code'
   types: ["python"]
 - id: python-pprint-detection
-  description: detect pprint() calls in Python files
+  description: 'DEPRECATED - use ruff (astral-sh/ruff-pre-commit) rule T203 (see DEPRECATIONS.md). detect pprint() calls in Python files'
   entry: pprint-detection
   exclude: 'tests?/'
   files: .py$
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect pprint on python code
+  name: '[DEPRECATED] detect pprint on python code'
   types: ["python"]
 - id: pylint-with-html-report
   additional_dependencies:
@@ -90,11 +90,11 @@
   name: sort yaml files
   types: ["yaml"]
 - id: debugger-detection
-  description: detect debugger statements (breakpoint, pdb, ipdb, pudb)
+  description: 'DEPRECATED - use ruff (astral-sh/ruff-pre-commit) rule T100 (see DEPRECATIONS.md). detect debugger statements (breakpoint, pdb, ipdb, pudb)'
   entry: debugger-detection
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect debugger statements
+  name: '[DEPRECATED] detect debugger statements'
 - id: json-sorter
   description: sort json files keys alphabetically
   entry: json-sorter
@@ -135,11 +135,11 @@
   name: check env files for secrets
   types: ["text"]
 - id: python-logger-detection
-  description: detect direct use of root logging module instead of named logger
+  description: 'DEPRECATED - use ruff (astral-sh/ruff-pre-commit) rule LOG015 (see DEPRECATIONS.md). detect direct use of root logging module instead of named logger'
   entry: logger-detection
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect root logger usage
+  name: '[DEPRECATED] detect root logger usage'
   types: ["python"]
 - id: python-unreachable-code
   description: detect unreachable code after return/raise/break/continue statements
@@ -164,12 +164,12 @@
   additional_dependencies:
     - tree-sitter>=0.23
     - tree-sitter-typescript>=0.23
-  description: detect unreachable code after return/throw/break/continue in TypeScript/TSX/JSX files
+  description: 'DEPRECATED - use ESLint core rule `no-unreachable` + tsconfig `allowUnreachableCode: false` (see DEPRECATIONS.md). detect unreachable code after return/throw/break/continue in TypeScript/TSX/JSX files'
   entry: ts-unreachable-code-detection
   files: \.(ts|tsx|js|jsx)$
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect unreachable code in TypeScript/JSX
+  name: '[DEPRECATED] detect unreachable code in TypeScript/JSX'
   types_or: ["ts", "tsx", "javascript", "file"]
 - id: css-duplicate-property
   description: detect duplicate/overridden CSS property declarations and duplicate ID selectors
@@ -196,27 +196,27 @@
   name: detect CSS outside CSS/SCSS files (CSS-in-JS)
   types_or: ["javascript", "jsx", "ts", "tsx", "html", "vue", "file"]
 - id: react-console-error-detection
-  description: detect console.error() calls in JavaScript/TypeScript/React files
+  description: 'DEPRECATED - use ESLint core rule `no-console` (see DEPRECATIONS.md). detect console.error() calls in JavaScript/TypeScript/React files'
   entry: react-console-error-detection
   files: \.(js|ts|jsx|tsx)$
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect console.error() calls
+  name: '[DEPRECATED] detect console.error() calls'
   types_or: ["ts", "tsx", "javascript", "file"]
 - id: no-bare-except
-  description: detect bare except clauses (without exception type) in Python files
+  description: 'DEPRECATED - use ruff (astral-sh/ruff-pre-commit) rule E722 (see DEPRECATIONS.md). detect bare except clauses (without exception type) in Python files'
   entry: no-bare-except-detection
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect bare except clauses
+  name: '[DEPRECATED] detect bare except clauses'
   types: ["python"]
 - id: no-print-in-migration
-  description: detect print() calls in Django migration files
+  description: 'DEPRECATED - use ruff (astral-sh/ruff-pre-commit) rule T201 (see DEPRECATIONS.md). detect print() calls in Django migration files'
   entry: no-print-in-migration
   files: 'migrations/.*\.py$'
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect print() in migrations
+  name: '[DEPRECATED] detect print() in migrations'
   types: ["python"]
 - id: django-hardcoded-secret
   description: detect hardcoded secrets (SECRET_KEY, PASSWORD, API_KEY, TOKEN) in Python settings
@@ -226,12 +226,12 @@
   name: detect hardcoded secrets in settings
   types: ["python"]
 - id: dockerfile-no-latest
-  description: detect FROM image:latest (non-pinned) instructions in Dockerfiles
+  description: 'DEPRECATED - use hadolint rules DL3007 (`:latest`) and DL3006 (untagged image) (see DEPRECATIONS.md). detect FROM image:latest (non-pinned) instructions in Dockerfiles'
   entry: dockerfile-no-latest-detection
   files: '(^|/)Dockerfile[^/]*$'
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect FROM :latest in Dockerfiles
+  name: '[DEPRECATED] detect FROM :latest in Dockerfiles'
   types_or: ["dockerfile", "file"]
 - id: env-example-sync
   description: check that .env and .env.example files contain the same keys
@@ -243,12 +243,12 @@
   pass_filenames: true
   types: ["text"]
 - id: no-console-warn
-  description: detect console.warn() calls in JavaScript/TypeScript/React files
+  description: 'DEPRECATED - use ESLint core rule `no-console` (see DEPRECATIONS.md). detect console.warn() calls in JavaScript/TypeScript/React files'
   entry: no-console-warn
   files: \.(js|gs|ts|jsx|tsx)$
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect console.warn() calls
+  name: '[DEPRECATED] detect console.warn() calls'
   types_or: ["ts", "tsx", "javascript", "file"]
 - id: react-direct-dom
   description: detect direct DOM manipulation (document.getElementById etc.) in React files
@@ -282,11 +282,11 @@
   name: detect raw SQL in Django
   types: ["python"]
 - id: no-sync-in-async
-  description: detect synchronous blocking calls (time.sleep, requests.*) inside async functions
+  description: 'DEPRECATED - use ruff (astral-sh/ruff-pre-commit) rules ASYNC210/212/220/221/222/230/251 (see DEPRECATIONS.md). detect synchronous blocking calls (time.sleep, requests.*) inside async functions'
   entry: no-sync-in-async
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect blocking calls in async functions
+  name: '[DEPRECATED] detect blocking calls in async functions'
   types: ["python"]
 - id: fastapi-missing-response-model
   description: detect FastAPI routes missing the response_model parameter
@@ -409,13 +409,13 @@
   name: detect root user in Dockerfile final stage
   types_or: ["dockerfile", "file"]
 - id: ts-no-any
-  description: 'detect explicit `any` type usage (`: any`, `as any`, `<any>`) in TypeScript files'
+  description: 'DEPRECATED - use typescript-eslint rule `@typescript-eslint/no-explicit-any` (see DEPRECATIONS.md). detect explicit `any` type usage (`: any`, `as any`, `<any>`) in TypeScript files'
   entry: ts-no-any
   exclude: 'tests?/|\.test\.|\.spec\.'
   files: \.(ts|tsx)$
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect `any` type in TypeScript
+  name: '[DEPRECATED] detect `any` type in TypeScript'
   types_or: ["ts", "tsx", "file"]
 - id: react-no-inline-styles
   description: detect `style={{...}}` inline styles in React/JSX/TSX files
@@ -442,12 +442,12 @@
   name: detect untyped raises in Python
   types: ["python"]
 - id: python-mutable-default
-  description: detect mutable default arguments ([], {}, set(), dict()) in Python signatures
+  description: 'DEPRECATED - use ruff (astral-sh/ruff-pre-commit) rule B006 (see DEPRECATIONS.md). detect mutable default arguments ([], {}, set(), dict()) in Python signatures'
   entry: python-mutable-default
   files: \.py$
   language: python
   minimum_pre_commit_version: '4.1.0'
-  name: detect mutable default arguments
+  name: '[DEPRECATED] detect mutable default arguments'
   types: ["python"]
 - id: python-dispatch-ladder
   description: detect if/elif ladders dispatching one value against constants — use a lookup table

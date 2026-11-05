@@ -8,6 +8,7 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
+from pre_commit_hooks.tools.deprecation import warn_deprecated
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 
 Violation = tuple[str, int, str]
@@ -113,6 +114,7 @@ def detect_sync_in_async(source: str, filename: str) -> list[Violation]:
 
 def main(argv: Sequence[str] | None = None) -> int:
     """Check files for blocking calls inside async functions."""
+    warn_deprecated(hook_id='no-sync-in-async')
     tools = PreCommitTools()
     tools.set_params(help_msg='detect sync calls inside async functions')
     args, _ = tools.get_args(argv=argv)

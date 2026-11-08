@@ -33,6 +33,7 @@
     "claude-agent-frontmatter",
     "claude-assets-present",
     "claude-mcp-config",
+    "claude-md-facts-check",
     "claude-skill-frontmatter",
     "compose-dev-hot-reload",
     "compose-missing-restart",

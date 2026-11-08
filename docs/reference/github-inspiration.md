@@ -26,21 +26,23 @@
   import argparse, ast
   from collections.abc import Sequence
 
-  DEBUG_NAMES = frozenset({"pdb", "ipdb", "breakpoint"})
+  DEBUG_NAMES = frozenset({'pdb', 'ipdb', 'breakpoint'})
+
 
   def check_file(filename: str) -> int:
-      with open(filename, "rb") as f:
+      with open(filename, 'rb') as f:
           tree = ast.parse(f.read(), filename=filename)
       rc = 0
       for node in ast.walk(tree):
-          if isinstance(node, ast.Call) and getattr(node.func, "id", "") == "breakpoint":
-              print(f"{filename}:{node.lineno}: breakpoint() found")
+          if isinstance(node, ast.Call) and getattr(node.func, 'id', '') == 'breakpoint':
+              print(f'{filename}:{node.lineno}: breakpoint() found')
               rc = 1
       return rc
 
+
   def main(argv: Sequence[str] | None = None) -> int:
       parser = argparse.ArgumentParser()
-      parser.add_argument("filenames", nargs="*")
+      parser.add_argument('filenames', nargs='*')
       args = parser.parse_args(argv)
       return max((check_file(f) for f in args.filenames), default=0)
   ```
@@ -60,6 +62,8 @@
   ```python
   # AST pour trouver + tokenize-rt pour réécrire en préservant le style
   from tokenize_rt import src_to_tokens, tokens_to_src, Offset
+
+
   def rewrite(src: str, offsets: dict) -> str:
       tokens = src_to_tokens(src)
       for i, tok in reversed(list(enumerate(tokens))):
@@ -82,11 +86,14 @@
 - **snippet portable:**
   ```python
   import math
+
+
   def shannon_entropy(data: str) -> float:
       if not data:
           return 0.0
       freq = {c: data.count(c) / len(data) for c in set(data)}
       return -sum(p * math.log2(p) for p in freq.values())
+
 
   # secret probable si high-entropy string dans un contexte assignation
   HIGH_ENTROPY = 4.5  # base64 ~4.5-6.0
@@ -128,18 +135,23 @@
   ```python
   # parser léger d'instructions Dockerfile ligne-continuée
   def parse_instructions(text: str):
-      logical, buf = [], ""
+      logical, buf = [], ''
       for line in text.splitlines():
           s = line.rstrip()
-          if s.endswith("\\"):
-              buf += s[:-1] + " "
+          if s.endswith('\\'):
+              buf += s[:-1] + ' '
           else:
-              logical.append((buf + s).strip()); buf = ""
-      return [l for l in logical if l and not l.startswith("#")]
+              logical.append((buf + s).strip())
+              buf = ''
+      return [l for l in logical if l and not l.startswith('#')]
+
 
   def check_no_latest(instrs):
-      return [i for i in instrs if i.upper().startswith("FROM") and ":latest" in i or
-              (i.upper().startswith("FROM") and ":" not in i.split()[1])]
+      return [
+          i
+          for i in instrs
+          if i.upper().startswith('FROM') and ':latest' in i or (i.upper().startswith('FROM') and ':' not in i.split()[1])
+      ]
   ```
 - **intégration dans ce projet:** aligner les numéros/messages de règles Docker sur la nomenclature hadolint (DL3007, etc.) pour familiarité ; réimplémenter la logique de parsing multi-ligne proprement plutôt qu'en regex naïve.
 - **gotchas:** **GPL-3.0 — interdiction de copier du code source ; réimplémenter from scratch depuis la description des règles (documentées sur le wiki hadolint).** Gérer les `FROM ... AS builder` (multi-stage), `--platform`, et les args `FROM ${BASE}`.

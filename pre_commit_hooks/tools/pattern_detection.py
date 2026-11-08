@@ -10,6 +10,30 @@ from pathlib import Path
 
 from pre_commit_hooks.tools.logger import logger
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
+from pre_commit_hooks.tools.source_reader import read_source
+
+_TRIPLE_QUOTE_RE = re.compile(r'"""|\'\'\'')
+
+
+def strip_triple_quoted(*, line: str, open_quote: str | None) -> tuple[str, str | None]:
+    """Drop triple-quoted text from a line, carrying the open delimiter across lines.
+
+    Returns the code outside any triple-quoted string and the delimiter still
+    open at end of line (None when the line ends outside a string).
+    """
+    code: list[str] = []
+    position = 0
+    for match in _TRIPLE_QUOTE_RE.finditer(line):
+        delimiter = match.group(0)
+        if open_quote is None:
+            code.append(line[position : match.start()])
+            open_quote = delimiter
+        elif delimiter == open_quote:
+            open_quote = None
+        position = match.end()
+    if open_quote is None:
+        code.append(line[position:])
+    return ''.join(code), open_quote
 
 
 @dataclass
@@ -43,17 +67,19 @@ class PatternDetection:
         ret_val: int = 0
         for file in namespace_args.filenames:
             file_path = Path(file)
-            try:
-                content = file_path.read_text(encoding='utf-8')
-            except (OSError, UnicodeDecodeError) as error:
-                logger.debug(f'skip unreadable file {file_path}: {error}')
+            source = read_source(file)
+            if source is None:
+                logger.debug(f'skip unreadable, non-UTF-8 or out-of-tree file {file_path}')
                 continue
+            lines = source.splitlines(keepends=True)
             logger.debug(f'process file {file_path}')
-            for line_number, line_content in enumerate(content.splitlines(), start=1):
+            open_quote: str | None = None
+            for line_number, line_content in enumerate(lines, start=1):
+                code, open_quote = strip_triple_quoted(line=line_content, open_quote=open_quote)
                 if (
-                    self.as_pattern(line=line_content)
+                    self.as_pattern(line=code)
                     and not self.is_disabled(line=line_content)
-                    and not self.is_commented(line=line_content)
+                    and not self.is_commented(line=code)
                 ):
                     print(
                         f'[{file_path}:{line_number}] {line_content.strip()}',

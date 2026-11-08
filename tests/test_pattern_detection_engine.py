@@ -12,6 +12,12 @@ from pre_commit_hooks.tools.pattern_detection import PatternDetection
 from pre_commit_hooks.tools.update_readme import update_readme
 
 
+@pytest.fixture(autouse=True)
+def _run_in_tmp_path(in_tmp_path: Path) -> Path:
+    """Path-guarded detection only reads files under the working tree."""
+    return in_tmp_path
+
+
 def _write(tmp_path: Path, name: str, content: str) -> str:
     p = tmp_path / name
     p.write_text(content, encoding='utf-8')

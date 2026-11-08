@@ -47,13 +47,13 @@ class TestWarnDeprecated:
 
 
 class TestDeprecatedHookMain:
-    def test_exit_code_unchanged_on_violation(self, tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
-        f = _write(tmp_path, 'bad.py', 'print("x")\n')
+    def test_exit_code_unchanged_on_violation(self, in_tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+        f = _write(in_tmp_path, 'bad.py', 'print("x")\n')
         assert print_main([f]) == 1
         assert '[DEPRECATED]' in capsys.readouterr().err
 
-    def test_exit_code_unchanged_on_clean_file(self, tmp_path: Path) -> None:
-        f = _write(tmp_path, 'ok.py', 'x = 1\n')
+    def test_exit_code_unchanged_on_clean_file(self, in_tmp_path: Path) -> None:
+        f = _write(in_tmp_path, 'ok.py', 'x = 1\n')
         assert print_main([f]) == 0
 
 

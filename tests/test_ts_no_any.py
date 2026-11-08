@@ -8,6 +8,8 @@ import pytest
 
 from pre_commit_hooks.ts_no_any import main
 
+pytestmark = pytest.mark.usefixtures('in_tmp_path')
+
 
 def _write(tmp_path: Path, name: str, content: str) -> str:
     p = tmp_path / name

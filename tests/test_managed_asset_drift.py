@@ -46,7 +46,9 @@ class TestManagedAssetDrift:
         assert main(['--root', str(repo)]) == 1
 
     def test_content_drift_with_matching_stat_signature_is_flagged(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         # Same size + mtime but different bytes: a shallow (stat-based) dircmp
         # would call these identical and miss the drift. Deep content compare

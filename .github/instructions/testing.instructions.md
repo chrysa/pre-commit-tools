@@ -41,6 +41,7 @@ class TestMyFunction:
     def test_violation_detected(self) -> None: ...
     def test_disable_comment_suppresses(self) -> None: ...
 
+
 class TestMyHookMain:
     def test_clean_file_returns_0(self, tmp_path: Path) -> None: ...
     def test_violation_returns_1(self, tmp_path: Path) -> None: ...
@@ -56,10 +57,10 @@ Always use `\n` escape sequences — NEVER literal newlines:
 css = '.foo {\n  color: red;\n}\n'
 
 # WRONG — breaks ruff and causes syntax errors
-css = '''.foo {
+css = """.foo {
   color: red;
 }
-'''
+"""
 ```
 
 ## `@pytest.mark.parametrize` Usage
@@ -67,10 +68,13 @@ css = '''.foo {
 Use parametrize for multiple inputs to the same function:
 
 ```python
-@pytest.mark.parametrize('source,expected', [
-    ('clean code', []),
-    ('print("x")', [('f.py', 1, 'print detected')]),
-])
+@pytest.mark.parametrize(
+    'source,expected',
+    [
+        ('clean code', []),
+        ('print("x")', [('f.py', 1, 'print detected')]),
+    ],
+)
 def test_detect(source: str, expected: list) -> None:
     assert detect(source, 'f.py') == expected
 ```

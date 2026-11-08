@@ -19,6 +19,7 @@ Pre-commit hooks collection for chrysa projects
     general-solution-architect.md
     general-technical-project-lead.md
     general-technical-writer.md
+    hook-scaffolder.md
   ape/
     README.md
     ape-transform-v2.md
@@ -34,7 +35,9 @@ Pre-commit hooks collection for chrysa projects
   hooks/
     check-no-env-files.cjs
     circuit-breaker.cjs
+    claude-config-drift.cjs
     frustration-detection.cjs
+    graphify-auto-update.cjs
     memory-consolidation.cjs
     model-debt-inventory.cjs
     secret-scanner.cjs
@@ -155,6 +158,7 @@ Pre-commit hooks collection for chrysa projects
 .quality-gate.json
 .secrets.baseline
 AGENTS.md
+ARCHITECTURE.md
 CHANGELOG.md
 CLAUDE.md
 CODEOWNERS
@@ -191,6 +195,7 @@ pre_commit_hooks/
   claude_agent_frontmatter.py
   claude_assets_present.py
   claude_mcp_config.py
+  claude_md_facts_check.py
   claude_skill_frontmatter.py
   compose_dev_hot_reload.py
   compose_missing_restart.py
@@ -303,6 +308,7 @@ standards/
     README.md
     accessibility.md
     agents.md
+    ai-orchestration.md
     api.md
     architecture.md
     backend-python.md
@@ -327,6 +333,7 @@ tests/
   test_claude_agent_frontmatter.py
   test_claude_assets_present.py
   test_claude_mcp_config.py
+  test_claude_md_facts_check.py
   test_claude_skill_frontmatter.py
   test_compose_dev_hot_reload.py
   test_compose_missing_restart.py
@@ -420,6 +427,7 @@ pre_commit_hooks/adr_gate.py
 pre_commit_hooks/claude_agent_frontmatter.py
 pre_commit_hooks/claude_assets_present.py
 pre_commit_hooks/claude_mcp_config.py
+pre_commit_hooks/claude_md_facts_check.py
 pre_commit_hooks/claude_skill_frontmatter.py
 pre_commit_hooks/compose_dev_hot_reload.py
 pre_commit_hooks/compose_missing_restart.py
@@ -453,4 +461,3 @@ pre_commit_hooks/format_dockerfile.py
 pre_commit_hooks/function_too_long.py
 pre_commit_hooks/generate_changelog.py
 pre_commit_hooks/helm_lint.py
-pre_commit_hooks/ignore_file_sorter.py

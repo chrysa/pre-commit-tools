@@ -10,6 +10,8 @@ from pre_commit_hooks.console_debug_detection import main as debug_main
 from pre_commit_hooks.console_log_detection import main as log_main
 from pre_commit_hooks.console_table_detection import main as table_main
 
+pytestmark = pytest.mark.usefixtures('in_tmp_path')
+
 
 def _write(tmp_path: Path, name: str, content: str) -> str:
     p = tmp_path / name

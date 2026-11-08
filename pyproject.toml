@@ -103,7 +103,7 @@ claude-md-facts-check = "pre_commit_hooks.claude_md_facts_check:main"
 [project.optional-dependencies]
 dead_code = ["vulture>=2.0"]
 format_dockerfile = ["dockerfile-parse==2.0.1"]
-lint = ["ruff==0.16.3"]  # keep in sync with the ruff-pre-commit rev
+lint = ["ruff==0.16.7"]  # keep in sync with the ruff-pre-commit rev
 pylint_report = ["pylint>=4.0.5", "pylint-report>=2.4.2"]
 screenshot = ["requests"]
 test = ["pytest", "pytest-cov", "pytest-mock", "ruamel.yaml"]
@@ -155,6 +155,10 @@ select = [
     "S",    # flake8-bandit (security)
     "FURB", # refurb
     "RUF",  # ruff-specific rules
+    "T10",  # flake8-debugger (replaces the deprecated debugger-detection hook)
+    "T20",  # flake8-print (replaces the deprecated print/pprint detection hooks)
+    "LOG",  # flake8-logging (replaces the deprecated python-logger-detection hook)
+    "ASYNC", # flake8-async (replaces the deprecated no-sync-in-async hook)
     "PERF203",
     "PERF401",
     "PLR0402",
@@ -178,7 +182,10 @@ split-on-trailing-comma = true
 
 [tool.ruff.lint.per-file-ignores]
 # Test fixtures use names that look like passwords and call partial-path binaries.
-"tests/**" = ["S101", "N802", "S105", "S106", "S603", "S607"]
+"tests/**" = ["S101", "N802", "S105", "S106", "S603", "S607", "T20"]
+# Hooks and scripts report findings on stdout by design.
+"pre_commit_hooks/**" = ["T201"]
+"scripts/**" = ["T201"]
 "pre_commit_hooks/pylint_report_html.py" = ["S101"]
 "**/tests/**" = ["PLR2004"]
 "**/test_*.py" = ["PLR2004"]

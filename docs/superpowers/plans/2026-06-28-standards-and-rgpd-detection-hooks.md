@@ -15,7 +15,7 @@
 - **User-facing prints carry a trailing `# print-detection: disable` comment.** The shared helpers already do this; any custom `print` you add must too.
 - **Ruff:** line-length 120, single quotes, rules E,F,W,C90,B,I,N,UP,TID,S,FURB,RUF. No unused `# noqa` (RUF100). `raise ... from exc` in except (B904). `subprocess` S603/S607 are repo-ignored.
 - **Tests:** `tests/test_<module>.py`, class-grouped, every test method annotated `-> None`. Run with `python -m pytest <file> -v -p no:query_optimizer` (the `-p no:query_optimizer` flag is REQUIRED — a Django plugin otherwise crashes pytest setup in this repo).
-- **Commits:** the repo's `pip-audit` pre-commit hook fails on pre-existing env CVEs and blocks every commit — commit with `git commit --no-verify` after running `ruff format` + `ruff check` manually. A post-commit "graphify" hook can make the commit appear to time out; it still lands — verify with `git log --oneline -1`, do not retry.
+- **Commits:** the repo's `pip-audit` pre-commit hook may fail on pre-existing env CVEs; never bypass it with `git commit --no-verify`: a failing security gate is fixed (upgrade the dependency) or waived as a governed, recorded decision (see `standards/rules/security.md`). A post-commit "graphify" hook can make the commit appear to time out; it still lands — verify with `git log --oneline -1`, do not retry.
 - **Detection-hook idiom:** a hook returns `0` when clean, `1` when a violation is found, printing `[<file>:<lineno>] <line>` per violation. Inline `<token>: disable` comments and commented-out lines are skipped.
 
 ## Common recipe — regex line hook (used by Tasks 3, 4, 5, 10, 11, 12, 15)
@@ -140,7 +140,7 @@ Expected: PASS (5 passed)
 ruff format pre_commit_hooks/no_external_tool_config.py tests/test_no_external_tool_config.py
 ruff check pre_commit_hooks/no_external_tool_config.py tests/test_no_external_tool_config.py
 git add pre_commit_hooks/no_external_tool_config.py tests/test_no_external_tool_config.py
-git commit --no-verify -m "feat: add python-no-external-tool-config hook"
+git commit -m "feat: add python-no-external-tool-config hook"
 ```
 
 ---
@@ -245,7 +245,7 @@ Expected: PASS (5 passed)
 ruff format pre_commit_hooks/no_setup_files.py tests/test_no_setup_files.py
 ruff check pre_commit_hooks/no_setup_files.py tests/test_no_setup_files.py
 git add pre_commit_hooks/no_setup_files.py tests/test_no_setup_files.py
-git commit --no-verify -m "feat: add python-no-setup-files hook"
+git commit -m "feat: add python-no-setup-files hook"
 ```
 
 ---
@@ -339,7 +339,7 @@ Expected: PASS (5 passed)
 ruff format pre_commit_hooks/cors_allow_all.py tests/test_cors_allow_all.py
 ruff check pre_commit_hooks/cors_allow_all.py tests/test_cors_allow_all.py
 git add pre_commit_hooks/cors_allow_all.py tests/test_cors_allow_all.py
-git commit --no-verify -m "feat: add python-cors-allow-all hook"
+git commit -m "feat: add python-cors-allow-all hook"
 ```
 
 ---
@@ -432,7 +432,7 @@ Expected: PASS (4 passed)
 ruff format pre_commit_hooks/no_create_all.py tests/test_no_create_all.py
 ruff check pre_commit_hooks/no_create_all.py tests/test_no_create_all.py
 git add pre_commit_hooks/no_create_all.py tests/test_no_create_all.py
-git commit --no-verify -m "feat: add python-no-create-all hook"
+git commit -m "feat: add python-no-create-all hook"
 ```
 
 ---
@@ -523,7 +523,7 @@ Expected: PASS (4 passed)
 ruff format pre_commit_hooks/os_environ_direct.py tests/test_os_environ_direct.py
 ruff check pre_commit_hooks/os_environ_direct.py tests/test_os_environ_direct.py
 git add pre_commit_hooks/os_environ_direct.py tests/test_os_environ_direct.py
-git commit --no-verify -m "feat: add python-os-environ-direct hook"
+git commit -m "feat: add python-os-environ-direct hook"
 ```
 
 ---
@@ -615,7 +615,7 @@ Expected: PASS (3 passed)
 ruff format pre_commit_hooks/file_too_long.py tests/test_file_too_long.py
 ruff check pre_commit_hooks/file_too_long.py tests/test_file_too_long.py
 git add pre_commit_hooks/file_too_long.py tests/test_file_too_long.py
-git commit --no-verify -m "feat: add python-file-too-long hook"
+git commit -m "feat: add python-file-too-long hook"
 ```
 
 ---
@@ -732,7 +732,7 @@ Expected: PASS (4 passed)
 ruff format pre_commit_hooks/function_too_long.py tests/test_function_too_long.py
 ruff check pre_commit_hooks/function_too_long.py tests/test_function_too_long.py
 git add pre_commit_hooks/function_too_long.py tests/test_function_too_long.py
-git commit --no-verify -m "feat: add python-function-too-long hook"
+git commit -m "feat: add python-function-too-long hook"
 ```
 
 ---
@@ -840,7 +840,7 @@ Expected: PASS (4 passed)
 ruff format pre_commit_hooks/compose_missing_restart.py tests/test_compose_missing_restart.py
 ruff check pre_commit_hooks/compose_missing_restart.py tests/test_compose_missing_restart.py
 git add pre_commit_hooks/compose_missing_restart.py tests/test_compose_missing_restart.py
-git commit --no-verify -m "feat: add docker-compose-missing-restart hook"
+git commit -m "feat: add docker-compose-missing-restart hook"
 ```
 
 ---
@@ -967,7 +967,7 @@ Expected: PASS (4 passed)
 ruff format pre_commit_hooks/react_useeffect_fetch.py tests/test_react_useeffect_fetch.py
 ruff check pre_commit_hooks/react_useeffect_fetch.py tests/test_react_useeffect_fetch.py
 git add pre_commit_hooks/react_useeffect_fetch.py tests/test_react_useeffect_fetch.py
-git commit --no-verify -m "feat: add react-useeffect-fetch hook"
+git commit -m "feat: add react-useeffect-fetch hook"
 ```
 
 ---
@@ -1058,7 +1058,7 @@ Expected: PASS (4 passed)
 ruff format pre_commit_hooks/sentry_no_default_pii.py tests/test_sentry_no_default_pii.py
 ruff check pre_commit_hooks/sentry_no_default_pii.py tests/test_sentry_no_default_pii.py
 git add pre_commit_hooks/sentry_no_default_pii.py tests/test_sentry_no_default_pii.py
-git commit --no-verify -m "feat: add sentry-no-default-pii RGPD hook"
+git commit -m "feat: add sentry-no-default-pii RGPD hook"
 ```
 
 ---
@@ -1151,7 +1151,7 @@ Expected: PASS (4 passed)
 ruff format pre_commit_hooks/react_token_localstorage.py tests/test_react_token_localstorage.py
 ruff check pre_commit_hooks/react_token_localstorage.py tests/test_react_token_localstorage.py
 git add pre_commit_hooks/react_token_localstorage.py tests/test_react_token_localstorage.py
-git commit --no-verify -m "feat: add react-no-token-in-localstorage RGPD hook"
+git commit -m "feat: add react-no-token-in-localstorage RGPD hook"
 ```
 
 ---
@@ -1249,7 +1249,7 @@ Expected: PASS (5 passed)
 ruff format pre_commit_hooks/pii_in_logs.py tests/test_pii_in_logs.py
 ruff check pre_commit_hooks/pii_in_logs.py tests/test_pii_in_logs.py
 git add pre_commit_hooks/pii_in_logs.py tests/test_pii_in_logs.py
-git commit --no-verify -m "feat: add python-pii-in-logs RGPD hook"
+git commit -m "feat: add python-pii-in-logs RGPD hook"
 ```
 
 ---
@@ -1368,7 +1368,7 @@ Expected: PASS (3 passed)
 ruff format pre_commit_hooks/django_cookie_security.py tests/test_django_cookie_security.py
 ruff check pre_commit_hooks/django_cookie_security.py tests/test_django_cookie_security.py
 git add pre_commit_hooks/django_cookie_security.py tests/test_django_cookie_security.py
-git commit --no-verify -m "feat: add django-cookie-security RGPD hook"
+git commit -m "feat: add django-cookie-security RGPD hook"
 ```
 
 ---
@@ -1495,7 +1495,7 @@ Expected: PASS (5 passed)
 ruff format pre_commit_hooks/fastapi_cookie_insecure.py tests/test_fastapi_cookie_insecure.py
 ruff check pre_commit_hooks/fastapi_cookie_insecure.py tests/test_fastapi_cookie_insecure.py
 git add pre_commit_hooks/fastapi_cookie_insecure.py tests/test_fastapi_cookie_insecure.py
-git commit --no-verify -m "feat: add fastapi-cookie-insecure RGPD hook"
+git commit -m "feat: add fastapi-cookie-insecure RGPD hook"
 ```
 
 ---
@@ -1594,7 +1594,7 @@ Expected: PASS (5 passed)
 ruff format pre_commit_hooks/pii_hardcoded.py tests/test_pii_hardcoded.py
 ruff check pre_commit_hooks/pii_hardcoded.py tests/test_pii_hardcoded.py
 git add pre_commit_hooks/pii_hardcoded.py tests/test_pii_hardcoded.py
-git commit --no-verify -m "feat: add pii-hardcoded RGPD hook"
+git commit -m "feat: add pii-hardcoded RGPD hook"
 ```
 
 ---
@@ -1780,7 +1780,7 @@ Expected: all pass.
 
 ```bash
 git add pyproject.toml .pre-commit-hooks.yaml README.md
-git commit --no-verify -m "feat: wire 15 standards & RGPD detection hooks (entry points + docs)"
+git commit -m "feat: wire 15 standards & RGPD detection hooks (entry points + docs)"
 ```
 
 ---

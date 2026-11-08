@@ -37,19 +37,14 @@ def update_readme(
 ) -> None:
     if readme_file_path is None:
         readme_file_path = Path(__file__).resolve().parent.parent / 'README.md'
-    with open(readme_file_path, 'r+') as file_stream:
-        content = file_stream.read()
-        pos_start = content.find(start_tag)
-        pos_end = content.find(end_tag)
-        if pos_start != -1 and pos_end != -1 and pos_end > pos_start:
-            update_content: str
-            if command_content_processed is not None:
-                update_content = command_content_processed
-            else:
-                update_content = run_command(command=command)
-            content = content[: pos_start + len(start_tag)]
-            content += update_content
-            content = content[pos_end:]
-        file_stream.seek(0)
-        file_stream.write(content)
-        file_stream.truncate()
+    content = readme_file_path.read_text(encoding='utf-8')
+    pos_start = content.find(start_tag)
+    pos_end = content.find(end_tag)
+    if pos_start != -1 and pos_end != -1 and pos_end > pos_start:
+        update_content: str
+        if command_content_processed is not None:
+            update_content = command_content_processed
+        else:
+            update_content = run_command(command=command)
+        content = content[: pos_start + len(start_tag)] + update_content + content[pos_end:]
+    readme_file_path.write_text(content, encoding='utf-8')

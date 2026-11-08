@@ -6,11 +6,13 @@ from __future__ import annotations
 import re
 from collections.abc import Sequence
 
+from pre_commit_hooks.tools.deprecation import warn_deprecated
 from pre_commit_hooks.tools.pattern_detection import PatternDetection
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     """Detect explicit `any` type annotations in TypeScript files."""
+    warn_deprecated(hook_id='ts-no-any')
     pattern_detection = PatternDetection(
         commented=re.compile(r'^\s*//'),
         disable_comment=re.compile(r'ts-no-any\s*:\s*disable'),

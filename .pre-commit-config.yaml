@@ -25,10 +25,6 @@ repos:
   repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v5.0.0
 - hooks:
-  - id: add-trailing-comma
-  repo: https://github.com/asottile/add-trailing-comma
-  rev: v4.0.0
-- hooks:
   - args:
     - --in-place
     - github
@@ -70,19 +66,11 @@ repos:
   rev: 2.1.1
 - hooks:
   - args:
-    - pre_commit_hooks/
-    id: vulture
-    stages:
-    - manual
-  repo: https://github.com/jendrikseipp/vulture
-  rev: v2.9.1
-- hooks:
-  - args:
     - --fix
     id: ruff-check
   - id: ruff-format
   repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.15.21
+  rev: v0.16.7
 - hooks:
   - id: python-no-eval
   - exclude: ^(pre_commit_hooks/no_console_warn\.py|tests/test_js_hooks_new\.py)$
@@ -100,20 +88,7 @@ repos:
   repo: https://github.com/dannysepler/rm_unneeded_f_str
   rev: v0.2.0
 - hooks:
-  - args:
-    - --ignore-vuln
-    - CVE-2026-3219
-    - --ignore-vuln
-    - CVE-2026-6357
-    - --ignore-vuln
-    - CVE-2025-8869
-    - --ignore-vuln
-    - CVE-2026-1703
-    - --ignore-vuln
-    - PYSEC-2026-196
-    - --ignore-vuln
-    - GHSA-6v7p-g79w-8964
-    id: pip-audit
+  - id: pip-audit
   repo: https://github.com/pypa/pip-audit
   rev: v2.10.1
 - hooks:
@@ -125,15 +100,6 @@ repos:
   repo: https://github.com/Yelp/detect-secrets
   rev: v1.5.0
 - hooks:
-  - args:
-    - --py3-only
-    - --py312-plus
-    id: pyupgrade
-    stages:
-    - manual
-  repo: https://github.com/asottile/pyupgrade
-  rev: v3.9.0
-- hooks:
   - id: guideline-check
     stages:
     - pre-push
@@ -141,29 +107,8 @@ repos:
   repo: https://github.com/chrysa/guideline-checker
   rev: v1.30.10
 - hooks:
-  - entry: print-detection
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
-    id: python-print-detection
-    language: system
-    name: detect print on python code
-    types:
-    - python
-  - entry: pprint-detection
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
-    id: python-pprint-detection
-    language: system
-    name: detect pprint on python code
-    types:
-    - python
-  - entry: debugger-detection
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
-    id: debugger-detection
-    language: system
-    name: detect debugger statements
-    types:
-    - python
   - entry: yaml-sorter
-    exclude: ^(\.github/|GitVersion\.yml)
+    exclude: ^(\.github/|GitVersion\.yml|workflows/|templates/|docker-compose)|(^|/)(pnpm-lock|yarn|uv|poetry)\.(yaml|lock)$|(^|/)\.pre-commit-config\.yaml$
     id: yaml-sorter
     language: system
     name: sort yaml files
@@ -189,13 +134,6 @@ repos:
     name: check env files for secrets
     types:
     - text
-  - entry: logger-detection
-    exclude: ^(pre_commit_hooks/|scripts/|tests/|README\.md)
-    id: python-logger-detection
-    language: system
-    name: detect root logger usage
-    types:
-    - python
   - entry: unreachable-code-detection
     id: python-unreachable-code
     language: system
@@ -219,9 +157,7 @@ repos:
     pass_filenames: false
     stages:
     - pre-push
-  - entry: bash -c 'docker run --rm --env SONAR_TOKEN -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli:11
-      -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=chrysa -Dsonar.projectKey=chrysa_pre-commit-tools
-      -Dsonar.python.coverage.reportPaths=reports/coverage.xml -Dsonar.python.xunit.reportPath=reports/junit.xml'
+  - entry: bash -c 'docker run --rm --env SONAR_TOKEN -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli:11@sha256:46341f2c2dc560381414e90347885f5cddc716db080adcbafc1cac13e1473094 -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=chrysa -Dsonar.projectKey=chrysa_pre-commit-tools -Dsonar.python.coverage.reportPaths=reports/coverage.xml -Dsonar.python.xunit.reportPath=reports/junit.xml'
     id: sonar-scanner
     language: system
     name: sonar cloud analysis
@@ -229,6 +165,20 @@ repos:
     stages:
     - pre-push
   repo: local
+- hooks:
+  - args:
+    - --error
+    - DL3006
+    - --error
+    - DL3007
+    - --failure-threshold
+    - error
+    files: (^|/)Dockerfile[^/]*$
+    id: hadolint-docker
+    types:
+    - file
+  repo: https://github.com/hadolint/hadolint
+  rev: v2.15.1
 - hooks:
   - id: gitleaks
   repo: https://github.com/gitleaks/gitleaks
@@ -253,25 +203,10 @@ repos:
 - hooks:
   - id: makefile-check
   - id: adr-gate
-  - id: no-bare-except
-  - id: no-sync-in-async
   - id: regression-gate
     stages:
     - pre-push
-  - exclude: ^(\.github/|workflows/|templates/|docker-compose)|(^|/)(pnpm-lock|yarn|uv|poetry)\.(yaml|lock)$|(^|/)\.pre-commit-config\.yaml$
-    id: yaml-sorter
-  - id: json-sorter
-  - id: env-file-check
   - id: env-example-sync
-  - exclude: (^|/)tests?/|^(README\.md|docs/)
-    id: debugger-detection
-  - exclude: (^|/)tests?/|^(README\.md|docs/|pre_commit_hooks/|scripts/)|(^|/)quality_gate\.py$|^\.claude/ape/
-    id: python-print-detection
-  - exclude: (^|/)tests?/|^(README\.md|docs/|pre_commit_hooks/|scripts/)|(^|/)quality_gate\.py$|^\.claude/ape/
-    id: python-pprint-detection
-  - exclude: (^|/)tests?/|^(README\.md|docs/)
-    id: python-logger-detection
-  - id: python-unreachable-code
   - exclude: tests?/|\.test\.|\.spec\.
     id: no-hardcoded-localhost
   - exclude: (^|/)tests/
@@ -283,28 +218,30 @@ repos:
   - id: claude-mcp-config
   - id: python-no-unittest-import
   - id: claude-assets-present
-  - exclude: (^|/)tests?/
-    id: python-untyped-raise
-  - id: python-mutable-default
+  - id: python-untyped-raise
+    exclude: (^|/)tests?/
   - id: python-dispatch-ladder
-  - id: dockerfile-no-latest
   repo: https://github.com/chrysa/pre-commit-tools
   rev: v0.2.0-253
-- hooks:
-  - always_run: true
-    entry: node .claude/hooks/claude-config-drift.cjs
-    id: claude-config-drift
-    language: system
+- repo: local
+  hooks:
+  - id: claude-config-drift
     name: claude config drift (advisory)
+    language: system
+    entry: node .claude/hooks/claude-config-drift.cjs
+    always_run: true
     pass_filenames: false
     verbose: true
-  - always_run: true
-    entry: node .claude/hooks/graphify-auto-update.cjs
-    id: graphify-auto-update
-    language: system
+  - id: graphify-auto-update
     name: graphify auto-update (post-merge/checkout)
+    language: system
+    entry: node .claude/hooks/graphify-auto-update.cjs
+    always_run: true
     pass_filenames: false
     stages:
     - post-merge
     - post-checkout
-  repo: local
+default_install_hook_types:
+- pre-commit
+- post-merge
+- post-checkout

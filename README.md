@@ -134,6 +134,11 @@ Add this to your `.pre-commit-config.yaml`
 
 ## Hooks available
 
+> **Deprecated hooks:** 16 hooks duplicate a native ruff / ESLint / hadolint rule and are
+> deprecated (still functional, they print a migration notice). Their names start with
+> `[DEPRECATED]` in `.pre-commit-hooks.yaml`. See [DEPRECATIONS.md](DEPRECATIONS.md) for the
+> replacement rule and the exact config change for each one.
+
 ### format-dockerfiles
 
 - Add shebang `# syntax=docker/dockerfile:1.4` if missing

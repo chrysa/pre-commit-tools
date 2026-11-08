@@ -3,19 +3,16 @@
 
 from __future__ import annotations
 
-import re
 from collections.abc import Sequence
 
-from pre_commit_hooks.tools.pattern_detection import PatternDetection
+from pre_commit_hooks.tools.console_detection import console_call_detection
+from pre_commit_hooks.tools.deprecation import warn_deprecated
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     """Detect uncommented console.warn() calls and return 1 if any are found."""
-    pattern_detection = PatternDetection(
-        commented=re.compile(r'^\s*//\s*console\.warn\('),
-        disable_comment=re.compile(r'no-console-warn\s*:\s*disable'),
-        pattern=re.compile(r'^\s*console\.warn\('),
-    )
+    warn_deprecated(hook_id='no-console-warn')
+    pattern_detection = console_call_detection(method='warn', disable_id='no-console-warn')
     return pattern_detection.detect(argv=argv)
 
 

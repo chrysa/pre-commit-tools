@@ -3,19 +3,16 @@
 
 from __future__ import annotations
 
-import re
 from collections.abc import Sequence
 
-from pre_commit_hooks.tools.pattern_detection import PatternDetection
+from pre_commit_hooks.tools.console_detection import console_call_detection
+from pre_commit_hooks.tools.deprecation import warn_deprecated
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     """Detect uncommented console.error() calls and return 1 if any are found."""
-    pattern_detection = PatternDetection(
-        commented=re.compile(r'^\s{0,}//\s*console\.error\('),
-        disable_comment=re.compile(r'console-error-detection\s*:\s*disable'),
-        pattern=re.compile(r'^\s{0,}console\.error\('),
-    )
+    warn_deprecated(hook_id='react-console-error-detection')
+    pattern_detection = console_call_detection(method='error', disable_id='console-error-detection')
     return pattern_detection.detect(argv=argv)
 
 

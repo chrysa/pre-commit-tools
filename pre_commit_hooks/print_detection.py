@@ -6,11 +6,13 @@ from __future__ import annotations
 import re
 from collections.abc import Sequence
 
+from pre_commit_hooks.tools.deprecation import warn_deprecated
 from pre_commit_hooks.tools.pattern_detection import PatternDetection
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     """Detect uncommented print() calls and return 1 if any are found."""
+    warn_deprecated(hook_id='python-print-detection')
     pattern_detection = PatternDetection(
         commented=re.compile(r'#\s*print\('),
         disable_comment=re.compile(r'\bprint-detection\s*:\s*disable'),

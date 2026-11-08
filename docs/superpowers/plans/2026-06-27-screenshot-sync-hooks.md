@@ -16,7 +16,7 @@
 - **Type annotations:** real annotations, never type comments (the `type annotations not comments` hook enforces this).
 - **Never block the commit by default:** on any environment/network problem, print a warning and `return 0`. Only `return 1` when `config.strict is True`.
 - **Default config filename:** `.screenshot-sync.yaml`. **Default manifest filename:** `.screenshot-manifest.json` (inside `output_dir`).
-- **Known env issue (not caused by this work):** the repo's `pip-audit` pre-commit hook currently fails on pre-existing CVEs in `msgpack 1.2.0` / `pip 26.1.1`. If a commit is blocked solely by `pip-audit`, commit with `git commit --no-verify`. Do NOT use `--no-verify` to bypass any other failing hook.
+- **Known env issue (not caused by this work):** the repo's `pip-audit` pre-commit hook currently fails on pre-existing CVEs in `msgpack 1.2.0` / `pip 26.1.1`. If a commit is blocked by `pip-audit`, never bypass it with `git commit --no-verify`: a failing security gate is fixed (upgrade the dependency) or waived as a governed, recorded decision (see `standards/rules/security.md`).
 - **Tests:** `tests/test_<module>.py`, class-grouped, every test method annotated `-> None`. Run with `python -m pytest`.
 
 ## File Structure

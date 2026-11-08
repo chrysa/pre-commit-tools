@@ -12,6 +12,7 @@ import ast
 import sys
 from collections.abc import Sequence
 
+from pre_commit_hooks.tools.deprecation import warn_deprecated
 from pre_commit_hooks.tools.pre_commit_tools import PreCommitTools
 from pre_commit_hooks.tools.source_reader import read_source
 
@@ -104,6 +105,7 @@ def detect_mutable_default(source: str, filename: str) -> list[Violation]:
 
 def main(argv: Sequence[str] | None = None) -> int:
     """Check files for mutable default arguments."""
+    warn_deprecated(hook_id='python-mutable-default')
     tools = PreCommitTools()
     tools.set_params(help_msg='detect mutable default arguments')
     args, _ = tools.get_args(argv=argv)

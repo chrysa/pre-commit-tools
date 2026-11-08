@@ -46,17 +46,14 @@ class PatternDetection:
 
     def as_pattern(self, *, line: str) -> bool:
         """Return True if the line matches the detection pattern."""
-        logger.debug(f'{line} | presence -> {bool(self.pattern.search(line))}')
         return bool(self.pattern.search(line))
 
     def is_commented(self, *, line: str) -> bool:
         """Return True if the line is a commented-out occurrence of the pattern."""
-        logger.debug(f'{line} | commented -> {bool(self.commented.search(line))}')
         return bool(self.commented.search(line))
 
     def is_disabled(self, *, line: str) -> bool:
         """Return True if the line contains an inline disable comment."""
-        logger.debug(f'{line} | disabled -> {bool(self.disable_comment.search(line))}')
         return bool(self.disable_comment.search(line))
 
     def detect(self, *, argv: Sequence[str] | None = None, help_msg: str = 'detect pattern in files') -> int:

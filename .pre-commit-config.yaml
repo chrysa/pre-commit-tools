@@ -157,7 +157,7 @@ repos:
     pass_filenames: false
     stages:
     - pre-push
-  - entry: bash -c 'docker run --rm --env SONAR_TOKEN -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli:11 -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=chrysa -Dsonar.projectKey=chrysa_pre-commit-tools -Dsonar.python.coverage.reportPaths=reports/coverage.xml -Dsonar.python.xunit.reportPath=reports/junit.xml'
+  - entry: bash -c 'docker run --rm --env SONAR_TOKEN -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli:11@sha256:46341f2c2dc560381414e90347885f5cddc716db080adcbafc1cac13e1473094 -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=chrysa -Dsonar.projectKey=chrysa_pre-commit-tools -Dsonar.python.coverage.reportPaths=reports/coverage.xml -Dsonar.python.xunit.reportPath=reports/junit.xml'
     id: sonar-scanner
     language: system
     name: sonar cloud analysis

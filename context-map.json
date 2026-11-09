@@ -8,7 +8,6 @@
     "python": [
       "PyYAML",
       "build",
-      "chrysa-quality-gate",
       "dockerfile-parse",
       "mypy",
       "pre_commit_hooks_tools",
